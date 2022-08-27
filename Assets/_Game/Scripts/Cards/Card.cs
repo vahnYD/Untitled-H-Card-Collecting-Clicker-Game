@@ -28,8 +28,8 @@ namespace Cards
         public string FlavourText => _flavourText;
         [SerializeField] private bool _hasAbility;
         public bool HasAbility => _hasAbility;
-        [SerializeField] private CardAbility _ability;
-        public CardAbility Ability => _ability;
+        [SerializeField] private Ability _ability;
+        public Ability Ability => _ability;
         [SerializeField] private Sprite _cardArt;
         public Sprite CardArt => _cardArt;
         #endregion
