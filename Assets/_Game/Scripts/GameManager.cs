@@ -8,7 +8,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cards;
+using _Game.Scripts.Cards;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,11 +19,21 @@ public class GameManager : MonoBehaviour
     private int _currentClickCoinAmount;
     private int _coinAmount;
     public int CoinTotal => _coinAmount;
+    private int _currentClickSoulAmount;
     private int _soulAmount;
     public int SoulTotal => _soulAmount;
-    private int _medalAmount;
+    private int _lewdPointAmount;
+    public int LewdPointTotal => _lewdPointAmount;
+    private int _crystalAmount;
+    public int CrystalTotal => _crystalAmount;
+    private int _starAmount;
+    public int StarTotal => _starAmount;
+    private int _devilTearAmount;
+    public int DevilTearTotal => _devilTearAmount;
     private PlayerCardInventory _cardInventory;
     private Deck _deck;
+    private Deck _hand;
+    private Deck _grave;
 	#endregion
 
     #region Unity Event Functions
@@ -44,6 +54,8 @@ public class GameManager : MonoBehaviour
 	#endregion
 	
 	#region Methods
+
+    //Clicker Interactions
     public void ManualClick()
     {
         _coinAmount += _currentClickCoinAmount;
@@ -54,13 +66,32 @@ public class GameManager : MonoBehaviour
 
     }
 
+
+    // Currency Interactions
     public int GetCurrentCoinTotal()
     {
         return 0;
     }
+
     public void RemoveCoins(int coins)
     {
 
+    }
+
+    public void AddCoins(int coins)
+    {
+        _coinAmount += coins;
+    }
+
+    // Card Interactions
+    public void MoveCards(CardGameStates moveFrom, CardGameStates moveTo, int amount = 1, bool sendByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
+    {
+
+    }
+
+    public void DestroyCards(int amount = 1, bool destroyByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
+    {
+        
     }
 	#endregion
 
@@ -83,4 +114,11 @@ public class GameManager : MonoBehaviour
     [ContextMenu("Debug/Add Souls/100k")]
     private void DebugAddSouls100000() => _soulAmount += 100000;
     #endif
+
+    public enum CardGameStates
+    {
+        Deck,
+        Grave,
+        Hand
+    }
 }

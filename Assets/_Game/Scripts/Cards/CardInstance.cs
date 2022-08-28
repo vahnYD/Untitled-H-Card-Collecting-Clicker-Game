@@ -7,26 +7,38 @@
 using System;
 using UnityEngine;
 
-namespace Cards
+namespace _Game.Scripts.Cards
 {
     [Serializable]
     public class CardInstance
     {
         private Card _card;
         private string _name;
+        public string Name => _name;
+        private Sprite _cardArt;
+        public Sprite CardArt => _cardArt;
         private bool _hasAbility;
+        public bool HasAbility;
+        public Abilities.Ability CardAbility => _card.Ability;
         private bool _onCooldown;
+        public bool OnCooldown => _onCooldown;
+        private int _remainingCooldown;
+        public int RemainingCooldown => _remainingCooldown;
         private int _level;
+        public int Level => _level;
         private int _nextUpgradeCost;
+        public int NextUpgradeCost => _nextUpgradeCost;
         private string _abilityText;
+        public string AbilityText => _abilityText;
         
         public CardInstance(Card card)
         {
             _card = card;
             _name = card.Name;
+            _cardArt = card.GetRandomCardArt();
             _hasAbility = card.HasAbility;
             _nextUpgradeCost = card.Ability.BaseUpgradeCost;
-            _level = 1;
+            _level = (_card.Ability.MaxLevel < 2) ? 0 : 1;
         }
 
         public void ActivateAbility()
@@ -35,9 +47,17 @@ namespace Cards
             _card.Ability.ActivateAbility(_level);
         }
 
-        public void Upgrade()
+        public bool AttemptUpgrade()
         {
-            if(_nextUpgradeCost > GameManager.Instance.GetCurrentCoinTotal()) return;
+            if(_nextUpgradeCost > GameManager.Instance.GetCurrentCoinTotal()) return false;
+            if(_level == 0) return false;
+            if(_level == _card.Ability.MaxLevel) return false;
+            Upgrade();
+            return true;
+        }
+
+        private void Upgrade()
+        {
             _level++;
             UpdateAbilityText();
             GameManager.Instance.RemoveCoins(_nextUpgradeCost);
@@ -46,7 +66,7 @@ namespace Cards
 
         private void UpdateAbilityText()
         {
-            _abilityText = _card.Ability.GetUpdatedAbilityTextForLevel(_level);
+            _abilityText = _card.Ability.GetUpdatedAbilityText(_level);
         }
     }
 }

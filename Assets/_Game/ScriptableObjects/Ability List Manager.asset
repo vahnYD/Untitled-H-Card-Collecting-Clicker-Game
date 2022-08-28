@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc4b9d496ec23954abef390e9b82bc6d, type: 3}
   m_Name: Ability List Manager
   m_EditorClassIdentifier: 
-  _abilityLevels: []
+  _abilityLevels:
+  - {fileID: 11400000, guid: bf5b20ea76f0c9e43825b90d7aea2fa7, type: 2}

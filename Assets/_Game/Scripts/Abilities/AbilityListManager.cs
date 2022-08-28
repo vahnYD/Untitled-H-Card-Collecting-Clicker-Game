@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Cards.Abilities
+namespace _Game.Scripts.Abilities
 {
     [CreateAssetMenu(fileName = "Ability List Manager", menuName = "ScriptableObjects/Lists/AbilityListManager")]
     public class AbilityListManager : ScriptableObject

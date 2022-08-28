@@ -5,11 +5,12 @@
  */
 	
 using UnityEngine;
+using _Game.Scripts.Cards;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Cards.Abilities
+namespace _Game.Scripts.Abilities
 {
     public class Ability : ScriptableObject
     {
@@ -23,8 +24,9 @@ namespace Cards.Abilities
         public int AbilityID => _id;
         [SerializeField] private string _name;
         public string Name => _name;
-        [SerializeField, TextArea(4, 10)] private string _abilityText; 
-        [SerializeField, Min(1)] private int _maxLevel;
+        [SerializeField, TextArea(4, 10), Tooltip("{0} = Flat Coin Gain Amount\n{1} = Coin Per Click Increase Amount\n{2} = Coin Per Click Increase (Manual Only) Amount\n\n{3} = Flat Soul Gain Amount\n{4} = Soul Per Click Gain Amount\n{5} = Soul Per Click Gain (Manual Only) Amount\n\n{6} = Draw Cards Amount\n{7} = Search in Deck Amount\n{8} = Search in Deck Property\n{9} = Search in Deck Name\n{10} = Search in Deck Type\n{11} = Search in Deck Rarity\n\n{12} = Search in Grave Amount\n{13} = Search in Grave Property\n{14} = Search in Grave Name\n{15} = Search in Grave Type\n{16} = Search in Grave Rarity\n\n{17} = Return from Hand Amount\n{18} = Return from Hand Property\n{19} = Return from Hand Name\n{20} = Return from Hand Type\n{21} = Return from Hand Rarity\n\n{22} = Return from Grave Amount\n{23} = Return from Grave Property\n{24} = Return from Grave Name\n{25} = Return from Grave Type\n{26} = Return from Grave Rarity\n\n{27} = Send Cards from Hand Amount\n{28} = Send Cards from Hand Property\n{29} = Send Cards from Hand Name\n{30} = Send Cards from Hand Type\n{31} = Send Cards from Hand Rarity\n\n{32} = Send Cards from Deck Amount\n{33} = Send Cards from Deck Property\n{34} = Send Cards from Deck Name\n{35} = Send Cards from Deck Type\n{36} = Send Cards from Deck Rarity\n\n{37} = Cooldown Reduction Card Amount\n{38} = Cooldown Reduction Reduction Amount\n{39} = Cooldown Reduction Property\n{40} = Cooldown Reduction Name\n{41} = Cooldown Reduction Type\n{42} = Cooldown Reduction Rarity\n\n{43} = Gacha Pull Cost Change\n\n{44} = Destroy Cards Amount\n{45} = Destroy Cards Property\n{46} = Destroy Cards Name\n{47} = Destroy Cards Type\n{48} = Destroy Cards Rarity\n\n{49} = Gain Stars Amount\n\n{50} = Autoclicker Duration")] 
+        private string _abilityText; 
+        [SerializeField, Min(1), Tooltip("Max Level < 2 => Un-upgradable")] private int _maxLevel;
         public int MaxLevel => _maxLevel;
         [SerializeField, Min(0)] private int _cooldownInSec;
         public int CooldownInSec;
@@ -32,22 +34,22 @@ namespace Cards.Abilities
         //Upgrade
         [SerializeField, Min(0)] private int _baseUpgradeCost;
         public int BaseUpgradeCost => _baseUpgradeCost;
-        [SerializeField] private int _upgradeCostMultAdditivePart;
-        [SerializeField] private int _upgradeCostMultMultiplicativePart;
+        [SerializeField] private float _upgradeCostMultAdditivePart;
+        [SerializeField] private float _upgradeCostMultMultiplicativePart;
         [SerializeField] private float _effectMultPerLevel;
 
         //Possible Ability Effects
         //Coin Gain
         [SerializeField] private bool _coinGainEffect;
         [SerializeField, Min(0)] private int _coinGain;
-        [SerializeField, Min(0)] private int _coinPerClickIncrease;
-        [SerializeField, Min(0)] private int _coinPerClickIncreaseManual;
+        [SerializeField, Min(0)] private float _coinPerClickIncrease;
+        [SerializeField, Min(0)] private float _coinPerClickIncreaseManual;
 
         //Soul Gain
         [SerializeField] private bool _soulGainEffect;
         [SerializeField, Min(0)] private int _soulGain;
-        [SerializeField, Min(0)] private int _soulPerClickGain;
-        [SerializeField, Min(0)] private int _soulPerClickGainManual;
+        [SerializeField, Min(0)] private float _soulPerClickGain;
+        [SerializeField, Min(0)] private float _soulPerClickGainManual;
 
         //Draw Cards
         [SerializeField] private bool _drawCards;
@@ -104,7 +106,7 @@ namespace Cards.Abilities
         //Card Cooldown Reduction
         [SerializeField] private bool _cooldownReduction;
         [SerializeField] private int _amountCardsCooldownReduction;
-        [SerializeField] private int _amountReductionCooldownReduction;
+        [SerializeField] private float _amountReductionCooldownReduction;
         [SerializeField] private bool _flatCooldownReduction;
         [SerializeField] private bool _cooldownReductionByProperty;
         [SerializeField] private Card.SearchableProperties _propertyCooldownReduction;
@@ -114,7 +116,7 @@ namespace Cards.Abilities
 
         //Gacha Pull Cost Manipulation
         [SerializeField] private bool _manipulateGachaPullCost;
-        [SerializeField] private int _gachaPullCostChange;
+        [SerializeField] private float _gachaPullCostChange;
         [SerializeField] private bool _blockOtherGachaCostChanges;
 
         //Removing Cards from the Players Inventory
@@ -136,19 +138,182 @@ namespace Cards.Abilities
         #endregion
 
         #region Methods
-        public void ActivateAbility(int level)
+        public void ActivateAbility(int level = 1)
         {
+            GameManager gameManager = GameManager.Instance;
 
+            if(_sendGraveHand)
+            {
+                int amountToSendPostMult = (_maxLevel < 2) ? _amountToSendGraveHand : CalculateEffectForLevel(_amountToSendGraveHand, level);
+
+                if(!_sendGraveByPropertyHand)
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult);
+                }
+                else
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, _nameToSendGraveHand, _typeToSentGraveHand, _rarityToSentGraveHand);
+                }
+            }
+
+            if(_sendGraveDeck)
+            {
+                int amountToSendPostMult = (_maxLevel < 2) ? _amountToSendGraveDeck : CalculateEffectForLevel(_amountToSendGraveDeck, level);
+
+                if(!_sendGraveByPropertyDeck)
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Grave ,amountToSendPostMult);
+                }
+                else
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveDeck, _nameToSendGraveDeck, _typeToSendGraveDeck, _rarityToSendGraveDeck);
+                }
+            }
+
+            if(_returnCardsFromHand)
+            {
+                int amountToReturnPostMult = (_maxLevel < 2) ? _amountOfCardsToReturnHand : CalculateEffectForLevel(_amountOfCardsToReturnHand, level);
+
+                if(!_returnCardsByPropertyHand)
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult);
+                }
+                else
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult, true, _propertyReturnCardsHand, _nameReturnCardsHand, _typeReturnCardsHand, _rarityReturnCardsHand);
+                }
+            }
+
+            if(_destroyCards)
+            {
+                int amountToDestroyPostMult = (_maxLevel < 2) ? _amountOfCardsToDestroy : CalculateEffectForLevel(_amountOfCardsToDestroy, level);
+
+                if(!_destroyCardsByProperty)
+                {
+                    gameManager.DestroyCards(amountToDestroyPostMult);
+                }
+                else
+                {
+                    gameManager.DestroyCards(amountToDestroyPostMult, true, _propertyDestroyCards, _nameDestroyCards, _typeDestroyCards, _rarityDestroyCards);
+                }
+            }
+
+            if(_coinGainEffect)
+            {
+                if(_coinGain > 0)
+                {
+                    int coinGainPostMult = (_maxLevel < 2) ? _coinGain : CalculateEffectForLevel(_coinGain, level);
+                    gameManager.AddCoins(coinGainPostMult);
+                }
+            }
+
+            if(_soulGainEffect)
+            {
+
+            }
+
+            if(_drawCards)
+            {
+
+            }
+
+            if(_deckSearch)
+            {
+
+            }
+
+            if(_graveSearch)
+            {
+
+            }
+
+            if(_returnCardsFromGrave)
+            {
+
+            }
+
+            if(_cooldownReduction)
+            {
+
+            }
+
+            if(_manipulateGachaPullCost)
+            {
+
+            }
+
+            if(_gainStars)
+            {
+
+            }
+
+            if(_gainAutoclicker)
+            {
+
+            }
         }
 
         public int GetUpgradeCostForLevel(int level)
         {
-            return _baseUpgradeCost * ((_upgradeCostMultAdditivePart + (_upgradeCostMultMultiplicativePart * level))/100);
+            return (int)Mathf.Floor(_baseUpgradeCost * ((_upgradeCostMultAdditivePart + (_upgradeCostMultMultiplicativePart * level))/100));
         }
 
-        public string GetUpdatedAbilityTextForLevel(int level)
+        // if the ability is upgradable calculates the effect multipliers for the given level, then replaces the numbers in the ability text and returns the string
+        public string GetUpdatedAbilityText(int level = 1)
         {
-            return "";
+            int coinGainPostMult = (_maxLevel < 2) ? _coinGain : CalculateEffectForLevel(_coinGain, level);
+            float coinPerClickIncreasePostMult = (_maxLevel < 2) ? _coinPerClickIncrease : CalculateEffectForLevel(_coinPerClickIncrease, level);
+            float coinPerClickIncreaseManualPostMult = (_maxLevel < 2) ? _coinPerClickIncreaseManual : CalculateEffectForLevel(_coinPerClickIncreaseManual, level);
+
+            int soulGainPostMult = (_maxLevel < 2) ? _soulGain : CalculateEffectForLevel(_soulGain, level);
+            float soulPerClickGainPostMult = (_maxLevel < 2) ? _soulPerClickGain : CalculateEffectForLevel(_soulPerClickGain, level);
+            float soulPerClickGainManualPostMult = (_maxLevel < 2) ? _soulPerClickGainManual : CalculateEffectForLevel(_soulPerClickGainManual, level);
+
+            int drawCardsPostMult = (_maxLevel < 2) ? _drawCardsAmount : CalculateEffectForLevel(_drawCardsAmount, level);
+            int deckSearchAmountPostMult = (_maxLevel < 2) ? _deckSearchAmount : CalculateEffectForLevel(_deckSearchAmount, level);
+            int graveSearchAmountPostMult = (_maxLevel < 2) ? _graveSearchAmount : CalculateEffectForLevel(_graveSearchAmount, level);
+            int amountOfCardsToReturnHandPostMult = (_maxLevel < 2) ? _amountOfCardsToReturnHand : CalculateEffectForLevel(_amountOfCardsToReturnHand, level);
+            int amountOfCardsToReturnGravePostMult = (_maxLevel < 2) ? _amountOfCardsToReturnGrave : CalculateEffectForLevel(_amountOfCardsToReturnGrave, level);
+            int amountToSendGraveHandPostMult = (_maxLevel < 2) ? _amountToSendGraveHand : CalculateEffectForLevel(_amountToSendGraveHand, level);
+            int amountToSendGraveDeckPostMult = (_maxLevel < 2) ? _amountToSendGraveDeck : CalculateEffectForLevel(_amountToSendGraveDeck, level);
+
+            int cooldownReductionCardAmountPostMult = (_maxLevel < 2) ? _amountCardsCooldownReduction : CalculateEffectForLevel(_amountCardsCooldownReduction, level);
+            float cooldownReductionReductionAmountPostMult = (_maxLevel < 2) ? _amountReductionCooldownReduction : CalculateEffectForLevel (_amountReductionCooldownReduction, level);
+
+            float gachaPullCostChangePostMult = (_maxLevel < 2) ? _gachaPullCostChange : CalculateEffectForLevel(_gachaPullCostChange, level);
+
+            int amountOfCardsToDestroyPostMult = (_maxLevel < 2) ? _amountOfCardsToDestroy : CalculateEffectForLevel(_amountOfCardsToDestroy, level);
+            int gainStarsAmountPostMult = (_maxLevel < 2) ? _gainStarsAmount : CalculateEffectForLevel(_gainStarsAmount, level);
+            int autoclickerDurationPostMult = (_maxLevel < 2) ? _autoclickerDuration : CalculateEffectForLevel(_autoclickerDuration, level);
+
+            return string.Format(
+                _abilityText,
+                coinGainPostMult, coinPerClickIncreasePostMult, coinPerClickIncreaseManualPostMult,
+                soulGainPostMult, soulPerClickGainPostMult, soulPerClickGainManualPostMult,
+                drawCardsPostMult,
+                deckSearchAmountPostMult, _propertyToSearchDeck, _nameToSearchDeck, _typeToSearchDeck, _rarityToSearchDeck,
+                graveSearchAmountPostMult, _propertyToSearchGrave, _nameToSearchGrave, _typeToSearchGrave, _rarityToSearchGrave,
+                amountOfCardsToReturnHandPostMult, _propertyReturnCardsHand, _nameReturnCardsHand, _typeReturnCardsHand, _rarityReturnCardsHand,
+                amountOfCardsToReturnGravePostMult, _propertyReturnCardsGrave, _nameReturnCardsGrave, _typeReturnCardsGrave, _rarityReturnCardsGrave,
+                amountToSendGraveHandPostMult, _propertyToSendGraveHand, _nameToSendGraveHand, _typeToSentGraveHand, _rarityToSentGraveHand,
+                amountToSendGraveDeckPostMult, _propertyToSendGraveDeck, _nameToSendGraveDeck, _typeToSendGraveDeck, _rarityToSendGraveDeck, 
+                cooldownReductionCardAmountPostMult, cooldownReductionReductionAmountPostMult,
+                _propertyCooldownReduction, _nameCooldownReduction, _typeCooldownReduction, _rarityCooldownReduction,
+                gachaPullCostChangePostMult,
+                amountOfCardsToDestroyPostMult, _propertyDestroyCards, _nameDestroyCards, _typeDestroyCards, _rarityDestroyCards,
+                gainStarsAmountPostMult,
+                autoclickerDurationPostMult
+                );
+        }
+
+        private float CalculateEffectForLevel(float effectVal, int level)
+        {
+            return effectVal * (_effectMultPerLevel * level);
+        }
+
+        private int CalculateEffectForLevel(int effectVal, int level)
+        {
+            return (int)Mathf.Floor(effectVal * (_effectMultPerLevel * level));
         }
         #endregion
 
@@ -400,7 +565,7 @@ namespace Cards.Abilities
             public override void OnInspectorGUI()
             {
                 serializedObject.Update();
-                EditorGUILayout.LabelField("Card Ability", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Ability", EditorStyles.boldLabel);
                 GUILayout.Label("Ability ID: " + _spId.intValue.ToString());
                 EditorGUILayout.PropertyField(_spName);
                 EditorGUILayout.PropertyField(_spMaxLevel);
@@ -489,6 +654,7 @@ namespace Cards.Abilities
                         GUILayout.Label("Soul Per Click Gain (Manual Only)");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spSoulPerClickGainManual, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
                     }
                     GUILayout.Space(10f);
 

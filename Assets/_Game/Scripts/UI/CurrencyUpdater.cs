@@ -3,15 +3,10 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
-	
-
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
-namespace UI
+namespace _Game.Scripts.UI
 {
     public class CurrencyUpdater : MonoBehaviour
     {
@@ -32,9 +27,6 @@ namespace UI
             _coinDisplay.text = _gameManager.CoinTotal.ToString();
             _soulDisplay.text = _gameManager.SoulTotal.ToString();
         }
-        #endregion
-        
-        #region Methods
         #endregion
     }
 }

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c3f911ce42d9254b815f37880801001, type: 3}
+  m_Name: Card List
+  m_EditorClassIdentifier: 
+  _cards:
+  - {fileID: 2225872661752845971}
+--- !u!114 &2225872661752845971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Placeholder Name
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 0
+  _name: Placeholder Name
+  _rarity: 2
+  _corruptionCost: 0
+  _type: 2
+  _strength: 20
+  _flavourText: 
+  _hasAbility: 0
+  _ability: {fileID: 0}
+  _cardArt: []

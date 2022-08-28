@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Cards.Abilities
+namespace _Game.Scripts.Abilities
 {
     [CreateAssetMenu(fileName ="Ability List", menuName = "ScriptableObjects/Lists/AbilityList")]
     public class AbilityList : ScriptableObject
@@ -39,11 +39,13 @@ namespace Cards.Abilities
         #if UNITY_EDITOR
 
         [ContextMenu("Create Ability")]
-        protected void CreateAbility()
+        private void DebugCreatAbility() => CreateAbility("Placeholder Name");
+
+        protected void CreateAbility(string abilityName)
         {
             Ability ability = ScriptableObject.CreateInstance<Ability>();
 
-            ability.Initialise(this, "Placeholder name", _abilityContainer.GetNextAbilityId());
+            ability.Initialise(this, abilityName, _abilityContainer.GetNextAbilityId());
             _abilityContainer.IncreaseNextAbilityId();
             _abilityList.Add(ability);
 
@@ -58,18 +60,35 @@ namespace Cards.Abilities
         public class AbilityListEditor : Editor
         {
             AbilityList _sO;
+            private bool _showAbilityName;
+            private string _abilityName;
             private void OnEnable()
             {
                 _sO = (AbilityList)target;
+                _showAbilityName = false;
+                _abilityName = "Placeholder Name";
             }
 
             public override void OnInspectorGUI()
             {
                 base.OnInspectorGUI();
                 GUILayout.Space(5f);
-                if(GUILayout.Button("Crate Ability"))
+                if(GUILayout.Button("Create Ability"))
                 {
-                    _sO.CreateAbility();
+                    _showAbilityName = !_showAbilityName;
+                }
+
+                if(_showAbilityName)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Label("Name:");
+                    EditorGUILayout.TextField(_abilityName);
+
+                    if(GUILayout.Button("Confirm", GUILayout.MaxWidth(80f)))
+                    {
+                        _sO.CreateAbility(_abilityName);
+                    }
+                    EditorGUILayout.EndHorizontal();
                 }
             }
         }

@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Cards
+namespace _Game.Scripts.Cards
 {
     public class PlayerCardInventory
     {

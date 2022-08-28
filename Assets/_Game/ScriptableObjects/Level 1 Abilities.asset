@@ -33,7 +33,7 @@ MonoBehaviour:
   _soulPerClickGainManual: 0
   _drawCards: 0
   _drawCardsAmount: 0
-  _deckSearch: 0
+  _deckSearch: 1
   _deckSearchAmount: 0
   _deckSearchByProperty: 0
   _propertyToSearchDeck: 2
