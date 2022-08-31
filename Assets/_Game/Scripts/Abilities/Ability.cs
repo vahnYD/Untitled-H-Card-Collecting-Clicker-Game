@@ -24,7 +24,7 @@ namespace _Game.Scripts.Abilities
         public int AbilityID => _id;
         [SerializeField] private string _name;
         public string Name => _name;
-        [SerializeField, TextArea(4, 10), Tooltip("{0} = Flat Coin Gain Amount\n{1} = Coin Per Click Increase Amount\n{2} = Coin Per Click Increase (Manual Only) Amount\n\n{3} = Flat Soul Gain Amount\n{4} = Soul Per Click Gain Amount\n{5} = Soul Per Click Gain (Manual Only) Amount\n\n{6} = Draw Cards Amount\n{7} = Search in Deck Amount\n{8} = Search in Deck Property\n{9} = Search in Deck Name\n{10} = Search in Deck Type\n{11} = Search in Deck Rarity\n\n{12} = Search in Grave Amount\n{13} = Search in Grave Property\n{14} = Search in Grave Name\n{15} = Search in Grave Type\n{16} = Search in Grave Rarity\n\n{17} = Return from Hand Amount\n{18} = Return from Hand Property\n{19} = Return from Hand Name\n{20} = Return from Hand Type\n{21} = Return from Hand Rarity\n\n{22} = Return from Grave Amount\n{23} = Return from Grave Property\n{24} = Return from Grave Name\n{25} = Return from Grave Type\n{26} = Return from Grave Rarity\n\n{27} = Send Cards from Hand Amount\n{28} = Send Cards from Hand Property\n{29} = Send Cards from Hand Name\n{30} = Send Cards from Hand Type\n{31} = Send Cards from Hand Rarity\n\n{32} = Send Cards from Deck Amount\n{33} = Send Cards from Deck Property\n{34} = Send Cards from Deck Name\n{35} = Send Cards from Deck Type\n{36} = Send Cards from Deck Rarity\n\n{37} = Cooldown Reduction Card Amount\n{38} = Cooldown Reduction Reduction Amount\n{39} = Cooldown Reduction Property\n{40} = Cooldown Reduction Name\n{41} = Cooldown Reduction Type\n{42} = Cooldown Reduction Rarity\n\n{43} = Gacha Pull Cost Change\n\n{44} = Destroy Cards Amount\n{45} = Destroy Cards Property\n{46} = Destroy Cards Name\n{47} = Destroy Cards Type\n{48} = Destroy Cards Rarity\n\n{49} = Gain Stars Amount\n\n{50} = Autoclicker Duration")] 
+        [SerializeField, TextArea(4, 10), Tooltip("{0} = Flat Coin Gain Amount\n{1} = Coin Per Click Increase Amount\n{2} = Coin Per Click Increase (Manual Only) Amount\n{3} = Coin Per Click Duration\n\n{4} = Flat Soul Gain Amount\n{5} = Soul Per Click Gain Amount\n{6} = Soul Per Click Gain (Manual Only) Amount\n{7} = Soul Per Click Duration\n\n{8} = Draw Cards Amount\n{9} = Search in Deck Amount\n{10} = Search in Deck Property\n{11} = Search in Deck Name\n{12} = Search in Deck Type\n{13} = Search in Deck Rarity\n\n{14} = Search in Grave Amount\n{15} = Search in Grave Property\n{16} = Search in Grave Name\n{17} = Search in Grave Type\n{18} = Search in Grave Rarity\n\n{19} = Return from Hand Amount\n{20} = Return from Hand Property\n{21} = Return from Hand Name\n{22} = Return from Hand Type\n{23} = Return from Hand Rarity\n\n{24} = Return from Grave Amount\n{25} = Return from Grave Property\n{26} = Return from Grave Name\n{27} = Return from Grave Type\n{28} = Return from Grave Rarity\n\n{29} = Send Cards from Hand Amount\n{30} = Send Cards from Hand Property\n{31} = Send Cards from Hand Name\n{32} = Send Cards from Hand Type\n{33} = Send Cards from Hand Rarity\n\n{34} = Send Cards from Deck Amount\n{35} = Send Cards from Deck Property\n{36} = Send Cards from Deck Name\n{37} = Send Cards from Deck Type\n{38} = Send Cards from Deck Rarity\n\n{39} = Cooldown Reduction Card Amount\n{40} = Cooldown Reduction Reduction Amount\n{41} = Cooldown Reduction Property\n{42} = Cooldown Reduction Name\n{43} = Cooldown Reduction Type\n{44} = Cooldown Reduction Rarity\n\n{45} = Gacha Pull Cost Change\n\n{46} = Destroy Cards Amount\n{47} = Destroy Cards Property\n{48} = Destroy Cards Name\n{49} = Destroy Cards Type\n{50} = Destroy Cards Rarity\n\n{51} = Gain Stars Amount\n\n{52} = Autoclicker Duration")] 
         private string _abilityText; 
         [SerializeField, Min(1), Tooltip("Max Level < 2 => Un-upgradable")] private int _maxLevel;
         public int MaxLevel => _maxLevel;
@@ -42,14 +42,16 @@ namespace _Game.Scripts.Abilities
         //Coin Gain
         [SerializeField] private bool _coinGainEffect;
         [SerializeField, Min(0)] private int _coinGain;
-        [SerializeField, Min(0)] private float _coinPerClickIncrease;
-        [SerializeField, Min(0)] private float _coinPerClickIncreaseManual;
+        [SerializeField, Min(0), Tooltip("Increases both Manual and Normal")] private float _coinPerClickIncrease;
+        [SerializeField, Min(0), Tooltip("Increases only Manual")] private float _coinPerClickIncreaseManual;
+        [SerializeField, Min(0), Tooltip("0 => Infinite Duration")] private int _coinPerClickDuration;
 
         //Soul Gain
         [SerializeField] private bool _soulGainEffect;
         [SerializeField, Min(0)] private int _soulGain;
-        [SerializeField, Min(0)] private float _soulPerClickGain;
-        [SerializeField, Min(0)] private float _soulPerClickGainManual;
+        [SerializeField, Min(0), Tooltip("Increases both Manual and Normal")] private float _soulPerClickGain;
+        [SerializeField, Min(0), Tooltip("Increases only Manual")] private float _soulPerClickGainManual;
+        [SerializeField, Min(0), Tooltip("0 => Infinite Duration")] private int _soulPerClickDuration;
 
         //Draw Cards
         [SerializeField] private bool _drawCards;
@@ -205,21 +207,52 @@ namespace _Game.Scripts.Abilities
                     int coinGainPostMult = (_maxLevel < 2) ? _coinGain : CalculateEffectForLevel(_coinGain, level);
                     gameManager.AddCoins(coinGainPostMult);
                 }
+
+                if(_coinPerClickIncrease > 0)
+                {
+                    int coinPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _coinPerClickIncrease : CalculateEffectForLevel(_coinPerClickIncrease, level));
+                    gameManager.IncreaseCoinsPerClick(coinPerClickPostMult, _coinPerClickDuration);
+                }
+
+                if(_coinPerClickIncreaseManual > 0)
+                {
+                    int coinPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _coinPerClickIncreaseManual : CalculateEffectForLevel(_coinPerClickIncreaseManual, level));
+                    gameManager.IncreaseCoinsPerClick(coinPerClickPostMult, _coinPerClickDuration, true);
+                }
             }
 
             if(_soulGainEffect)
             {
+                if(_soulGain > 0)
+                {
+                    int soulGainPostMult = (_maxLevel < 2) ? _soulGain : CalculateEffectForLevel(_soulGain, level);
+                    gameManager.AddSouls(soulGainPostMult);
+                }
 
+                if(_soulPerClickGain > 0)
+                {
+                    int soulPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _soulPerClickGain : CalculateEffectForLevel(_soulPerClickGain, level));
+                    gameManager.IncreaseSoulsPerClick(soulPerClickPostMult, _soulPerClickDuration);
+                }
+
+                if(_soulPerClickGainManual > 0)
+                {
+                    int soulPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _soulPerClickGainManual : CalculateEffectForLevel(_soulPerClickGainManual, level));
+                    gameManager.IncreaseSoulsPerClick(soulPerClickPostMult, _soulPerClickDuration, true);
+                }
             }
 
             if(_drawCards)
             {
-
+                int amountPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _drawCardsAmount : CalculateEffectForLevel(_drawCardsAmount, level));
+                gameManager.DrawCard(amountPostMult);
             }
 
             if(_deckSearch)
             {
+                int amountPostMult = (_maxLevel < 2) ? _deckSearchAmount : CalculateEffectForLevel(_deckSearchAmount, level);
 
+                
             }
 
             if(_graveSearch)
@@ -288,8 +321,8 @@ namespace _Game.Scripts.Abilities
 
             return string.Format(
                 _abilityText,
-                coinGainPostMult, coinPerClickIncreasePostMult, coinPerClickIncreaseManualPostMult,
-                soulGainPostMult, soulPerClickGainPostMult, soulPerClickGainManualPostMult,
+                coinGainPostMult, coinPerClickIncreasePostMult, coinPerClickIncreaseManualPostMult, _coinPerClickDuration,
+                soulGainPostMult, soulPerClickGainPostMult, soulPerClickGainManualPostMult, _soulPerClickDuration,
                 drawCardsPostMult,
                 deckSearchAmountPostMult, _propertyToSearchDeck, _nameToSearchDeck, _typeToSearchDeck, _rarityToSearchDeck,
                 graveSearchAmountPostMult, _propertyToSearchGrave, _nameToSearchGrave, _typeToSearchGrave, _rarityToSearchGrave,
@@ -351,12 +384,14 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spCoinGain;
             SerializedProperty _spCoinPerClickIncrease;
             SerializedProperty _spCoinPerClickIncreaseManual;
+            SerializedProperty _spCoinPerClickDuration;
 
             //Soul Gain
             SerializedProperty _spSoulGainEffect;
             SerializedProperty _spSoulGain;
             SerializedProperty _spSoulPerClickGain;
             SerializedProperty _spSoulPerClickGainManual;
+            SerializedProperty _spSoulPerClickDuration;
 
             //Draw Cards
             SerializedProperty _spDrawCards;
@@ -469,12 +504,14 @@ namespace _Game.Scripts.Abilities
                 _spCoinGain = serializedObject.FindProperty("_coinGain");
                 _spCoinPerClickIncrease = serializedObject.FindProperty("_coinPerClickIncrease");
                 _spCoinPerClickIncreaseManual = serializedObject.FindProperty("_coinPerClickIncreaseManual");
+                _spCoinPerClickDuration = serializedObject.FindProperty("_coinPerClickDuration");
 
                 //Soul Gain
                 _spSoulGainEffect = serializedObject.FindProperty("_soulGainEffect");
                 _spSoulGain = serializedObject.FindProperty("_soulGain");
                 _spSoulPerClickGain = serializedObject.FindProperty("_soulPerClickGain");
                 _spSoulPerClickGainManual = serializedObject.FindProperty("_soulPerClickGainManual");
+                _spSoulPerClickDuration = serializedObject.FindProperty("_soulPerClickDuration");
 
                 //Draw Cards
                 _spDrawCards = serializedObject.FindProperty("_drawCards");
@@ -628,6 +665,12 @@ namespace _Game.Scripts.Abilities
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spCoinPerClickIncreaseManual, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Coin Per Click Duration");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spCoinPerClickDuration, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
                     }
                     GUILayout.Space(10f);
 
@@ -654,6 +697,12 @@ namespace _Game.Scripts.Abilities
                         GUILayout.Label("Soul Per Click Gain (Manual Only)");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spSoulPerClickGainManual, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Soul Per Click Duration");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spSoulPerClickDuration, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
                     }
                     GUILayout.Space(10f);

@@ -466,7 +466,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cardList: {fileID: 0}
-  _clickCoinAmountDefault: 15
+  _gameSettings: {fileID: 11400000, guid: 732d82a13141b4c4995897cb8d35c7b4, type: 2}
 --- !u!1 &557868232
 GameObject:
   m_ObjectHideFlags: 0

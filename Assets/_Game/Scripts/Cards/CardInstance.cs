@@ -49,7 +49,7 @@ namespace _Game.Scripts.Cards
 
         public bool AttemptUpgrade()
         {
-            if(_nextUpgradeCost > GameManager.Instance.GetCurrentCoinTotal()) return false;
+            if(_nextUpgradeCost > GameManager.Instance.CoinTotal) return false;
             if(_level == 0) return false;
             if(_level == _card.Ability.MaxLevel) return false;
             Upgrade();

@@ -23,17 +23,19 @@ MonoBehaviour:
   _upgradeCostMultAdditivePart: 0
   _upgradeCostMultMultiplicativePart: 0
   _effectMultPerLevel: 0
-  _coinGainEffect: 0
+  _coinGainEffect: 1
   _coinGain: 0
   _coinPerClickIncrease: 0
   _coinPerClickIncreaseManual: 0
+  _coinPerClickDuration: 0
   _soulGainEffect: 0
   _soulGain: 0
   _soulPerClickGain: 0
   _soulPerClickGainManual: 0
+  _soulPerClickDuration: 0
   _drawCards: 0
   _drawCardsAmount: 0
-  _deckSearch: 1
+  _deckSearch: 0
   _deckSearchAmount: 0
   _deckSearchByProperty: 0
   _propertyToSearchDeck: 2
