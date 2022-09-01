@@ -18,5 +18,21 @@ namespace _Game.Scripts.Extensions
             yield return new WaitForSeconds(seconds);
             action.Invoke();
         }
+
+        public static IEnumerator InvokeActionForSecondsInInterval(Action action, int duration, int interval)
+        {
+            int counter = 0;
+            do
+            {
+                yield return new WaitForSeconds(1f);
+                counter++;
+                if(counter == interval)
+                {
+                    action.Invoke();
+                    counter = 0;
+                }
+                duration--;
+            }while(duration > 0);
+        }
     }
 }

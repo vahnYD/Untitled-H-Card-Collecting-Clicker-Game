@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
     #region Properties
     [SerializeField] private CardList _cardList;
     [SerializeField] private GameSettingsScriptableObject _gameSettings;
+    public GameSettingsScriptableObject GameSettingsRef => _gameSettings;
+
+    private int _runningAutoClickerDuration = 0;
 
     private int _currentClickCoinAmount;
     private int _currentClickCoinAmountManual;
@@ -27,14 +30,15 @@ public class GameManager : MonoBehaviour
     private int _coinAmount;
     public int CoinTotal => _coinAmount;
 
-    private int _currentClickSoulAmount;
-    private int _currentClickSoulAmountManual;
+    private int _currentClickSoulAmount = 0;
+    private int _currentClickSoulAmountManual = 0;
     private Queue<int> _soulPerClickIncreases = new Queue<int>();
     private Queue<int> _soulPerClickIncreasesManual = new Queue<int>();
     private Action ReduceSoulsPerClickAction;
     private Action ReduceSoulsPerClickManualAction;
-    private int _soulAmount;
-    public int SoulTotal => _soulAmount;
+    private long _soulAmount;
+    public long SoulTotal => _soulAmount;
+
     private int _lewdPointAmount;
     public int LewdPointTotal => _lewdPointAmount;
     private int _crystalAmount;
@@ -45,8 +49,11 @@ public class GameManager : MonoBehaviour
     public int DevilTearTotal => _devilTearAmount;
     private PlayerCardInventory _cardInventory;
     private Deck _deck;
+    public int DeckSize => _deck.DeckList.Count;
     private Deck _hand;
+    public int HandSize => _hand.DeckList.Count;
     private Deck _grave;
+    public int GraveSize => _grave.DeckList.Count;
 	#endregion
 
     #region Unity Event Functions
@@ -70,6 +77,16 @@ public class GameManager : MonoBehaviour
         ReduceSoulsPerClickAction = () => ReduceSoulsPerClick(ref _currentClickSoulAmount);
         ReduceSoulsPerClickManualAction = () => ReduceCoinsPerClick(ref _currentClickSoulAmountManual, true);
     }
+
+    private void OnEnable()
+    {
+        StartCoroutine(AutoclickerGlobalTiming());
+    }
+
+    private void OnDisable()
+    {
+        StopCoroutine(AutoclickerGlobalTiming());
+    }
 	#endregion
 	
 	#region Methods
@@ -77,12 +94,19 @@ public class GameManager : MonoBehaviour
     //Clicker Interactions
     public void ManualClick()
     {
-        _coinAmount += _currentClickCoinAmountManual;
+        AddCoins(_currentClickCoinAmountManual);
+        AddSouls(_currentClickSoulAmountManual);
     }
 
     public void Click()
     {
-        _coinAmount += _currentClickCoinAmount;
+        AddCoins(_currentClickCoinAmount);
+        AddSouls(_currentClickSoulAmount);
+    }
+
+    public void GainAutoclicker(int duration)
+    {
+        _runningAutoClickerDuration += duration;
     }
 
 
@@ -132,7 +156,12 @@ public class GameManager : MonoBehaviour
         else val = lowerBound;
     }
 
-    public void AddSouls(int souls) => _soulAmount += souls;
+    public void AddSouls(int souls)
+    {
+        if(_soulAmount > _gameSettings.MaxSoulsAtBase) return;
+        _soulAmount += souls;
+        if(_soulAmount > _gameSettings.MaxSoulsAtBase) _soulAmount = _gameSettings.MaxSoulsAtBase;
+    }
 
     public void RemoveSouls(int souls)
     {
@@ -177,6 +206,38 @@ public class GameManager : MonoBehaviour
         return;
     }
 
+    private void UpdateLewdPoints()
+    {
+        _lewdPointAmount = Mathf.FloorToInt(_cardInventory.TotalStrength * _cardInventory.TypeMultiplier * GetSoulMult());
+
+        _currentClickCoinAmount = _gameSettings.BaseCoinGainPerClick + Mathf.FloorToInt(_lewdPointAmount / 10);
+        Queue<int> autoIncreases = _coinPerClickIncreases;
+        for(int i = 0; i < autoIncreases.Count; i++)
+        {
+            _currentClickCoinAmount += autoIncreases.Dequeue();
+        }
+
+        _currentClickCoinAmountManual = _gameSettings.BaseCoinGainPerClick + _lewdPointAmount;
+        Queue<int> manualIncreases = _coinPerClickIncreasesManual;
+        for(int i = 0; i < manualIncreases.Count; i++)
+        {
+            _currentClickCoinAmountManual += manualIncreases.Dequeue();
+        }
+    }
+
+    private float GetSoulMult()
+    {
+        List<float> soulMults = _gameSettings.SoulMultipliers;
+        List<int> soulMultBounds = _gameSettings.SoulMultiplierUpperBounds;
+
+        for(int i = 0; i < soulMults.Count; i++)
+        {
+            if(i >= soulMultBounds.Count) break;
+            if(_soulAmount <= soulMultBounds[i]) return soulMults[i];
+        }
+        return soulMults[soulMults.Count-1];
+    }
+
     // Card Interactions
     public void DrawCard(int amount = 1)
     {
@@ -192,7 +253,42 @@ public class GameManager : MonoBehaviour
     {
         
     }
+
+    public void ReduceCooldownOfCards(float reductionAmount, int cardAmount = 1, bool reduceByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
+    {
+
+    }
+
+
+    // Gacha interactions
+    public void ModifyGachaCost(float amount, bool isFlat = false, bool isBlocking = false)
+    {
+
+    }
+
+    public void AddStar(int amount = 1)
+    {
+        _starAmount += amount;
+    }
 	#endregion
+
+    #region Coroutines
+    private IEnumerator AutoclickerGlobalTiming()
+    {
+        int counter = 0;
+        int lpInterval = _gameSettings.AutoClickerLewdpointInterval;
+        int abilityInterval = _gameSettings.AutoclickerAbilityInterval;
+        int counterRest = (lpInterval > abilityInterval) ? lpInterval : abilityInterval;
+        for(;;)
+        {
+            yield return new WaitForSeconds(1f);
+            counter = counter++ % counterRest;
+            if(_runningAutoClickerDuration > 0 && counter % abilityInterval == 0) Click();
+            if(counter % lpInterval == 0) Click();
+            if(_runningAutoClickerDuration > 0) _runningAutoClickerDuration--;
+        }
+    }
+    #endregion
 
     #if UNITY_EDITOR
     [ContextMenu("Debug/Add Coins/1k")]
@@ -212,6 +308,15 @@ public class GameManager : MonoBehaviour
 
     [ContextMenu("Debug/Add Souls/100k")]
     private void DebugAddSouls100000() => _soulAmount += 100000;
+
+    [ContextMenu("Debug/Gain Autoclicker/30sec")]
+    private void DebugAddAutoclicker30() => GainAutoclicker(30);
+
+    [ContextMenu("Debug/Gain Autoclicker/1min")]
+    private void DebugAddAutoclicker60() => GainAutoclicker(60);
+
+    [ContextMenu("Debug/Gain Autoclicker/10min")]
+    private void DebugAddAutoclicker600() => GainAutoclicker(600);
     #endif
 
     public enum CardGameStates

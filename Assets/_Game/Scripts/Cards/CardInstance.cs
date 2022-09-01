@@ -13,6 +13,7 @@ namespace _Game.Scripts.Cards
     public class CardInstance
     {
         private Card _card;
+        public Card CardRef => _card;
         private string _name;
         public string Name => _name;
         private Sprite _cardArt;

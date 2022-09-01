@@ -45,6 +45,7 @@ namespace _Game.Scripts.Abilities
         [SerializeField, Min(0), Tooltip("Increases both Manual and Normal")] private float _coinPerClickIncrease;
         [SerializeField, Min(0), Tooltip("Increases only Manual")] private float _coinPerClickIncreaseManual;
         [SerializeField, Min(0), Tooltip("0 => Infinite Duration")] private int _coinPerClickDuration;
+        [SerializeField] private bool _coinEffectIgnoresLevel;
 
         //Soul Gain
         [SerializeField] private bool _soulGainEffect;
@@ -52,14 +53,17 @@ namespace _Game.Scripts.Abilities
         [SerializeField, Min(0), Tooltip("Increases both Manual and Normal")] private float _soulPerClickGain;
         [SerializeField, Min(0), Tooltip("Increases only Manual")] private float _soulPerClickGainManual;
         [SerializeField, Min(0), Tooltip("0 => Infinite Duration")] private int _soulPerClickDuration;
+        [SerializeField] private bool _soulEffectIgnoresLevel;
 
         //Draw Cards
         [SerializeField] private bool _drawCards;
         [SerializeField, Min(0)] private int _drawCardsAmount;
+        [SerializeField] private bool _drawEffectIgnoresLevel;
 
         //Search Cards
         [SerializeField] private bool _deckSearch; 
         [SerializeField, Min(0)] private int _deckSearchAmount;
+        [SerializeField] private bool _deckSearchAmountIgnoresLevel;
         [SerializeField] private bool _deckSearchByProperty;
         [SerializeField] private Card.SearchableProperties _propertyToSearchDeck;
         [SerializeField] private string _nameToSearchDeck;
@@ -67,6 +71,7 @@ namespace _Game.Scripts.Abilities
         [SerializeField] private Card.CardRarity _rarityToSearchDeck;
         [SerializeField] private bool _graveSearch;
         [SerializeField, Min(0)] private int _graveSearchAmount;
+        [SerializeField] private bool _graveSearchAmountIgnoresLevel;
         [SerializeField] private bool _graveSearchByProperty;
         [SerializeField] private Card.SearchableProperties _propertyToSearchGrave;
         [SerializeField] private string _nameToSearchGrave;
@@ -76,6 +81,7 @@ namespace _Game.Scripts.Abilities
         //Return Cards to Deck
         [SerializeField] private bool _returnCardsFromHand;
         [SerializeField, Min(0)] private int _amountOfCardsToReturnHand;
+        [SerializeField] private bool _returnFromHandAmountIgnoresLevel;
         [SerializeField] private bool _returnCardsByPropertyHand;
         [SerializeField] private Card.SearchableProperties _propertyReturnCardsHand;
         [SerializeField] private string _nameReturnCardsHand;
@@ -83,6 +89,7 @@ namespace _Game.Scripts.Abilities
         [SerializeField] private Card.CardRarity _rarityReturnCardsHand;
         [SerializeField] private bool _returnCardsFromGrave;
         [SerializeField, Min(0)] private int _amountOfCardsToReturnGrave;
+        [SerializeField] private bool _returnFromGraveAmountIgnoresLevel;
         [SerializeField] private bool _returnCardsByPropertyGrave;
         [SerializeField] private Card.SearchableProperties _propertyReturnCardsGrave;
         [SerializeField] private string _nameReturnCardsGrave;
@@ -92,6 +99,7 @@ namespace _Game.Scripts.Abilities
         //Send Cards to Grave
         [SerializeField] private bool _sendGraveHand;
         [SerializeField, Min(0)] private int _amountToSendGraveHand;
+        [SerializeField] private bool _sendFromHandAmountIgnoresLevel;
         [SerializeField] private bool _sendGraveByPropertyHand;
         [SerializeField] private Card.SearchableProperties _propertyToSendGraveHand;
         [SerializeField] private string _nameToSendGraveHand;
@@ -99,6 +107,7 @@ namespace _Game.Scripts.Abilities
         [SerializeField] private Card.CardRarity _rarityToSentGraveHand;
         [SerializeField] private bool _sendGraveDeck;
         [SerializeField, Min(0)] private int _amountToSendGraveDeck;
+        [SerializeField] private bool _sendFromDeckAmountIgnoresLevel;
         [SerializeField] private bool _sendGraveByPropertyDeck;
         [SerializeField] private Card.SearchableProperties _propertyToSendGraveDeck;
         [SerializeField] private string _nameToSendGraveDeck;
@@ -108,8 +117,10 @@ namespace _Game.Scripts.Abilities
         //Card Cooldown Reduction
         [SerializeField] private bool _cooldownReduction;
         [SerializeField] private int _amountCardsCooldownReduction;
+        [SerializeField] private bool _cdReductionCardAmountIgnoresLevel;
         [SerializeField] private float _amountReductionCooldownReduction;
         [SerializeField] private bool _flatCooldownReduction;
+        [SerializeField] private bool _cdReductionReductionAmountIgnoresLevel;
         [SerializeField] private bool _cooldownReductionByProperty;
         [SerializeField] private Card.SearchableProperties _propertyCooldownReduction;
         [SerializeField] private string _nameCooldownReduction;
@@ -119,11 +130,14 @@ namespace _Game.Scripts.Abilities
         //Gacha Pull Cost Manipulation
         [SerializeField] private bool _manipulateGachaPullCost;
         [SerializeField] private float _gachaPullCostChange;
+        [SerializeField] private bool _gachaPullCostChangeIsFlat;
         [SerializeField] private bool _blockOtherGachaCostChanges;
+        [SerializeField] private bool _gachaPullCostChangeAmountIgnoresLevel;
 
         //Removing Cards from the Players Inventory
         [SerializeField] private bool _destroyCards;
         [SerializeField, Min(0)] private int _amountOfCardsToDestroy;
+        [SerializeField] private bool _destroyAmountIgnoresLevel;
         [SerializeField] private bool _destroyCardsByProperty;
         [SerializeField] private Card.SearchableProperties _propertyDestroyCards;
         [SerializeField] private string _nameDestroyCards;
@@ -133,20 +147,24 @@ namespace _Game.Scripts.Abilities
         //Gain stars
         [SerializeField] private bool _gainStars;
         [SerializeField, Min(0)] private int _gainStarsAmount;
+        [SerializeField] private bool _starAmountIgnoresLevel;
 
         //Get Autoclicker
         [SerializeField] private bool _gainAutoclicker;
         [SerializeField, Min(0)] private int _autoclickerDuration;
+        [SerializeField] private bool _autoclickerDurationIgnoresLevel;
         #endregion
 
         #region Methods
+        //checks for all possible abilities.
+        //If they apply, calculates the right amount/modifier for the given level, then sends the neded informations to the Game Manager
         public void ActivateAbility(int level = 1)
         {
             GameManager gameManager = GameManager.Instance;
 
             if(_sendGraveHand)
             {
-                int amountToSendPostMult = (_maxLevel < 2) ? _amountToSendGraveHand : CalculateEffectForLevel(_amountToSendGraveHand, level);
+                int amountToSendPostMult = (_maxLevel < 2 || _sendFromHandAmountIgnoresLevel) ? _amountToSendGraveHand : CalculateEffectForLevel(_amountToSendGraveHand, level);
 
                 if(!_sendGraveByPropertyHand)
                 {
@@ -160,7 +178,7 @@ namespace _Game.Scripts.Abilities
 
             if(_sendGraveDeck)
             {
-                int amountToSendPostMult = (_maxLevel < 2) ? _amountToSendGraveDeck : CalculateEffectForLevel(_amountToSendGraveDeck, level);
+                int amountToSendPostMult = (_maxLevel < 2 || _sendFromDeckAmountIgnoresLevel) ? _amountToSendGraveDeck : CalculateEffectForLevel(_amountToSendGraveDeck, level);
 
                 if(!_sendGraveByPropertyDeck)
                 {
@@ -174,7 +192,7 @@ namespace _Game.Scripts.Abilities
 
             if(_returnCardsFromHand)
             {
-                int amountToReturnPostMult = (_maxLevel < 2) ? _amountOfCardsToReturnHand : CalculateEffectForLevel(_amountOfCardsToReturnHand, level);
+                int amountToReturnPostMult = (_maxLevel < 2 || _returnFromHandAmountIgnoresLevel) ? _amountOfCardsToReturnHand : CalculateEffectForLevel(_amountOfCardsToReturnHand, level);
 
                 if(!_returnCardsByPropertyHand)
                 {
@@ -188,7 +206,7 @@ namespace _Game.Scripts.Abilities
 
             if(_destroyCards)
             {
-                int amountToDestroyPostMult = (_maxLevel < 2) ? _amountOfCardsToDestroy : CalculateEffectForLevel(_amountOfCardsToDestroy, level);
+                int amountToDestroyPostMult = (_maxLevel < 2 || _deckSearchAmountIgnoresLevel) ? _amountOfCardsToDestroy : CalculateEffectForLevel(_amountOfCardsToDestroy, level);
 
                 if(!_destroyCardsByProperty)
                 {
@@ -204,19 +222,19 @@ namespace _Game.Scripts.Abilities
             {
                 if(_coinGain > 0)
                 {
-                    int coinGainPostMult = (_maxLevel < 2) ? _coinGain : CalculateEffectForLevel(_coinGain, level);
+                    int coinGainPostMult = (_maxLevel < 2 || _coinEffectIgnoresLevel) ? _coinGain : CalculateEffectForLevel(_coinGain, level);
                     gameManager.AddCoins(coinGainPostMult);
                 }
 
                 if(_coinPerClickIncrease > 0)
                 {
-                    int coinPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _coinPerClickIncrease : CalculateEffectForLevel(_coinPerClickIncrease, level));
+                    int coinPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2 || _coinEffectIgnoresLevel) ? _coinPerClickIncrease : CalculateEffectForLevel(_coinPerClickIncrease, level));
                     gameManager.IncreaseCoinsPerClick(coinPerClickPostMult, _coinPerClickDuration);
                 }
 
                 if(_coinPerClickIncreaseManual > 0)
                 {
-                    int coinPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _coinPerClickIncreaseManual : CalculateEffectForLevel(_coinPerClickIncreaseManual, level));
+                    int coinPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2 || _coinEffectIgnoresLevel) ? _coinPerClickIncreaseManual : CalculateEffectForLevel(_coinPerClickIncreaseManual, level));
                     gameManager.IncreaseCoinsPerClick(coinPerClickPostMult, _coinPerClickDuration, true);
                 }
             }
@@ -225,64 +243,105 @@ namespace _Game.Scripts.Abilities
             {
                 if(_soulGain > 0)
                 {
-                    int soulGainPostMult = (_maxLevel < 2) ? _soulGain : CalculateEffectForLevel(_soulGain, level);
+                    int soulGainPostMult = (_maxLevel < 2 || _soulEffectIgnoresLevel) ? _soulGain : CalculateEffectForLevel(_soulGain, level);
                     gameManager.AddSouls(soulGainPostMult);
                 }
 
                 if(_soulPerClickGain > 0)
                 {
-                    int soulPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _soulPerClickGain : CalculateEffectForLevel(_soulPerClickGain, level));
+                    int soulPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2 || _soulEffectIgnoresLevel) ? _soulPerClickGain : CalculateEffectForLevel(_soulPerClickGain, level));
                     gameManager.IncreaseSoulsPerClick(soulPerClickPostMult, _soulPerClickDuration);
                 }
 
                 if(_soulPerClickGainManual > 0)
                 {
-                    int soulPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _soulPerClickGainManual : CalculateEffectForLevel(_soulPerClickGainManual, level));
+                    int soulPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2 || _soulEffectIgnoresLevel) ? _soulPerClickGainManual : CalculateEffectForLevel(_soulPerClickGainManual, level));
                     gameManager.IncreaseSoulsPerClick(soulPerClickPostMult, _soulPerClickDuration, true);
                 }
             }
 
             if(_drawCards)
             {
-                int amountPostMult = Mathf.FloorToInt((_maxLevel < 2) ? _drawCardsAmount : CalculateEffectForLevel(_drawCardsAmount, level));
+                int amountPostMult = Mathf.FloorToInt((_maxLevel < 2 || _drawEffectIgnoresLevel) ? _drawCardsAmount : CalculateEffectForLevel(_drawCardsAmount, level));
                 gameManager.DrawCard(amountPostMult);
             }
 
             if(_deckSearch)
             {
-                int amountPostMult = (_maxLevel < 2) ? _deckSearchAmount : CalculateEffectForLevel(_deckSearchAmount, level);
+                int amountPostMult = (_maxLevel < 2 || _deckSearchAmountIgnoresLevel) ? _deckSearchAmount : CalculateEffectForLevel(_deckSearchAmount, level);
 
-                
+               if(!_deckSearchByProperty)
+               {
+                    gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Hand, amountPostMult);
+               }
+               else
+               {
+                    gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchDeck, _nameToSearchDeck, _typeToSearchDeck, _rarityToSearchDeck);
+               }
             }
 
             if(_graveSearch)
             {
+                int amountPostMult = (_maxLevel < 2 || _graveSearchAmountIgnoresLevel) ? _graveSearchAmount : CalculateEffectForLevel(_graveSearchAmount, level);
 
+                if(!_graveSearchByProperty)
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Hand, amountPostMult);
+                }
+                else
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchGrave, _nameToSearchGrave, _typeToSearchGrave, _rarityToSearchGrave);
+                }
             }
 
             if(_returnCardsFromGrave)
             {
+                int amountPostMult = (_maxLevel < 2 || _returnFromGraveAmountIgnoresLevel) ? _amountOfCardsToReturnGrave : CalculateEffectForLevel(_amountOfCardsToReturnGrave, level);
 
+                if(!_returnCardsByPropertyGrave)
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Deck, amountPostMult);
+                }
+                else
+                {
+                    gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Deck, amountPostMult, true, _propertyReturnCardsGrave, _nameReturnCardsGrave, _typeReturnCardsGrave, _rarityReturnCardsGrave);
+                }
             }
 
             if(_cooldownReduction)
             {
+                int amountPostMult = (_maxLevel < 2 || _cdReductionCardAmountIgnoresLevel) ? _amountCardsCooldownReduction : CalculateEffectForLevel(_amountCardsCooldownReduction, level);
+                float reductionPostMult = (_maxLevel < 2 || _cdReductionReductionAmountIgnoresLevel) ? _amountReductionCooldownReduction : CalculateEffectForLevel(_amountReductionCooldownReduction, level);
 
+                if(!_cooldownReductionByProperty)
+                {
+                    gameManager.ReduceCooldownOfCards(reductionPostMult, amountPostMult);
+                }
+                else
+                {
+                    gameManager.ReduceCooldownOfCards(reductionPostMult, amountPostMult, true, _propertyCooldownReduction, _nameCooldownReduction, _typeCooldownReduction, _rarityCooldownReduction);
+                }
             }
 
             if(_manipulateGachaPullCost)
             {
+                float amountPostMult = (_maxLevel < 2 || _gachaPullCostChangeAmountIgnoresLevel) ? _gachaPullCostChange : CalculateEffectForLevel(_gachaPullCostChange, level);
 
+                gameManager.ModifyGachaCost(amountPostMult, _gachaPullCostChangeIsFlat, _blockOtherGachaCostChanges);
             }
 
             if(_gainStars)
             {
+                int amountPostMult = (_maxLevel < 2 || _starAmountIgnoresLevel) ? _gainStarsAmount : CalculateEffectForLevel(_gainStarsAmount, level);
 
+                gameManager.AddStar(amountPostMult);
             }
 
             if(_gainAutoclicker)
             {
+                int durationPostMult = (_maxLevel < 2 || _autoclickerDurationIgnoresLevel) ? _autoclickerDuration : CalculateEffectForLevel(_autoclickerDuration, level);
 
+                gameManager.GainAutoclicker(durationPostMult);
             }
         }
 
@@ -385,6 +444,7 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spCoinPerClickIncrease;
             SerializedProperty _spCoinPerClickIncreaseManual;
             SerializedProperty _spCoinPerClickDuration;
+            SerializedProperty _spCoinEffectIgnoresLevel;
 
             //Soul Gain
             SerializedProperty _spSoulGainEffect;
@@ -392,14 +452,17 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spSoulPerClickGain;
             SerializedProperty _spSoulPerClickGainManual;
             SerializedProperty _spSoulPerClickDuration;
+            SerializedProperty _spSoulEffectIgnoresLevel;
 
             //Draw Cards
             SerializedProperty _spDrawCards;
             SerializedProperty _spDrawCardsAmount;
+            SerializedProperty _spDrawEffectIgnoresLevel;
 
             //Search Cards
             SerializedProperty _spDeckSearch;
             SerializedProperty _spDeckSearchAmount;
+            SerializedProperty _spDeckSearchAmountIgnoresLevel;
             SerializedProperty _spDeckSearchByProperty;
             SerializedProperty _spPropertyToSearchDeck;
             SerializedProperty _spNameToSearchDeck;
@@ -407,6 +470,7 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spRarityToSearchDeck;
             SerializedProperty _spGraveSearch;
             SerializedProperty _spGraveSearchAmount;
+            SerializedProperty _spGraveSearchAmountIgnoresLevel;
             SerializedProperty _spGraveSearchByProperty;
             SerializedProperty _spPropertyToSearchGrave;
             SerializedProperty _spNameToSearchGrave;
@@ -416,6 +480,7 @@ namespace _Game.Scripts.Abilities
             //Return Cards to Deck
             SerializedProperty _spReturnCardsFromHand;
             SerializedProperty _spAmountOfCardsToReturnHand;
+            SerializedProperty _spReturnFromHandAmountIgnoresLevel;
             SerializedProperty _spReturnCardsByPropertyHand;
             SerializedProperty _spPropertyReturnCardsHand;
             SerializedProperty _spNameReturnCardsHand;
@@ -423,6 +488,7 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spRarityReturnCardsHand;
             SerializedProperty _spReturnCardsFromGrave;
             SerializedProperty _spAmountOfCardsToReturnGrave;
+            SerializedProperty _spReturnFromGraveAmountIgnoresLevel;
             SerializedProperty _spReturnCardsByPropertyGrave;
             SerializedProperty _spPropertyReturnCardsGrave;
             SerializedProperty _spNameReturnCardsGrave;
@@ -432,6 +498,7 @@ namespace _Game.Scripts.Abilities
             //Send Cards to Grave
             SerializedProperty _spSendGraveHand;
             SerializedProperty _spAmountToSendGraveHand;
+            SerializedProperty _spSendFromHandAmountIgnoresLevel;
             SerializedProperty _spSendGraveByPropertyHand;
             SerializedProperty _spPropertyToSendGraveHand;
             SerializedProperty _spNameToSendGraveHand;
@@ -439,6 +506,7 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spRarityToSendGraveHand;
             SerializedProperty _spSendGraveDeck;
             SerializedProperty _spAmountToSendGraveDeck;
+            SerializedProperty _spSendFromDeckAmountIgnoresLevel;
             SerializedProperty _spSendGraveByPropertyDeck;
             SerializedProperty _spPropertyToSendGraveDeck;
             SerializedProperty _spNameToSendGraveDeck;
@@ -448,8 +516,10 @@ namespace _Game.Scripts.Abilities
             //Card Cooldown Reduction
             SerializedProperty _spCooldownReduction;
             SerializedProperty _spAmountCardsCooldownReduction;
+            SerializedProperty _spCdReductionCardAmountIgnoresLevel;
             SerializedProperty _spAmountReductionCooldownReduction;
             SerializedProperty _spFlatCooldownReduction;
+            SerializedProperty _spCdReductionReductionAmountIgnoresLevel;
             SerializedProperty _spCooldownReductionByProperty;
             SerializedProperty _spPropertyCooldownReduction;
             SerializedProperty _spNameCooldownReduction;
@@ -459,12 +529,15 @@ namespace _Game.Scripts.Abilities
             //Gacha Pull Cost Manipulation
             SerializedProperty _spManipulateGachaPullCost;
             SerializedProperty _spGachaPullCostChange;
+            SerializedProperty _spGachaPullCostChangeIsFlat;
             SerializedProperty _spBlockOtherGachaCostChanges;
+            SerializedProperty _spGachaPullCostChangeAmountIgnoresLevel;
 
 
             //Removing Cards from the Players Inventory
             SerializedProperty _spDestroyCards;
             SerializedProperty _spAmountOfCardsToDestroy;
+            SerializedProperty _spDestroyAmountIgnoresLevel;
             SerializedProperty _spDestroyCardsByProperty;
             SerializedProperty _spPropertyDestroyCards;
             SerializedProperty _spNameDestroyCards;
@@ -474,10 +547,13 @@ namespace _Game.Scripts.Abilities
             //Gain Stars
             SerializedProperty _spGainStars;
             SerializedProperty _spGainStarsAmount;
+            SerializedProperty _spStarAmountIgnoresLevel;
+
 
             //Gain Autoclicker
             SerializedProperty _spGainAutoclicker;
             SerializedProperty _spAutoclickerDuration;
+            SerializedProperty _spAutoclickerDurationIgnoresLevel;
             #endregion
 
             private bool _showUpgrades, _showAbilities = false;
@@ -505,6 +581,7 @@ namespace _Game.Scripts.Abilities
                 _spCoinPerClickIncrease = serializedObject.FindProperty("_coinPerClickIncrease");
                 _spCoinPerClickIncreaseManual = serializedObject.FindProperty("_coinPerClickIncreaseManual");
                 _spCoinPerClickDuration = serializedObject.FindProperty("_coinPerClickDuration");
+                _spCoinEffectIgnoresLevel = serializedObject.FindProperty("_coinEffectIgnoresLevel");
 
                 //Soul Gain
                 _spSoulGainEffect = serializedObject.FindProperty("_soulGainEffect");
@@ -512,14 +589,17 @@ namespace _Game.Scripts.Abilities
                 _spSoulPerClickGain = serializedObject.FindProperty("_soulPerClickGain");
                 _spSoulPerClickGainManual = serializedObject.FindProperty("_soulPerClickGainManual");
                 _spSoulPerClickDuration = serializedObject.FindProperty("_soulPerClickDuration");
+                _spSoulEffectIgnoresLevel = serializedObject.FindProperty("_soulEffectIgnoresLevel");
 
                 //Draw Cards
                 _spDrawCards = serializedObject.FindProperty("_drawCards");
                 _spDrawCardsAmount = serializedObject.FindProperty("_drawCardsAmount");
+                _spDrawEffectIgnoresLevel = serializedObject.FindProperty("_drawEffectIgnoresLevel");
 
                 //Search Cards
                 _spDeckSearch = serializedObject.FindProperty("_deckSearch");
                 _spDeckSearchAmount = serializedObject.FindProperty("_deckSearchAmount");
+                _spDeckSearchAmountIgnoresLevel = serializedObject.FindProperty("_deckSearchAmountIgnoresLevel");
                 _spDeckSearchByProperty = serializedObject.FindProperty("_deckSearchByProperty");
                 _spPropertyToSearchDeck = serializedObject.FindProperty("_propertyToSearchDeck");
                 _spNameToSearchDeck = serializedObject.FindProperty("_nameToSearchDeck");
@@ -527,6 +607,7 @@ namespace _Game.Scripts.Abilities
                 _spRarityToSearchDeck = serializedObject.FindProperty("_rarityToSearchDeck");
                 _spGraveSearch = serializedObject.FindProperty("_graveSearch");
                 _spGraveSearchAmount = serializedObject.FindProperty("_graveSearchAmount");
+                _spGraveSearchAmountIgnoresLevel = serializedObject.FindProperty("graveSearchAmountIgnoresLevel");
                 _spGraveSearchByProperty = serializedObject.FindProperty("_graveSearchByProperty");
                 _spPropertyToSearchGrave = serializedObject.FindProperty("_propertyToSearchGrave");
                 _spNameToSearchGrave = serializedObject.FindProperty("_nameToSearchGrave");
@@ -536,6 +617,7 @@ namespace _Game.Scripts.Abilities
                 //Return Cards to Deck
                 _spReturnCardsFromHand = serializedObject.FindProperty("_returnCardsFromHand");
                 _spAmountOfCardsToReturnHand = serializedObject.FindProperty("_amountOfCardsToReturnHand");
+                _spReturnFromHandAmountIgnoresLevel = serializedObject.FindProperty("_returnFromHandAmountIgnoresLevel");
                 _spReturnCardsByPropertyHand = serializedObject.FindProperty("_returnCardsByPropertyHand");
                 _spPropertyReturnCardsHand = serializedObject.FindProperty("_propertyReturnCardsHand");
                 _spNameReturnCardsHand = serializedObject.FindProperty("_nameReturnCardsHand");
@@ -543,6 +625,7 @@ namespace _Game.Scripts.Abilities
                 _spRarityReturnCardsHand = serializedObject.FindProperty("_rarityReturnCardsHand");
                 _spReturnCardsFromGrave = serializedObject.FindProperty("_returnCardsFromGrave");
                 _spAmountOfCardsToReturnGrave = serializedObject.FindProperty("_amountOfCardsToReturnGrave");
+                _spReturnFromGraveAmountIgnoresLevel = serializedObject.FindProperty("_returnFromGraveAmountIgnoresLevel");
                 _spReturnCardsByPropertyGrave = serializedObject.FindProperty("_returnCardsByPropertyGrave");
                 _spPropertyReturnCardsGrave = serializedObject.FindProperty("_propertyReturnCardsGrave");
                 _spNameReturnCardsGrave = serializedObject.FindProperty("_nameReturnCardsGrave");
@@ -552,6 +635,7 @@ namespace _Game.Scripts.Abilities
                 //Send Cards to Grave
                 _spSendGraveHand = serializedObject.FindProperty("_sendGraveHand");
                 _spAmountToSendGraveHand = serializedObject.FindProperty("_amountToSendGraveHand");
+                _spSendFromHandAmountIgnoresLevel = serializedObject.FindProperty("_sendFromHandAmountIgnoresLevel");
                 _spSendGraveByPropertyHand = serializedObject.FindProperty("_sendGraveByPropertyHand");
                 _spPropertyToSendGraveHand = serializedObject.FindProperty("_propertyToSendGraveHand");
                 _spNameToSendGraveHand = serializedObject.FindProperty("_nameToSendGraveHand");
@@ -559,6 +643,7 @@ namespace _Game.Scripts.Abilities
                 _spRarityToSendGraveHand = serializedObject.FindProperty("_rarityToSendGraveHand");
                 _spSendGraveDeck = serializedObject.FindProperty("_sendGraveDeck");
                 _spAmountToSendGraveDeck = serializedObject.FindProperty("_amountToSendGraveDeck");
+                _spSendFromDeckAmountIgnoresLevel = serializedObject.FindProperty("_sendFromDeckAmountIgnoresLevel");
                 _spSendGraveByPropertyDeck = serializedObject.FindProperty("_sendGraveByPropertyDeck");
                 _spPropertyToSendGraveDeck = serializedObject.FindProperty("_propertyToSendGraveDeck");
                 _spNameToSendGraveDeck = serializedObject.FindProperty("_nameToSendGraveDeck");
@@ -568,8 +653,10 @@ namespace _Game.Scripts.Abilities
                 //Card Cooldown Reduction
                 _spCooldownReduction = serializedObject.FindProperty("_cooldownReduction");
                 _spAmountCardsCooldownReduction = serializedObject.FindProperty("_amountCardsCooldownReduction");
+                _spCdReductionCardAmountIgnoresLevel = serializedObject.FindProperty("_cdReductionCardAmountIgnoresLevel");
                 _spAmountReductionCooldownReduction = serializedObject.FindProperty("_amountReductionCooldownReduction");
                 _spFlatCooldownReduction = serializedObject.FindProperty("_flatCooldownReduction");
+                _spCdReductionReductionAmountIgnoresLevel = serializedObject.FindProperty("_cdReductionReductionAmountIgnoresLevel");
                 _spCooldownReductionByProperty = serializedObject.FindProperty("_cooldownReductionByProperty");
                 _spPropertyCooldownReduction = serializedObject.FindProperty("_propertyCooldownReduction");
                 _spNameCooldownReduction = serializedObject.FindProperty("_nameCooldownReduction");
@@ -579,11 +666,14 @@ namespace _Game.Scripts.Abilities
                 //Gacha Pull Cost Manipulation
                 _spManipulateGachaPullCost = serializedObject.FindProperty("_manipulateGachaPullCost");
                 _spGachaPullCostChange = serializedObject.FindProperty("_gachaPullCostChange");
+                _spGachaPullCostChangeIsFlat = serializedObject.FindProperty("_gachaPullCostChangeIsFlat");
                 _spBlockOtherGachaCostChanges = serializedObject.FindProperty("_blockOtherGachaCostChanges");
+                _spGachaPullCostChangeAmountIgnoresLevel = serializedObject.FindProperty("_gachaPullCostChangeAmountIgnoresLevel");
 
                 //Remove Cards from the Players Inventory
                 _spDestroyCards = serializedObject.FindProperty("_destroyCards");
                 _spAmountOfCardsToDestroy = serializedObject.FindProperty("_amountOfCardsToDestroy");
+                _spDestroyAmountIgnoresLevel = serializedObject.FindProperty("_destroyAmountIgnoresLevel");
                 _spDestroyCardsByProperty = serializedObject.FindProperty("_destroyCardsByProperty");
                 _spPropertyDestroyCards = serializedObject.FindProperty("_propertyDestroyCards");
                 _spNameDestroyCards = serializedObject.FindProperty("_nameDestroyCards");
@@ -593,10 +683,12 @@ namespace _Game.Scripts.Abilities
                 //Gain Stars
                 _spGainStars = serializedObject.FindProperty("_gainStars");
                 _spGainStarsAmount = serializedObject.FindProperty("_gainStarsAmount");
+                _spStarAmountIgnoresLevel = serializedObject.FindProperty("_starAmountIgnoresLevel");
                 
                 //Gain Autoclicker
                 _spGainAutoclicker = serializedObject.FindProperty("_gainAutoclicker");
                 _spAutoclickerDuration = serializedObject.FindProperty("_autoclickerDuration");
+                _spAutoclickerDurationIgnoresLevel = serializedObject.FindProperty("_autoclickerDurationIgnoresLevel");
             }
 
             public override void OnInspectorGUI()
@@ -671,6 +763,12 @@ namespace _Game.Scripts.Abilities
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spCoinPerClickDuration, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
+                        
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spCoinEffectIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
                     }
                     GUILayout.Space(10f);
 
@@ -704,6 +802,12 @@ namespace _Game.Scripts.Abilities
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spSoulPerClickDuration, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spSoulEffectIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
                     }
                     GUILayout.Space(10f);
 
@@ -718,6 +822,12 @@ namespace _Game.Scripts.Abilities
                         GUILayout.Label("Amount");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spDrawCardsAmount, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spDrawEffectIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
                     }
                     GUILayout.Space(10f);
@@ -734,6 +844,14 @@ namespace _Game.Scripts.Abilities
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spDeckSearchAmount, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spDeckSearchAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Search By Property?");
@@ -776,6 +894,14 @@ namespace _Game.Scripts.Abilities
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spGraveSearchAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Search By Property?");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spGraveSearchByProperty, GUIContent.none, GUILayout.MaxWidth(50f));
@@ -814,6 +940,14 @@ namespace _Game.Scripts.Abilities
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spAmountOfCardsToReturnHand, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spReturnFromHandAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Return By Property?");
@@ -857,6 +991,14 @@ namespace _Game.Scripts.Abilities
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spReturnFromGraveAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Return By Property?");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spReturnCardsByPropertyGrave, GUIContent.none, GUILayout.MaxWidth(50f));
@@ -896,6 +1038,14 @@ namespace _Game.Scripts.Abilities
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spAmountToSendGraveHand, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spSendFromHandAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Send By Property?");
@@ -939,6 +1089,14 @@ namespace _Game.Scripts.Abilities
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spSendFromDeckAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Send By Property?");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spSendGraveByPropertyDeck, GUIContent.none, GUILayout.MaxWidth(50f));
@@ -980,16 +1138,32 @@ namespace _Game.Scripts.Abilities
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spCdReductionCardAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Amount of Reduction");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spAmountReductionCooldownReduction, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
-                        GUILayout.Label("Is the reduction flat?");
+                        GUILayout.Label("Is the reduction additive?");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spFlatCooldownReduction, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spCdReductionReductionAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Limit to Property?");
@@ -1020,27 +1194,6 @@ namespace _Game.Scripts.Abilities
                     GUILayout.Space(10f);
 
                     EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
-                    EditorGUILayout.LabelField("Manipulate Gacha Pull Cost", EditorStyles.boldLabel, GUILayout.Width(250f));
-                    GUILayout.FlexibleSpace();
-                    EditorGUILayout.PropertyField(_spManipulateGachaPullCost, GUIContent.none, GUILayout.MaxWidth(50f));
-                    EditorGUILayout.EndHorizontal();
-                    if(_spManipulateGachaPullCost.boolValue)
-                    {
-                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
-                        GUILayout.Label("Gacha Cost Change (Multiplier)");
-                        GUILayout.FlexibleSpace();
-                        EditorGUILayout.PropertyField(_spGachaPullCostChange, GUIContent.none, GUILayout.MaxWidth(50f));
-                        EditorGUILayout.EndHorizontal();
-
-                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
-                        GUILayout.Label("Block Other Cost Changes?");
-                        GUILayout.FlexibleSpace();
-                        EditorGUILayout.PropertyField(_spBlockOtherGachaCostChanges, GUIContent.none, GUILayout.MaxWidth(50f));
-                        EditorGUILayout.EndHorizontal();
-                    }
-                    GUILayout.Space(10f);
-
-                    EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                     EditorGUILayout.LabelField("Destroy Card/s", EditorStyles.boldLabel, GUILayout.Width(250f));
                     GUILayout.FlexibleSpace();
                     EditorGUILayout.PropertyField(_spDestroyCards, GUIContent.none, GUILayout.MaxWidth(50f));
@@ -1052,6 +1205,14 @@ namespace _Game.Scripts.Abilities
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spAmountOfCardsToDestroy, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spDestroyAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.Space(5f);
 
                         EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                         GUILayout.Label("Destroy By Property?");
@@ -1082,6 +1243,39 @@ namespace _Game.Scripts.Abilities
                     GUILayout.Space(10f);
 
                     EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                    EditorGUILayout.LabelField("Manipulate Gacha Pull Cost", EditorStyles.boldLabel, GUILayout.Width(250f));
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.PropertyField(_spManipulateGachaPullCost, GUIContent.none, GUILayout.MaxWidth(50f));
+                    EditorGUILayout.EndHorizontal();
+                    if(_spManipulateGachaPullCost.boolValue)
+                    {
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Gacha Cost Change (Multiplier)");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spGachaPullCostChange, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Is the change additive?");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spGachaPullCostChangeIsFlat, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spGachaPullCostChangeAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Block Other Cost Changes?");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spBlockOtherGachaCostChanges, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+                    }
+                    GUILayout.Space(10f);
+
+                    EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                     EditorGUILayout.LabelField("Gain Stars", EditorStyles.boldLabel, GUILayout.Width(250f));
                     GUILayout.FlexibleSpace();
                     EditorGUILayout.PropertyField(_spGainStars, GUIContent.none, GUILayout.MaxWidth(50f));
@@ -1092,6 +1286,12 @@ namespace _Game.Scripts.Abilities
                         GUILayout.Label("Amount");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spGainStarsAmount, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spStarAmountIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
                     }
                     GUILayout.Space(10f);
@@ -1107,6 +1307,12 @@ namespace _Game.Scripts.Abilities
                         GUILayout.Label("Duration");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spAutoclickerDuration, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        GUILayout.Label("Value is Static");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spAutoclickerDurationIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
                     }
                 }

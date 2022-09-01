@@ -14,6 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startingCoins: 0
   _startingSouls: 0
-  _baseCoinGainPerClick: 15
+  _maxSoulsBase: 11000000000
+  _soulMultipliers:
+  - 1
+  - 2
+  - 6
+  - 20
+  - 99.99
+  _soulMultiplierUpperBounds: 0d000000640000000f27000040420f00
+  _cardTypeMultipliers:
+  - 0.1
+  - 1
+  - 15
+  _cardTypeMultiplierUpperBounds: 6400000070170000
+  _baseCoinGainPerClick: 1
   _capCoinsPerClickAtBase: 0
+  _autoclickerIntervalLp: 11
+  _autoclickerIntervalAbility: 3
   _baseGachaPullCost: 0
+  _maxDupesAllowedInDeck: 1
