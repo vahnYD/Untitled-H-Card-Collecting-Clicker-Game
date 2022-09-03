@@ -10,7 +10,7 @@ using UnityEngine;
 namespace _Game.Scripts.Cards
 {
     [Serializable]
-    public class Deck
+    public class Deck : ICardList
     {
         #region Properties
         [SerializeField] private List<CardInstance> _decklist = new List<CardInstance>();
@@ -18,9 +18,19 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #region Methods
+        public List<CardInstance> GetCardList() => _decklist;
         public void AddCard(CardInstance card)
         {
             _decklist.Add(card);
+        }
+
+        public void AddMultipleCards(CardInstance[] cards)
+        {
+            if(cards.Length is 0) return;
+            for(int i = 0; i < cards.Length; i++)
+            {
+                if(cards[i] != null)_decklist.Add(cards[i]);
+            }
         }
 
         public void RemoveCard(CardInstance card)
@@ -30,6 +40,7 @@ namespace _Game.Scripts.Cards
 
         public CardInstance Draw()
         {
+            if(_decklist.Count is 0) return null;
             CardInstance card = _decklist[0];
             _decklist.RemoveAt(0);
             return card;

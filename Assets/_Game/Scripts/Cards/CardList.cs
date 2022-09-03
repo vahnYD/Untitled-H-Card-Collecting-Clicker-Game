@@ -33,11 +33,21 @@ namespace _Game.Scripts.Cards
             //! needs implementation
             return null;
         }
+
+        public Card GetRandomCard()
+        {
+            return _cards[Random.Range(0, _cards.Count)];
+        }
         #endregion
 
         #if UNITY_EDITOR
         [ContextMenu("Create Card")]
         private void DebugCreateCard() => CreateCard("Placeholder Name");
+
+        public void RemoveCard(Card card)
+        {
+            _cards.Remove(card);
+        }
 
         protected void CreateCard(string cardName)
         {

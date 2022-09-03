@@ -12,7 +12,7 @@ using UnityEngine;
 namespace _Game.Scripts.Cards
 {
     [Serializable]
-    public class PlayerCardInventory
+    public class PlayerCardInventory : ICardList
     {
         #region Properties
         [SerializeField] private List<CardInstance> _cardInventory = new List<CardInstance>();
@@ -25,6 +25,7 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #region Methods
+        public List<CardInstance> GetCardList() => _cardInventory;
         public void AddCard(CardInstance card)
         {
             Card cardRef = card.CardRef;
@@ -100,6 +101,15 @@ namespace _Game.Scripts.Cards
             }
 
             _typeMultiplier = output;
+        }
+
+        public bool CheckIfCardIsDuplicate(CardInstance card)
+        {
+            for(int i = 0; i < _cardInventory.Count; i++)
+            {
+                if(_cardInventory[i].CardArt == card.CardArt) return true;
+            }
+            return false;
         }
         #endregion
     }

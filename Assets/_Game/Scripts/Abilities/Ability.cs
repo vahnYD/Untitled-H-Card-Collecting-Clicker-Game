@@ -129,7 +129,8 @@ namespace _Game.Scripts.Abilities
 
         //Gacha Pull Cost Manipulation
         [SerializeField] private bool _manipulateGachaPullCost;
-        [SerializeField] private float _gachaPullCostChange;
+        public bool ModifiesGachaPullCost => _manipulateGachaPullCost;
+        [SerializeField, Tooltip("Negative Values are Reductions, Positive Values are Increases.")] private float _gachaPullCostChange;
         [SerializeField] private bool _gachaPullCostChangeIsFlat;
         [SerializeField] private bool _blockOtherGachaCostChanges;
         [SerializeField] private bool _gachaPullCostChangeAmountIgnoresLevel;
@@ -315,11 +316,11 @@ namespace _Game.Scripts.Abilities
 
                 if(!_cooldownReductionByProperty)
                 {
-                    gameManager.ReduceCooldownOfCards(reductionPostMult, amountPostMult);
+                    gameManager.ReduceCooldownOfCards(reductionPostMult, _flatCooldownReduction, amountPostMult);
                 }
                 else
                 {
-                    gameManager.ReduceCooldownOfCards(reductionPostMult, amountPostMult, true, _propertyCooldownReduction, _nameCooldownReduction, _typeCooldownReduction, _rarityCooldownReduction);
+                    gameManager.ReduceCooldownOfCards(reductionPostMult, _flatCooldownReduction, amountPostMult, true, _propertyCooldownReduction, _nameCooldownReduction, _typeCooldownReduction, _rarityCooldownReduction);
                 }
             }
 
@@ -411,6 +412,12 @@ namespace _Game.Scripts.Abilities
 
 
         #if UNITY_EDITOR
+        protected void DeleteAbility()
+        {
+            _abilityLevelList.RemoveAbility(this);
+            Destroy(this);
+        }
+
         public void Initialise(AbilityList abilityList, string name, int id)
         {
             _abilityLevelList = abilityList;
@@ -423,6 +430,7 @@ namespace _Game.Scripts.Abilities
         public class AbilityEditor : Editor
         {
             #region Serialized Properties
+            Ability _sO;
             //Basic Properties
             SerializedProperty _spAbilityLevelList;
             SerializedProperty _spId;
@@ -556,10 +564,11 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spAutoclickerDurationIgnoresLevel;
             #endregion
 
-            private bool _showUpgrades, _showAbilities = false;
+            private bool _showUpgrades, _showAbilities, _showDeleteButton = false;
 
             private void OnEnable()
             {
+                _sO = (Ability) target;
                 //Basic Properties
                 _spAbilityLevelList = serializedObject.FindProperty("_abilityLevelList");
                 _spId = serializedObject.FindProperty("_id");
@@ -1317,6 +1326,20 @@ namespace _Game.Scripts.Abilities
                     }
                 }
                 EditorGUILayout.EndFoldoutHeaderGroup();
+
+                GUILayout.Space(15f);
+                if(GUILayout.Button("Delete Ability"))
+                {
+                    _showDeleteButton = !_showDeleteButton;
+                }
+
+                if(_showDeleteButton)
+                {
+                    if(GUILayout.Button("Are you Sure?"))
+                    {
+                        _sO.DeleteAbility();
+                    }
+                }
 
                 serializedObject.ApplyModifiedProperties();
             }

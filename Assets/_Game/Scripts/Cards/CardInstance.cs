@@ -23,8 +23,6 @@ namespace _Game.Scripts.Cards
         public Abilities.Ability CardAbility => _card.Ability;
         private bool _onCooldown;
         public bool OnCooldown => _onCooldown;
-        private int _remainingCooldown;
-        public int RemainingCooldown => _remainingCooldown;
         private int _level;
         public int Level => _level;
         private int _nextUpgradeCost;
@@ -45,8 +43,14 @@ namespace _Game.Scripts.Cards
         public void ActivateAbility()
         {
             if(!_hasAbility) return;
+            if(_onCooldown) return;
             _card.Ability.ActivateAbility(_level);
+            _onCooldown = true;
+            CardCooldownManager.Instance.StartCooldownForCard(this, _card.Ability.CooldownInSec);
+            GameManager.Instance.MoveSpecificCard(this, GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave);
         }
+
+        public void OffCooldown() => _onCooldown = false;
 
         public bool AttemptUpgrade()
         {

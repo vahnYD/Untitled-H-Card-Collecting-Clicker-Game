@@ -56,6 +56,11 @@ namespace _Game.Scripts.Abilities
             EditorUtility.SetDirty(ability);
         }
 
+        public void RemoveAbility(Ability ability)
+        {
+            _abilityList.Remove(ability);
+        }
+
         [CustomEditor(typeof(AbilityList))]
         public class AbilityListEditor : Editor
         {

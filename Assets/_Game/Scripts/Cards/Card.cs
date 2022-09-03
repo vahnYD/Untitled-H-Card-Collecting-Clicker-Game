@@ -52,6 +52,12 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #if UNITY_EDITOR
+        protected void DeleteCard()
+        {
+            _cardList.RemoveCard(this);
+            Destroy(this);
+        }
+
         public void Initialise(CardList cardList, string name, int id)
         {
             _cardList = cardList;
@@ -64,6 +70,7 @@ namespace _Game.Scripts.Cards
         public class CardEditor : Editor
         {
             #region Serialized Properties
+            Card _sO;
             SerializedProperty _spCardList;
             SerializedProperty _spId;
             SerializedProperty _spName;
@@ -77,10 +84,11 @@ namespace _Game.Scripts.Cards
             SerializedProperty _spCardArt;
             #endregion
 
-
+            private bool _showDeleteButton = false;
 
             private void OnEnable()
             {
+                _sO = (Card) target;
                 _spCardList = serializedObject.FindProperty("_cardList");
                 _spId = serializedObject.FindProperty("_id");
                 _spName = serializedObject.FindProperty("_name");
@@ -109,6 +117,19 @@ namespace _Game.Scripts.Cards
                     EditorGUILayout.PropertyField(_spAbility);
                 EditorGUILayout.PropertyField(_spCardArt);
                 EditorGUILayout.PropertyField(_spFlavourText);
+
+                GUILayout.Space(15f);
+                if(GUILayout.Button("Delete Card"))
+                {
+                    _showDeleteButton = !_showDeleteButton;
+                }
+                if(_showDeleteButton)
+                {
+                    if(GUILayout.Button("Are you sure?"))
+                    {
+                        _sO.DeleteCard();
+                    }
+                }
 
                 serializedObject.ApplyModifiedProperties();
             }
