@@ -17,14 +17,19 @@ namespace _Game.Scripts.Cards
         #region Properties
         [SerializeField] private List<CardInstance> _cardInventory = new List<CardInstance>();
         public List<CardInstance> CardInventory => _cardInventory;
-        private int _totalStrength;
+        private int _totalStrength = 0;
         public int TotalStrength => _totalStrength;
         private Dictionary<Card.CardType, int> _ownedTypes = new Dictionary<Card.CardType, int>();
-        private float _typeMultiplier;
+        private float _typeMultiplier = 0f;
         public float TypeMultiplier => _typeMultiplier;
         #endregion
 
         #region Methods
+        public PlayerCardInventory()
+        {
+            this._totalStrength = 0;
+            this._typeMultiplier = 0;
+        }
         public List<CardInstance> GetCardList() => _cardInventory;
         public void AddCard(CardInstance card)
         {

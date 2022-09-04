@@ -8,6 +8,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using _Game.Scripts.Cards;
 using _Game.Scripts.Extensions;
 using _Game.Scripts.UI;
@@ -29,8 +32,8 @@ public class GameManager : MonoBehaviour
     private Queue<int> _coinPerClickIncreasesManual = new Queue<int>();
     private Action ReduceCoinsPerClickAction;
     private Action ReduceCoinsPerClickManualAction;
-    [SerializeField] private int _coinAmount;
-    public int CoinTotal => _coinAmount;
+    [SerializeField] private LongValue _coinAmount;
+    public long CoinTotal => _coinAmount.Value;
     [SerializeField] private long _totalCoinsEarned;
 
     private int _currentClickSoulAmount = 0;
@@ -39,20 +42,22 @@ public class GameManager : MonoBehaviour
     private Queue<int> _soulPerClickIncreasesManual = new Queue<int>();
     private Action ReduceSoulsPerClickAction;
     private Action ReduceSoulsPerClickManualAction;
-    [SerializeField] private long _soulAmount;
-    public long SoulTotal => _soulAmount;
+    [SerializeField] private LongValue _soulAmount;
+    public long SoulTotal => _soulAmount.Value;
 
-    [SerializeField] private int _lewdPointAmount;
-    public int LewdPointTotal => _lewdPointAmount;
-    [SerializeField] private int _crystalAmount;
-    public int CrystalTotal => _crystalAmount;
-    [SerializeField] private int _starAmount;
-    public int StarTotal => _starAmount;
-    [SerializeField] private int _devilTearAmount;
-    public int DevilTearTotal => _devilTearAmount;
+    [SerializeField] private IntValue _lewdPointAmount;
+    public int LewdPointTotal => _lewdPointAmount.Value;
+    public float LewdPointTypeMultiplier => _cardInventory.TypeMultiplier;
+    public int LewdPointStrength => _cardInventory.TotalStrength;
+    [SerializeField] private IntValue _crystalAmount;
+    public int CrystalTotal => _crystalAmount.Value;
+    [SerializeField] private IntValue _starAmount;
+    public int StarTotal => _starAmount.Value;
+    [SerializeField] private IntValue _devilTearAmount;
+    public int DevilTearTotal => _devilTearAmount.Value;
 
-    private bool _drawIsBlocked = false;
-    public bool isDrawingBlocked => _drawIsBlocked;
+    [SerializeField] private BoolValue _drawIsBlocked;
+    public bool isDrawingBlocked => _drawIsBlocked.Value;
     private Action UnblockDrawAction;
     [SerializeField] private PlayerCardInventory _cardInventory = null;
     [SerializeField] private Deck _deck = null;
@@ -62,20 +67,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Deck _grave = null;
     public int GraveSize => _grave.DeckList.Count;
 
-    [SerializeField] private bool _firstRound = true;
-    [SerializeField] private bool _reachedFirstRoundCap = false;
-    public bool FirstRoundGachaCapReached => _reachedFirstRoundCap;
-    [SerializeField] private bool _tenPullDisabled = true;
-    public bool isTenPullDisabled => _tenPullDisabled;
+    [SerializeField] private BoolValue _firstRound;
+    [SerializeField] private BoolValue _reachedFirstRoundCap;
+    public bool FirstRoundGachaCapReached => _reachedFirstRoundCap.Value;
+    [SerializeField] private BoolValue _tenPullDisabled;
+    public bool isTenPullDisabled => _tenPullDisabled.Value;
     [SerializeField] private int _totalGachaPullAmount;
     public int TotalGachaPullAmount => _totalGachaPullAmount;
-    private int _gachaPullCost;
-    private int _gachaPullCost10;
-    private bool _gachaCostIsModified = false;
-    private bool _gachaCostChangesAreBlocked = false;
-    private bool _starWasUsed = false;
-    private bool StarWasUsed => _starWasUsed;
-    public bool GachaCostChangesAreBlocked => _gachaCostChangesAreBlocked;
+    [SerializeField] private IntValue _gachaPullCost;
+    [SerializeField] private IntValue _gachaPullCost10;
+    [SerializeField] private BoolValue _gachaCostIsModified;
+    [SerializeField] private BoolValue _gachaCostChangesAreBlocked;
+    [SerializeField] private BoolValue _starWasUsed;
+    private bool StarWasUsed => _starWasUsed.Value;
+    public bool GachaCostChangesAreBlocked => _gachaCostChangesAreBlocked.Value;
 	#endregion
 
     #region Events
@@ -95,22 +100,31 @@ public class GameManager : MonoBehaviour
             Instance = this;
         }
 
+        #if UNITY_EDITOR
+        if(_cardList is null || _gameSettings is null || _coinAmount is null || _soulAmount is null || _lewdPointAmount is null || _crystalAmount is null || _starAmount is null || _devilTearAmount is null || _drawIsBlocked is null || _firstRound is null || _reachedFirstRoundCap is null || _tenPullDisabled is null || _gachaPullCost is null || _gachaPullCost10 is null || _gachaCostIsModified is null || _gachaCostChangesAreBlocked is null || _starWasUsed is null)
+            Debug.LogWarning("Game Manager is missing Object References");
+        #endif
+
         if(_cardInventory is null) _cardInventory = new PlayerCardInventory();
         if(_deck is null) _deck = new Deck();
         if(_grave is null) _grave = new Deck();
         if(_hand is null) _hand = new Deck();
 
-        _currentClickCoinAmount = _gameSettings.BaseCoinGainPerClick;
+        _currentClickCoinAmount = 0;
         _currentClickCoinAmountManual = _gameSettings.BaseCoinGainPerClick;
 
         UpdateGachaPullCost();
+        UpdateLewdPoints();
 
         ReduceCoinsPerClickAction = () => ReduceCoinsPerClick(ref _currentClickCoinAmount);
         ReduceCoinsPerClickManualAction = () => ReduceCoinsPerClick(ref _currentClickCoinAmountManual, true);
         ReduceSoulsPerClickAction = () => ReduceSoulsPerClick(ref _currentClickSoulAmount);
         ReduceSoulsPerClickManualAction = () => ReduceCoinsPerClick(ref _currentClickSoulAmountManual, true);
 
-        UnblockDrawAction = () => _drawIsBlocked = false;
+        #if UNITY_EDITOR
+        if(_drawIsBlocked != null)
+        #endif
+            UnblockDrawAction = () => _drawIsBlocked.Value = false;
     }
 
     private void OnEnable()
@@ -148,18 +162,18 @@ public class GameManager : MonoBehaviour
     // Currency Interactions
     public void AddCoins(int coins)
     {
-        _coinAmount += coins;
+        _coinAmount.Value += coins;
         _totalCoinsEarned += coins;
     }
 
     public void RemoveCoins(int coins)
     {
-        if(_coinAmount - coins <= 0)
+        if(_coinAmount.Value - coins <= 0)
         {
-            _coinAmount = 0;
+            _coinAmount.Value = 0;
             return;
         }
-        _coinAmount -= coins;
+        _coinAmount.Value -= coins;
     }
 
     public void IncreaseCoinsPerClick(int increase, int duration, bool isManual = false)
@@ -197,19 +211,19 @@ public class GameManager : MonoBehaviour
 
     public void AddSouls(int souls)
     {
-        if(_soulAmount > _gameSettings.MaxSoulsAtBase) return;
-        _soulAmount += souls;
-        if(_soulAmount > _gameSettings.MaxSoulsAtBase) _soulAmount = _gameSettings.MaxSoulsAtBase;
+        if(_soulAmount.Value > _gameSettings.MaxSoulsAtBase) return;
+        _soulAmount.Value += souls;
+        if(_soulAmount.Value > _gameSettings.MaxSoulsAtBase) _soulAmount.Value = _gameSettings.MaxSoulsAtBase;
     }
 
     public void RemoveSouls(int souls)
     {
-        if(_soulAmount - souls <= 0)
+        if(_soulAmount.Value - souls <= 0)
         {
-            _soulAmount = 0;
+            _soulAmount.Value = 0;
             return;
         }
-        _soulAmount -= souls;
+        _soulAmount.Value -= souls;
     }
 
     public void IncreaseSoulsPerClick(int increase, int duration, bool isManual = false)
@@ -247,16 +261,16 @@ public class GameManager : MonoBehaviour
 
     private void UpdateLewdPoints()
     {
-        _lewdPointAmount = Mathf.FloorToInt(_cardInventory.TotalStrength * _cardInventory.TypeMultiplier * GetSoulMult());
+        _lewdPointAmount.Value = Mathf.FloorToInt(_cardInventory.TotalStrength * _cardInventory.TypeMultiplier * GetSoulMult());
 
-        _currentClickCoinAmount = _gameSettings.BaseCoinGainPerClick + Mathf.FloorToInt(_lewdPointAmount / 10);
+        _currentClickCoinAmount = Mathf.FloorToInt(_lewdPointAmount.Value / 10);
         Queue<int> autoIncreases = _coinPerClickIncreases;
         for(int i = 0; i < autoIncreases.Count; i++)
         {
             _currentClickCoinAmount += autoIncreases.Dequeue();
         }
 
-        _currentClickCoinAmountManual = _gameSettings.BaseCoinGainPerClick + _lewdPointAmount;
+        _currentClickCoinAmountManual = _gameSettings.BaseCoinGainPerClick + _lewdPointAmount.Value;
         Queue<int> manualIncreases = _coinPerClickIncreasesManual;
         for(int i = 0; i < manualIncreases.Count; i++)
         {
@@ -272,7 +286,7 @@ public class GameManager : MonoBehaviour
         for(int i = 0; i < soulMults.Count; i++)
         {
             if(i >= soulMultBounds.Count) break;
-            if(_soulAmount <= soulMultBounds[i]) return soulMults[i];
+            if(_soulAmount.Value <= soulMultBounds[i]) return soulMults[i];
         }
         return soulMults[soulMults.Count-1];
     }
@@ -286,7 +300,7 @@ public class GameManager : MonoBehaviour
             drawnCards[i] = _deck.Draw();
         //TODO DrawAnimation shenanigans
         _hand.AddMultipleCards(drawnCards);
-        _drawIsBlocked = true;
+        _drawIsBlocked.Value = true;
         StartCoroutine(CoroutineExtensions.InvokeActionAfterSeconds(UnblockDrawAction, _gameSettings.DrawCooldownInSec));
     }
 
@@ -425,6 +439,7 @@ public class GameManager : MonoBehaviour
         if(cardsToDestroy is null) return;
         for(int i = 0; i < cardsToDestroy.Length; i++)
             if(cardsToDestroy[i] != null) _cardInventory?.RemoveCard(cardsToDestroy[i]);
+        UpdateLewdPoints();
     }
 
     public async void ReduceCooldownOfCards(float reductionAmount, bool reductionIsFlat, int cardAmount = 1, bool reduceByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
@@ -478,7 +493,7 @@ public class GameManager : MonoBehaviour
     public Dictionary<CardInstance, bool> GachaPull(bool isTenPull = false)
     {
         int amount = (isTenPull) ? 10 : 1;
-        RemoveCoins((isTenPull) ? _gachaPullCost10 : _gachaPullCost);
+        RemoveCoins((isTenPull) ? _gachaPullCost10.Value : _gachaPullCost.Value);
         Dictionary<CardInstance, bool> pulledCards = new Dictionary<CardInstance, bool>();
         for(int i = 0; i < amount; i++)
         {
@@ -489,10 +504,11 @@ public class GameManager : MonoBehaviour
             pulledCards.Add(card, isDupe);
         }
         _totalGachaPullAmount += amount;
-        if(_totalGachaPullAmount > 10) _tenPullDisabled = false;
-        if(_firstRound && _totalGachaPullAmount < _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1] -10) _tenPullDisabled = true;
-        if(_firstRound && _totalGachaPullAmount >= _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1]) _reachedFirstRoundCap = true;
+        if(_totalGachaPullAmount > 10) _tenPullDisabled.Value = false;
+        if(_firstRound && _totalGachaPullAmount < _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1] -10) _tenPullDisabled.Value = true;
+        if(_firstRound && _totalGachaPullAmount >= _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1]) _reachedFirstRoundCap.Value = true;
         UpdateGachaPullCost();
+        UpdateLewdPoints();
         return pulledCards;
     }
 
@@ -501,11 +517,12 @@ public class GameManager : MonoBehaviour
         List<int> bounds = _gameSettings.GachaPullCostIncreaseReductionUpperBounds;
         List<float> mults = _gameSettings.GachaPullCostIncreaseReductions;
 
-        _gachaPullCost = CalcGachaCostRecursive(_totalGachaPullAmount, bounds, mults);
+        _gachaPullCost.Value = CalcGachaCostRecursive(_totalGachaPullAmount, bounds, mults);
 
-        _gachaPullCost10 = 0;
+        int cost = 0;
         for(int i = 0; i < 10; i++)
-            _gachaPullCost10 += CalcGachaCostRecursive(_totalGachaPullAmount + i, bounds, mults);
+            cost += CalcGachaCostRecursive(_totalGachaPullAmount + i, bounds, mults);
+        _gachaPullCost10.Value = cost;
     }
 
     private int CalcGachaCostRecursive(int counter, List<int> bounds, List<float> mults)
@@ -532,15 +549,15 @@ public class GameManager : MonoBehaviour
 
     public void ModifyGachaCost(float amount, bool isFlat = false, bool isBlocking = false, bool starWasUsed = false)
     {
-        if(starWasUsed is true && _starWasUsed is true) return;
+        if(starWasUsed is true && _starWasUsed.Value is true) return;
         if(_gachaCostChangesAreBlocked) return;
-        if(!isFlat && !starWasUsed) _gachaPullCost = Mathf.RoundToInt(_gachaPullCost + (_gachaPullCost * amount));
-        else if(!starWasUsed) _gachaPullCost += Mathf.RoundToInt(amount);
-        if(isBlocking) _gachaCostChangesAreBlocked = true;
+        if(!isFlat && !starWasUsed) _gachaPullCost.Value = Mathf.RoundToInt(_gachaPullCost.Value + (_gachaPullCost.Value * amount));
+        else if(!starWasUsed) _gachaPullCost.Value += Mathf.RoundToInt(amount);
+        if(isBlocking) _gachaCostChangesAreBlocked.Value = true;
         if(starWasUsed is true)
         {
-            _starWasUsed = true;
-            _gachaPullCost10 = Mathf.RoundToInt(_gachaPullCost10 * 0.5f);
+            _starWasUsed.Value = true;
+            _gachaPullCost10.Value = Mathf.RoundToInt(_gachaPullCost10.Value * 0.5f);
         }
     }
 
@@ -549,35 +566,35 @@ public class GameManager : MonoBehaviour
         switch(rarity)
         {
             case Card.CardRarity.Common:
-                _crystalAmount += _gameSettings.CardDismantleCrystalValues[0];
+                _crystalAmount.Value += _gameSettings.CardDismantleCrystalValues[0];
                 break;
             case Card.CardRarity.Rare:
-                _crystalAmount += _gameSettings.CardDismantleCrystalValues[1];
+                _crystalAmount.Value += _gameSettings.CardDismantleCrystalValues[1];
                 break;
             case Card.CardRarity.VeryRare:
-                _crystalAmount += _gameSettings.CardDismantleCrystalValues[2];
+                _crystalAmount.Value += _gameSettings.CardDismantleCrystalValues[2];
                 break;
             case Card.CardRarity.Special:
-                _crystalAmount += _gameSettings.CardDismantleCrystalValues[3];
+                _crystalAmount.Value += _gameSettings.CardDismantleCrystalValues[3];
                 break;
         }
 
-        if(_crystalAmount > _gameSettings.CrystalsPerStar)
+        if(_crystalAmount.Value > _gameSettings.CrystalsPerStar)
         {
-            _crystalAmount -= _gameSettings.CrystalsPerStar;
+            _crystalAmount.Value -= _gameSettings.CrystalsPerStar;
             AddStar();
         }
     }
 
     public void AddStar(int amount = 1)
     {
-        _starAmount += amount;
+        _starAmount.Value += amount;
     }
 
     public void RemoveStar(int amount = 1)
     {
-        _starAmount -= amount;
-        if(_starAmount < 0) _starAmount = 0;
+        _starAmount.Value -= amount;
+        if(_starAmount.Value < 0) _starAmount.Value = 0;
     }
 	#endregion
 
@@ -601,22 +618,56 @@ public class GameManager : MonoBehaviour
 
     #if UNITY_EDITOR
     [ContextMenu("Debug/Add Coins/1k")]
-    private void DebugAddCoins1000() => _coinAmount += 1000;
+    private void DebugAddCoins1000() => _coinAmount.Value += 1000;
 
     [ContextMenu("Debug/Add Coins/10k")]
-    private void DebugAddCoins10000() => _coinAmount += 10000;
+    private void DebugAddCoins10000() => _coinAmount.Value += 10000;
 
     [ContextMenu("Debug/Add Coins/100k")]
-    private void DebugAddCoins100000() => _coinAmount += 100000;
+    private void DebugAddCoins100000() => _coinAmount.Value += 100000;
 
     [ContextMenu("Debug/Add Souls/1k")]
-    private void DebugAddSouls1000() => _soulAmount += 1000;
+    private void DebugAddSouls1000() => _soulAmount.Value += 1000;
 
     [ContextMenu("Debug/Add Souls/10k")]
-    private void DebugAddSouls10000() => _soulAmount += 10000;
+    private void DebugAddSouls10000() => _soulAmount.Value += 10000;
 
     [ContextMenu("Debug/Add Souls/100k")]
-    private void DebugAddSouls100000() => _soulAmount += 100000;
+    private void DebugAddSouls100000() => _soulAmount.Value += 100000;
+
+    [ContextMenu("Debug/Add Souls/1M")]
+    private void DebugAddSouls1000000() => _soulAmount.Value += 1000000;
+
+    [ContextMenu("Debug/Add Souls/10M")]
+    private void DebugAddSouls10000000() => _soulAmount.Value += 10000000;
+
+    [ContextMenu("Debug/Add Crystals/1")]
+    private void DebugAddCrystals() => _crystalAmount.Value += 1;
+
+    [ContextMenu("Debug/Add Crystals/10")]
+    private void DebugAddCrystals10() => _crystalAmount.Value += 10;
+
+    [ContextMenu("Debug/Add Crystals/100")]
+    private void DebugAddCrystals100()
+    {
+        _crystalAmount.Value += 99;
+        AddCrystals(Card.CardRarity.Common);
+    }
+
+    [ContextMenu("Debug/Add Stars/1")]
+    private void DebugAddStars() => _starAmount.Value += 1;
+
+    [ContextMenu("Debug/Add Stars/10")]
+    private void DebugAddStars10() => _starAmount.Value += 10;
+
+    [ContextMenu("Debug/Add Devil Tear/1")]
+    private void DebugAddDevilTear() => _devilTearAmount.Value += 1;
+
+    [ContextMenu("Debug/Add Devil Tear/10")]
+    private void DebugAddDevilTear10() => _devilTearAmount.Value += 10;
+
+    [ContextMenu("Debug/Add Devil Tear/100")]
+    private void DebugAddDevilTear100() => _devilTearAmount.Value += 100;
 
     [ContextMenu("Debug/Gain Autoclicker/30sec")]
     private void DebugAddAutoclicker30() => GainAutoclicker(30);
@@ -626,6 +677,15 @@ public class GameManager : MonoBehaviour
 
     [ContextMenu("Debug/Gain Autoclicker/10min")]
     private void DebugAddAutoclicker600() => GainAutoclicker(600);
+
+    [CustomEditor(typeof(GameManager))]
+    public class GameManagerEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+        }
+    }
     #endif
 
     public enum CardGameStates
