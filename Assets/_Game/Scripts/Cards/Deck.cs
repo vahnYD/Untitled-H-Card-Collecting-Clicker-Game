@@ -15,6 +15,7 @@ namespace _Game.Scripts.Cards
         #region Properties
         [SerializeField] private List<CardInstance> _decklist = new List<CardInstance>();
         public List<CardInstance> DeckList => _decklist;
+        public event Action DeckSizeChangedEvent;
         #endregion
 
         #region Methods
@@ -22,6 +23,7 @@ namespace _Game.Scripts.Cards
         public void AddCard(CardInstance card)
         {
             _decklist.Add(card);
+            DeckSizeChangedEvent?.Invoke();
         }
 
         public void AddMultipleCards(CardInstance[] cards)
@@ -31,18 +33,25 @@ namespace _Game.Scripts.Cards
             {
                 if(cards[i] != null)_decklist.Add(cards[i]);
             }
+            DeckSizeChangedEvent?.Invoke();
         }
 
         public void RemoveCard(CardInstance card)
         {
             _decklist.Remove(card);;
+            DeckSizeChangedEvent.Invoke();
         }
+
+        public List<CardInstance> GetCardsByName(string name) => _decklist.FindAll((CardInstance card) => card.Name == name);
+        public List<CardInstance> GetCardsByType(Card.CardType type) => _decklist.FindAll((CardInstance card) => card.CardRef.Type == type);
+        public List<CardInstance> GetCardsByRarity(Card.CardRarity rarity) => _decklist.FindAll((CardInstance card) => card.CardRef.Rarity == rarity);
 
         public CardInstance Draw()
         {
             if(_decklist.Count is 0) return null;
             CardInstance card = _decklist[0];
             _decklist.RemoveAt(0);
+            DeckSizeChangedEvent?.Invoke();
             return card;
         }
 

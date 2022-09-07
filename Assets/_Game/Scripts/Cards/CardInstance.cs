@@ -29,6 +29,7 @@ namespace _Game.Scripts.Cards
         public int NextUpgradeCost => _nextUpgradeCost;
         private string _abilityText;
         public string AbilityText => _abilityText;
+        public event Action AbilityUpgradeEvent;
         
         public CardInstance(Card card)
         {
@@ -67,6 +68,7 @@ namespace _Game.Scripts.Cards
             UpdateAbilityText();
             GameManager.Instance.RemoveCoins(_nextUpgradeCost);
             _nextUpgradeCost = _card.Ability.GetUpgradeCostForLevel(_level+1);
+            AbilityUpgradeEvent?.Invoke();
         }
 
         private void UpdateAbilityText()
