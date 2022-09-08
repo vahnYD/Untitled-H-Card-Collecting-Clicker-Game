@@ -20,13 +20,19 @@ namespace _Game.Scripts.UI
         private GameSettingsScriptableObject _gameSettings = null;
         #endregion
 
+        #if UNITY_EDITOR
         private void Awake()
         {
-            _gameSettings = GameManager.Instance.GameSettingsRef;
+            if(_duplicateAnimObj is null || _obtainedCrystalsText is null)
+                Debug.LogWarning("GachaPullDuplicateAnimationHandler.cs at " + this.name + " is missing Object references.");
+        }
+        #endif
 
+        private void Start()
+        {
+            _gameSettings = GameManager.Instance.GameSettingsRef;
             #if UNITY_EDITOR
-            if(_duplicateAnimObj is null || _obtainedCrystalsText is null || _gameSettings is null)
-                Debug.LogWarning("GachaPullDuplicateAnimationHandle.cs at " + this.name + " is missing Object references.");
+            if(_gameSettings is null) Debug.LogWarning("GachaPullDuplicateAnimationHandler.cs at " + this.name + " can't get the GameSettings from the GameManager.");
             #endif
         }
         

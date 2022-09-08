@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour
     public int LewdPointTotal => _lewdPointAmount.Value;
     public float LewdPointTypeMultiplier => _cardInventory.TypeMultiplier;
     public int LewdPointStrength => _cardInventory.TotalStrength;
+    public float LewdPointSoulMultiplier => GetSoulMult();
     [SerializeField] private IntValue _crystalAmount;
     public int CrystalTotal => _crystalAmount.Value;
     [SerializeField] private IntValue _starAmount;
@@ -263,14 +264,14 @@ public class GameManager : MonoBehaviour
     {
         _lewdPointAmount.Value = Mathf.FloorToInt(_cardInventory.TotalStrength * _cardInventory.TypeMultiplier * GetSoulMult());
 
-        _currentClickCoinAmount = Mathf.FloorToInt(_lewdPointAmount.Value / 10);
+        _currentClickCoinAmount = _lewdPointAmount.Value;
         Queue<int> autoIncreases = _coinPerClickIncreases;
         for(int i = 0; i < autoIncreases.Count; i++)
         {
             _currentClickCoinAmount += autoIncreases.Dequeue();
         }
 
-        _currentClickCoinAmountManual = _gameSettings.BaseCoinGainPerClick + _lewdPointAmount.Value;
+        _currentClickCoinAmountManual = _gameSettings.BaseCoinGainPerClick + Mathf.FloorToInt(_lewdPointAmount.Value/10);
         Queue<int> manualIncreases = _coinPerClickIncreasesManual;
         for(int i = 0; i < manualIncreases.Count; i++)
         {
@@ -516,15 +517,39 @@ public class GameManager : MonoBehaviour
     {
         List<int> bounds = _gameSettings.GachaPullCostIncreaseReductionUpperBounds;
         List<float> mults = _gameSettings.GachaPullCostIncreaseReductions;
+        int singleCost = _gachaPullCost.Value;
+        _gachaPullCost.Value = CalcGachaCost(singleCost, bounds, mults);
 
-        _gachaPullCost.Value = CalcGachaCostRecursive(_totalGachaPullAmount, bounds, mults);
-
-        int cost = 0;
-        for(int i = 0; i < 10; i++)
-            cost += CalcGachaCostRecursive(_totalGachaPullAmount + i, bounds, mults);
+        int cost = _gachaPullCost.Value;
+        for(int i = 1; i < 10; i++)
+        {
+            singleCost = CalcGachaCost(singleCost, bounds, mults, i);
+            cost += singleCost;
+        }
         _gachaPullCost10.Value = cost;
     }
 
+    private int CalcGachaCost(int singlePullCost, List<int> bounds, List<float> mults, int pullIncrease = 0)
+    {
+        if(singlePullCost is 0) singlePullCost = _gameSettings.BaseGachaPullCost;
+        float incrementMult = 1f;
+        bool multSet = false;
+        for(int i = 0; i < mults.Count - 1; i++)
+        {
+            if(i >= bounds.Count) break;
+            if(_totalGachaPullAmount+pullIncrease < bounds[i])
+            {
+                incrementMult = mults[i];
+                multSet = true;
+                break;
+            }
+        }
+        if(!multSet && _firstRound) incrementMult = mults[mults.Count - 1];
+        singlePullCost =  Mathf.FloorToInt(singlePullCost + (_totalGachaPullAmount+pullIncrease) * (_gameSettings.BaseGachaPullIncrement * incrementMult));
+        return singlePullCost;
+    }
+
+    //! Deprecated 
     private int CalcGachaCostRecursive(int counter, List<int> bounds, List<float> mults)
     {
         if(counter <= 0)
@@ -544,7 +569,8 @@ public class GameManager : MonoBehaviour
         }
         if(!multSet && _firstRound) incrementMult = mults[mults.Count - 1];
 
-        return Mathf.FloorToInt(CalcGachaCostRecursive(counter - 1, bounds, mults) + (counter * (_gameSettings.BaseGachaPullIncrement * incrementMult)));
+        int output = Mathf.FloorToInt(CalcGachaCostRecursive(counter - 1, bounds, mults) + (counter * (_gameSettings.BaseGachaPullIncrement * incrementMult)));
+        return output;
     }
 
     public void ModifyGachaCost(float amount, bool isFlat = false, bool isBlocking = false, bool starWasUsed = false)
@@ -604,11 +630,12 @@ public class GameManager : MonoBehaviour
         int counter = 0;
         int lpInterval = _gameSettings.AutoClickerLewdpointInterval;
         int abilityInterval = _gameSettings.AutoclickerAbilityInterval;
-        int counterRest = (lpInterval > abilityInterval) ? lpInterval : abilityInterval;
+        int counterRest = (lpInterval >= abilityInterval) ? lpInterval : abilityInterval;
         for(;;)
         {
             yield return new WaitForSeconds(1f);
-            counter = counter++ % counterRest;
+            counter++;
+            if(counter >= counterRest) counter = 0;
             if(_runningAutoClickerDuration > 0 && counter % abilityInterval == 0) Click();
             if(counter % lpInterval == 0) Click();
             if(_runningAutoClickerDuration > 0) _runningAutoClickerDuration--;
@@ -677,6 +704,12 @@ public class GameManager : MonoBehaviour
 
     [ContextMenu("Debug/Gain Autoclicker/10min")]
     private void DebugAddAutoclicker600() => GainAutoclicker(600);
+
+    [ContextMenu("Debug/Force Update/Gacha Cost")]
+    private void DebugForceUpdateGachaCost() => UpdateGachaPullCost();
+
+    [ContextMenu("Debug/Force Update/Lewd Points")]
+    private void DebugForceUpdateLewdPoints() => UpdateLewdPoints();
 
     [CustomEditor(typeof(GameManager))]
     public class GameManagerEditor : Editor

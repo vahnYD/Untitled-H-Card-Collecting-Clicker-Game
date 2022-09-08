@@ -3,6 +3,7 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -103,10 +104,10 @@ namespace _Game.Scripts.UI
         #region Methods
         private void CatchCoinAmountChange(long newVal)
         {
-            if(newVal > _singlePullCost.Value && !_reachedFirstRoundCapFlag.Value && !_buttonGachaLock) _singlePullButton.interactable = true;
+            if(newVal >= _singlePullCost.Value && !_reachedFirstRoundCapFlag.Value && !_buttonGachaLock) _singlePullButton.interactable = true;
             else _singlePullButton.interactable = false;
 
-            if(newVal > _tenPullCost.Value && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag && !_buttonGachaLock) _tenPullButton.interactable = true;
+            if(newVal >= _tenPullCost.Value && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag && !_buttonGachaLock) _tenPullButton.interactable = true;
             else _tenPullButton.interactable = false;
         }
 
@@ -170,10 +171,11 @@ namespace _Game.Scripts.UI
         public void GachaCloseBtn()
         {
             _gachaPullWindowObj.gameObject.SetActive(false);
-            foreach(Transform ob in _displayedGachaPulls)
+            for(int i = _displayedGachaPulls.Count - 1; i >= 0; i--)
             {
+                Transform ob = _displayedGachaPulls[i];
                 _displayedGachaPulls.Remove(ob);
-                Destroy(ob);
+                Destroy(ob.gameObject);
             }
             foreach(GachaPullDuplicateAnimationHandler handler in _displayTenGachaPullsCoordinates) handler.Reset();
             _buttonGachaLock = false;

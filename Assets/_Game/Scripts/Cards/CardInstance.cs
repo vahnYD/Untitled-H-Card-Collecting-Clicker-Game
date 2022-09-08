@@ -12,22 +12,22 @@ namespace _Game.Scripts.Cards
     [Serializable]
     public class CardInstance
     {
-        private Card _card;
+        [SerializeField] private Card _card;
         public Card CardRef => _card;
-        private string _name;
+        [SerializeField] private string _name;
         public string Name => _name;
-        private Sprite _cardArt;
+        [SerializeField] private Sprite _cardArt;
         public Sprite CardArt => _cardArt;
-        private bool _hasAbility;
-        public bool HasAbility;
+        [SerializeField] private bool _hasAbility;
+        public bool HasAbility => _hasAbility;
         public Abilities.Ability CardAbility => _card.Ability;
-        private bool _onCooldown;
+        [SerializeField] private bool _onCooldown;
         public bool OnCooldown => _onCooldown;
-        private int _level;
+        [SerializeField] private int _level;
         public int Level => _level;
-        private int _nextUpgradeCost;
+        [SerializeField] private int _nextUpgradeCost;
         public int NextUpgradeCost => _nextUpgradeCost;
-        private string _abilityText;
+        [SerializeField, TextArea(1, 4)] private string _abilityText;
         public string AbilityText => _abilityText;
         public event Action AbilityUpgradeEvent;
         
@@ -37,8 +37,8 @@ namespace _Game.Scripts.Cards
             _name = card.Name;
             _cardArt = card.GetRandomCardArt();
             _hasAbility = card.HasAbility;
-            _nextUpgradeCost = card.Ability.BaseUpgradeCost;
-            _level = (_card.Ability.MaxLevel < 2) ? 0 : 1;
+            if(_hasAbility)_nextUpgradeCost = card.Ability.BaseUpgradeCost;
+            _level = (_hasAbility && _card.Ability.MaxLevel >= 2) ? 1 : 0;
         }
 
         public void ActivateAbility()

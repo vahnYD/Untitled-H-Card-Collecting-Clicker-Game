@@ -37,6 +37,7 @@ namespace _Game.Scripts.Cards
             _cardInventory.Add(card);
             _totalStrength += cardRef.Strength;
             UpdateCardType(cardRef.Type, cardRef.Strength);
+            UpdateTypeMultiplier();
         }
 
         public void RemoveCard(CardInstance card)
