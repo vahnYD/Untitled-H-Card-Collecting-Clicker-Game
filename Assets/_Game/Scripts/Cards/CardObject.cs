@@ -3,10 +3,6 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
-	
-
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using _Game.Scripts.Extensions;
@@ -54,7 +50,7 @@ namespace _Game.Scripts.Cards
         #region Methods
         public void Initialise(CardInstance card)
         {
-            this.name = transform.parent.gameObject.name + "_" + card.Name;
+            this.name = card.Name + "_" + transform.parent.gameObject.name;
             _card = card;
             _cardArtImageObj.sprite = card.CardArt;
             _nameText.text = card.Name;

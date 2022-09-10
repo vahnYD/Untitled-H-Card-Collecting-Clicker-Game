@@ -3,9 +3,7 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
-	
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,6 +29,7 @@ namespace _Game.Scripts.Cards
             this._typeMultiplier = 0;
         }
         public List<CardInstance> GetCardList() => _cardInventory;
+        public List<CardInstance> GetCardListOfType(Card.CardType type) => _cardInventory.FindAll((CardInstance card) => card.CardRef.Type == type);
         public void AddCard(CardInstance card)
         {
             Card cardRef = card.CardRef;

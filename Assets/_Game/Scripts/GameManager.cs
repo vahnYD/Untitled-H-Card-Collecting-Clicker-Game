@@ -489,6 +489,8 @@ public class GameManager : MonoBehaviour
         GraveSizeChangedEvent?.Invoke(_grave.DeckList.Count);
     }
 
+    public List<CardInstance> GetOwnedCardsOfType(Card.CardType type) => _cardInventory.GetCardListOfType(type);
+    public List<CardInstance> GetOwnedCards() => _cardInventory.CardInventory;
 
     // Gacha interactions
     public Dictionary<CardInstance, bool> GachaPull(bool isTenPull = false)

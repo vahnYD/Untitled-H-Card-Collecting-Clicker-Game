@@ -3,8 +3,6 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using _Game.Scripts.Extensions;
