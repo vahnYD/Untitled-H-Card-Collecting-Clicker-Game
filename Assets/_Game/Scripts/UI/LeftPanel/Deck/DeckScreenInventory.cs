@@ -22,7 +22,6 @@ namespace _Game.Scripts.UI
         [SerializeField] private float _heightOffset = 182f;
         private int[] _columnCardCount = new int[4];
         private Dictionary<Transform, int> _displayedCards = new Dictionary<Transform, int>();
-        private List<int> _unfilledIndeces = new List<int>();
         private GameManager _gameManager = null;
         #endregion
 
@@ -76,7 +75,10 @@ namespace _Game.Scripts.UI
 
             CardInstance[] carry = new CardInstance[ownedCards.Count];
             ownedCards.CopyTo(carry);
-            foreach(CardInstance card in carry) if(_displayedCards.Where(x=> x.Key.GetComponent<CardObject>().CardInstanceRef == card).Count() > 0) ownedCards.Remove(card);
+            foreach(CardInstance card in carry)
+            {
+                if(_displayedCards.Where(x=> x.Key.GetComponent<CardObject>().CardInstanceRef.CardArt == card.CardArt).Count() > 0) ownedCards.Remove(card);
+            }
 
             foreach(CardInstance card in ownedCards)
             {
@@ -90,44 +92,34 @@ namespace _Game.Scripts.UI
                     columnIndex = index % _columnTransforms.Length;
                     rowIndex = (index - (index % _columnTransforms.Length))/_columnTransforms.Length;
                 }
-                else if(_unfilledIndeces.Count > 0)
-                {
-                    int index = _unfilledIndeces.First();
-                    _unfilledIndeces.Remove(_unfilledIndeces.First());
-                    columnIndex = index % _columnTransforms.Length;
-                    rowIndex = (index - (index % _columnTransforms.Length))/_columnTransforms.Length;
-                }
                 else
                 {
                     int index = _displayedCards.Count;
-                    columnIndex = (index % _columnTransforms.Length)+1;
+                    columnIndex = index % _columnTransforms.Length;
                     rowIndex = (index - (index % _columnTransforms.Length))/_columnTransforms.Length;
-                    if(columnIndex is 0) rowIndex++;
+                    if(columnIndex is 0 && _displayedCards.Count > 3) rowIndex++;
                 }
 
                 GameObject cardObject = Instantiate(_cardObjectPrefab, _columnTransforms[columnIndex]);
                 cardObject.transform.localPosition = Vector2.zero;
                 cardObject.GetComponent<CardObject>().Initialise(card);
 
-                cardObject.transform.localPosition = new Vector2(cardObject.transform.localPosition.x, (-1) * _heightOffset * rowIndex);
+                cardObject.transform.localPosition = new Vector2(cardObject.transform.localPosition.x, (-1) * (-_heightOffset) * rowIndex);
                 _displayedCards.Add(cardObject.transform, columnIndex * rowIndex);
-                _columnCardCount[columnIndex]++;
+                _columnCardCount[columnIndex] += 1;
             }
+            if(removedIndeces.Count > 0)
+                FillEmptyIndeces(removedIndeces);
+
             int tallestColumnCount = 0;
             for(int i = 0; i < _columnCardCount.Length; i++)
-                if(i > tallestColumnCount) tallestColumnCount = i;
+                if(tallestColumnCount < _columnCardCount[i]) tallestColumnCount = _columnCardCount[i];
             _scrollviewContentObj.GetComponent<RectTransform>().sizeDelta = new Vector2(_scrollviewContentObj.GetComponent<RectTransform>().sizeDelta.x, _heightOffset * tallestColumnCount);
-
-            //! needs reworking to actually move cards to fill spots instead of leaving them empty till new cards get added
-            if(removedIndeces.Count > 0)
-                foreach(int i in removedIndeces)
-                    _unfilledIndeces.Add(i);
         }
 
         private bool RemoveExtraCards(List<CardInstance> ownedCards, ref List<int> removedIndeces)
         {
             bool cardsWereRemoved = false;
-            int removedCardsAmount = 0;
 
             List<CardInstance> displayedCards = _displayedCards.Keys.Select(x => x.GetComponent<CardObject>().CardInstanceRef).ToList<CardInstance>();
 
@@ -135,17 +127,46 @@ namespace _Game.Scripts.UI
             {
                 if(!ownedCards.Contains(card))
                 {
-                    KeyValuePair<Transform, int> cardObject = _displayedCards.Where(x => x.Key.GetComponent<CardObject>().CardInstanceRef == card).FirstOrDefault();
+                    KeyValuePair<Transform, int> cardObject = _displayedCards.Where(x => x.Key.GetComponent<CardObject>().CardInstanceRef.CardArt == card.CardArt).FirstOrDefault();
+                    Debug.Log(cardObject);
                     _displayedCards.Remove(cardObject.Key);
                     removedIndeces.Add(cardObject.Value);
                     _columnCardCount[cardObject.Value % _columnTransforms.Length]--;
                     Destroy(cardObject.Key.gameObject);
-                    removedCardsAmount++;
                     cardsWereRemoved = true;
                 }
             }
 
             return cardsWereRemoved;
+        }
+
+        private void FillEmptyIndeces(List<int> emptyIndeces)
+        {
+            List<KeyValuePair<Transform, int>> sortedDisplayedCards = _displayedCards.ToList();
+            sortedDisplayedCards.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
+
+            emptyIndeces.Sort((i, j) => i.CompareTo(j));
+
+            foreach(int i in emptyIndeces)
+            {
+                for(int j = i; i < sortedDisplayedCards.Count; j++)
+                {
+                    KeyValuePair<Transform, int> pair = sortedDisplayedCards[j];
+                    int columnIndex = pair.Value % _columnTransforms.Length;
+                    int rowIndex = (pair.Value - (pair.Value % _columnTransforms.Length)) / _columnTransforms.Length;
+                    _columnCardCount[columnIndex]--;
+                    columnIndex--;
+                    if(columnIndex < 0)
+                    {
+                        columnIndex = _columnTransforms.Length - 1;
+                        rowIndex--;
+                    }
+                    pair.Key.SetParent(_columnTransforms[columnIndex]);
+                    pair.Key.localPosition = new Vector2(0, _heightOffset * rowIndex);
+                    _columnCardCount[columnIndex]++;
+                    _displayedCards[pair.Key] = columnIndex * rowIndex;
+                }
+            }
         }
         #endregion
     }

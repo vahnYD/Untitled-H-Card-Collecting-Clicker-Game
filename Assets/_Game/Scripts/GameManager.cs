@@ -86,6 +86,7 @@ public class GameManager : MonoBehaviour
 
     #region Events
     public static event Action<int> GraveSizeChangedEvent;
+    public static event Action<int> DeckSizeChangedEvent;
     #endregion
 
     #region Unity Event Functions
@@ -491,6 +492,17 @@ public class GameManager : MonoBehaviour
 
     public List<CardInstance> GetOwnedCardsOfType(Card.CardType type) => _cardInventory.GetCardListOfType(type);
     public List<CardInstance> GetOwnedCards() => _cardInventory.CardInventory;
+    public List<CardInstance> GetDeckList() => _deck.GetCardList();
+    public void RemoveCardFromDeck(CardInstance card)
+    {
+        _deck.RemoveCard(card);
+        DeckSizeChangedEvent?.Invoke(_deck.GetCardList().Count);
+    }
+    public void AddCardToDeck(CardInstance card)
+    {
+        _deck.AddCard(card);
+        DeckSizeChangedEvent?.Invoke(_deck.GetCardList().Count);
+    }
 
     // Gacha interactions
     public Dictionary<CardInstance, bool> GachaPull(bool isTenPull = false)

@@ -34,7 +34,6 @@ namespace _Game.Scripts.UI
         private float _cardSpotOffset = 0;
         private GameManager _gameManager = null;
         private Dictionary<Transform, int> _displayedCards = new Dictionary<Transform, int>();
-        private List<int> _unfilledIndeces = new List<int>();
         #endregion
 
         #region Unity Event Functions
@@ -131,7 +130,7 @@ namespace _Game.Scripts.UI
             foreach(CardInstance card in carry)
             {
                 strength += card.CardRef.Strength;
-                if(_displayedCards.Where(x=>x.Key.GetComponent<CardObject>().CardInstanceRef == card).Count() > 0) cards.Remove(card);
+                if(_displayedCards.Where(x=>x.Key.GetComponent<CardObject>().CardInstanceRef.CardArt == card.CardArt).Count() > 0) cards.Remove(card);
             }
             _typeStrengthText.text = strength.ToString();
 
@@ -145,30 +144,22 @@ namespace _Game.Scripts.UI
                     offsetMult = removedIndeces.First();
                     removedIndeces.Remove(removedIndeces.First());
                 }
-                else if(_unfilledIndeces.Count > 0)
-                {
-                    offsetMult = _unfilledIndeces.First();
-                    _unfilledIndeces.Remove(_unfilledIndeces.First());
-                }
                 else offsetMult = _displayedCards.Count;
                 cardObject.transform.localPosition = new Vector2((_cardSpotOffset + cardObject.GetComponent<RectTransform>().sizeDelta.x) * offsetMult, cardObject.transform.localPosition.y);
                 cardObject.GetComponent<CardObject>().Initialise(card);
                 _displayedCards.Add(cardObject.transform, offsetMult);
             }
+
+            if(removedIndeces.Count > 0)
+                FillEmptyIndeces(removedIndeces);
+
             RectTransform _firstCardSpotRect = _firstCardSpot.GetComponent<RectTransform>();
             _scrollviewContent.sizeDelta = new Vector2( (_firstCardSpotRect.sizeDelta.x + (2*(_cardSpotOffset-(_firstCardSpotRect.sizeDelta.x/2))))*_displayedCards.Count, _scrollviewContent.sizeDelta.y);
-
-
-            //! If there is time, needs to be replaced with code that moves all the other cards to fill the empty spot instead of leaving it till it gets filled
-            if(removedIndeces.Count > 0)
-                foreach(int i in removedIndeces)
-                    _unfilledIndeces.Add(i);
         }
 
         private bool RemoveExtraCards(List<CardInstance> ownedCards, ref List<int> removedIndeces)
         {
             bool cardsWereRemoved = false;
-            int removedCardsAmount = 0;
 
             List<CardInstance> displayedCards = _displayedCards.Keys.Select(x => x.GetComponent<CardObject>().CardInstanceRef).ToList<CardInstance>();
 
@@ -176,16 +167,33 @@ namespace _Game.Scripts.UI
             {
                 if(!ownedCards.Contains(card))
                 {
-                    KeyValuePair<Transform, int> cardObject = _displayedCards.Where(x => x.Key.GetComponent<CardObject>().CardInstanceRef == card).FirstOrDefault();
+                    KeyValuePair<Transform, int> cardObject = _displayedCards.Where(x => x.Key.GetComponent<CardObject>().CardInstanceRef.CardArt == card.CardArt).FirstOrDefault();
                     _displayedCards.Remove(cardObject.Key);
                     removedIndeces.Add(cardObject.Value);
                     Destroy(cardObject.Key.gameObject);
-                    removedCardsAmount++;
                     cardsWereRemoved = true;
                 }
             }
 
             return cardsWereRemoved;
+        }
+
+        private void FillEmptyIndeces(List<int> emptyIndeces)
+        {
+            List<KeyValuePair<Transform, int>> sortedDisplayedCards = _displayedCards.ToList();
+            sortedDisplayedCards.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
+
+            emptyIndeces.Sort((i, j) => i.CompareTo(j));
+
+            foreach(int i in emptyIndeces)
+            {
+                for(int j = i; j < sortedDisplayedCards.Count; j++)
+                {
+                    KeyValuePair<Transform, int> pair = sortedDisplayedCards[j];
+                    pair.Key.localPosition = new Vector2(pair.Key.localPosition.x - (_cardSpotOffset + pair.Key.GetComponent<RectTransform>().sizeDelta.x), pair.Key.localPosition.y);
+                    _displayedCards[pair.Key]--;
+                }
+            }
         }
 
         private void ScrollRight(bool newVal)

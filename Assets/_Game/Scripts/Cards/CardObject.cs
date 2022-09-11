@@ -25,6 +25,7 @@ namespace _Game.Scripts.Cards
         [SerializeField] private Transform _abilityContainerObj = null;
         [SerializeField] private TMP_Text _abilityText = null;
         private bool _isInitialised = false;
+        private bool _isClickable = false;
         #endregion
 
         #region Unity Event Functions
@@ -48,7 +49,7 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #region Methods
-        public void Initialise(CardInstance card)
+        public void Initialise(CardInstance card, bool isClickable = false)
         {
             this.name = card.Name + "_" + transform.parent.gameObject.name;
             _card = card;
@@ -80,11 +81,17 @@ namespace _Game.Scripts.Cards
             }
             card.AbilityUpgradeEvent += CatchAbilityUpgrade;
             _isInitialised = true;
+            _isClickable = isClickable;
         }
 
         private void CatchAbilityUpgrade()
         {
             _abilityText.text = _card.AbilityText;
+        }
+
+        public void Click()
+        {
+            if(!_isClickable) return;
         }
         #endregion
     }

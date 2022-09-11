@@ -60,6 +60,16 @@ public class GameSettingsScriptableObject : ScriptableObject
     public int DrawCooldownInSec => _drawCooldownInSec;
     [SerializeField, Min(1)] private int _maxDupesAllowedInDeck;
     public int AmountOfDupesAllowedInDeck => _maxDupesAllowedInDeck;
+    [SerializeField, Min(1)] private int _defaultDeckSize;
+    public int DefaultDeckSize => _defaultDeckSize;
+    [SerializeField] private int _deckSizeIncreasePerVeryRare;
+    public int DeckSizeIncreasePerVeryRare => _deckSizeIncreasePerVeryRare;
+    [SerializeField, Min(0)] private int _maxVRareCardsAllowedInDeckBase;
+    public int MaximumVRareCardsAllowedInDeckAtBase => _maxVRareCardsAllowedInDeckBase;
+    [SerializeField] private int _deckSizeIncreasePerSpecial;
+    public int DeckSizeIncreasePerSpecial => _deckSizeIncreasePerSpecial;
+    [SerializeField, Min(0)] private int _maxSpecialCardsAllowedInDeckBase;
+    public int MaximumSpecialCardsAllowedInDeckAtBase => _maxSpecialCardsAllowedInDeckBase;
 
     #if UNITY_EDITOR
     [CustomEditor(typeof(GameSettingsScriptableObject))]
@@ -93,6 +103,11 @@ public class GameSettingsScriptableObject : ScriptableObject
         //Card stuff
         SerializedProperty _spDrawCooldownInSec;
         SerializedProperty _spMaxDupesAllowedInDeck;
+        SerializedProperty _spDefaultDeckSize;
+        SerializedProperty _spDeckSizeIncreasePerVeryRare;
+        SerializedProperty _spMaxVRareCardsAllowedInDeckBase;
+        SerializedProperty _spDeckSizeIncreasePerSpecial;
+        SerializedProperty _spMaxSpecialCardsAllowedInDeckBase;
         #endregion
 
         private bool _showLewdPointCalcSettings, _showClickInteractionSettings, _showGachaSettings, _showCardSettings = false;
@@ -126,6 +141,11 @@ public class GameSettingsScriptableObject : ScriptableObject
             //Cards
             _spDrawCooldownInSec = serializedObject.FindProperty("_drawCooldownInSec");
             _spMaxDupesAllowedInDeck = serializedObject.FindProperty("_maxDupesAllowedInDeck");
+            _spDefaultDeckSize = serializedObject.FindProperty("_defaultDeckSize");
+            _spDeckSizeIncreasePerVeryRare = serializedObject.FindProperty("_deckSizeIncreasePerVeryRare");
+            _spMaxVRareCardsAllowedInDeckBase = serializedObject.FindProperty("_maxVRareCardsAllowedInDeckBase");
+            _spDeckSizeIncreasePerSpecial = serializedObject.FindProperty("_deckSizeIncreasePerSpecial");
+            _spMaxSpecialCardsAllowedInDeckBase = serializedObject.FindProperty("_maxSpecialCardsAllowedInDeckBase");
         }
 
         public override void OnInspectorGUI()
@@ -158,7 +178,18 @@ public class GameSettingsScriptableObject : ScriptableObject
             if(_showCardSettings)
             {
                 EditorGUILayout.PropertyField(_spDrawCooldownInSec);
+                EditorGUILayout.PropertyField(_spDefaultDeckSize);
                 EditorGUILayout.PropertyField(_spMaxDupesAllowedInDeck);
+
+                GUILayout.Space(3f);
+
+                EditorGUILayout.PropertyField(_spMaxVRareCardsAllowedInDeckBase);
+                EditorGUILayout.PropertyField(_spDeckSizeIncreasePerVeryRare);
+
+                GUILayout.Space(3f);
+
+                EditorGUILayout.PropertyField(_spMaxSpecialCardsAllowedInDeckBase);
+                EditorGUILayout.PropertyField(_spDeckSizeIncreasePerSpecial);
             }
 
             GUILayout.Space(5f);
