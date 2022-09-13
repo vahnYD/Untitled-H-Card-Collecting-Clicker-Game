@@ -3,7 +3,7 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
-	
+using System.Collections.Generic;
 using UnityEngine;
 using _Game.Scripts.Cards;
 #if UNITY_EDITOR
@@ -37,6 +37,8 @@ namespace _Game.Scripts.Abilities
         [SerializeField] private float _upgradeCostMultAdditivePart;
         [SerializeField] private float _upgradeCostMultMultiplicativePart;
         [SerializeField] private float _effectMultPerLevel;
+        [SerializeField] private bool _overwriteEffectMultipliers;
+        [SerializeField] private List<float> _effectMultPerLevelOverwrites;
 
         //Possible Ability Effects
         //Coin Gain
@@ -401,7 +403,20 @@ namespace _Game.Scripts.Abilities
 
         private float CalculateEffectForLevel(float effectVal, int level)
         {
-            return effectVal * (_effectMultPerLevel * level);
+            float effectMultPerLevel = 0f;
+            if(!_overwriteEffectMultipliers)
+            {
+                effectMultPerLevel = _effectMultPerLevel;
+            }
+            else if(level - 1 < _effectMultPerLevelOverwrites.Count)
+            {
+                effectMultPerLevel = _effectMultPerLevelOverwrites[level-1];
+            }
+            else
+            {
+                effectMultPerLevel = _effectMultPerLevelOverwrites[_effectMultPerLevelOverwrites.Count-1];
+            }
+            return effectVal * (effectMultPerLevel * level);
         }
 
         private int CalculateEffectForLevel(int effectVal, int level)
@@ -444,6 +459,8 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spUpgradeCostMultAdditivePart;
             SerializedProperty _spUpgradeCostMultMultiplicativePart;
             SerializedProperty _spEffectMultPerLevel;
+            SerializedProperty _spOverwriteEffectMultipliers;
+            SerializedProperty _spEffectMultPerLevelOverwrites;
 
             //Possible Ability Effects
             //Coin Gain
@@ -582,6 +599,8 @@ namespace _Game.Scripts.Abilities
                 _spUpgradeCostMultAdditivePart = serializedObject.FindProperty("_upgradeCostMultAdditivePart");
                 _spUpgradeCostMultMultiplicativePart = serializedObject.FindProperty("_upgradeCostMultMultiplicativePart");
                 _spEffectMultPerLevel = serializedObject.FindProperty("_effectMultPerLevel");
+                _spOverwriteEffectMultipliers = serializedObject.FindProperty("_overwriteEffectMultipliers");
+                _spEffectMultPerLevelOverwrites = serializedObject.FindProperty("_effectMultPerLevelOverwrites");
 
                 //Possible Ability Effects
                 //Coin Gain
@@ -711,7 +730,7 @@ namespace _Game.Scripts.Abilities
                 EditorGUILayout.PropertyField(_spAbilityText);
                 GUILayout.Space(5f);
 
-                _showUpgrades = EditorGUILayout.BeginFoldoutHeaderGroup(_showUpgrades, "Upgrade Details");
+                _showUpgrades = EditorGUILayout.Foldout(_showUpgrades, "Upgrade Details");
                 if(_showUpgrades)
                 {
                     GUILayout.Space(5f);
@@ -720,6 +739,21 @@ namespace _Game.Scripts.Abilities
                     GUILayout.FlexibleSpace();
                     EditorGUILayout.PropertyField(_spEffectMultPerLevel, GUIContent.none, GUILayout.MaxWidth(50f));
                     EditorGUILayout.EndHorizontal();
+
+                    EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                    GUILayout.Label("Set Specific Multipliers per Level");
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.PropertyField(_spOverwriteEffectMultipliers, GUIContent.none, GUILayout.MaxWidth(50f));
+                    EditorGUILayout.EndHorizontal();
+
+                    if(_spOverwriteEffectMultipliers.boolValue)
+                    {
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        EditorGUILayout.PropertyField(_spEffectMultPerLevelOverwrites, GUILayout.MaxWidth(300f));
+                        EditorGUILayout.EndHorizontal();
+                    }
+
+                    GUILayout.Space(3f);
 
                     EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
                     GUILayout.Label("Base Upgrade Cost");
@@ -735,10 +769,9 @@ namespace _Game.Scripts.Abilities
                     GUILayout.Label(" x [Current Level]))%");
                     EditorGUILayout.EndHorizontal();
                 }
-                EditorGUILayout.EndFoldoutHeaderGroup();
                 GUILayout.Space(5f);
 
-                _showAbilities = EditorGUILayout.BeginFoldoutHeaderGroup(_showAbilities, "Ability Details");
+                _showAbilities = EditorGUILayout.Foldout(_showAbilities, "Ability Details");
                 if(_showAbilities)
                 {
                     GUILayout.Space(5f);
@@ -1325,7 +1358,6 @@ namespace _Game.Scripts.Abilities
                         EditorGUILayout.EndHorizontal();
                     }
                 }
-                EditorGUILayout.EndFoldoutHeaderGroup();
 
                 GUILayout.Space(15f);
                 if(GUILayout.Button("Delete Ability"))

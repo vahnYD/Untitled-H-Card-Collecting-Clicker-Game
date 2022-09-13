@@ -15,6 +15,7 @@ namespace _Game.Scripts.UI
     public class DeckScreenInventory : MonoBehaviour
     {
         #region Properties
+        [SerializeField] private DeckScreenHandler _deckScreenHandler = null;
         [SerializeField] private GameObject _cardObjectPrefab = null;
         [SerializeField] private IntValue _lewdPointValueObj = null;
         [SerializeField] private Transform _scrollviewContentObj = null;
@@ -29,7 +30,7 @@ namespace _Game.Scripts.UI
         private void Awake()
         {
             #if UNITY_EDITOR
-            if(_cardObjectPrefab is null || _lewdPointValueObj is null || _scrollviewContentObj is null)
+            if(_deckScreenHandler is null || _cardObjectPrefab is null || _lewdPointValueObj is null || _scrollviewContentObj is null)
                 Debug.LogWarning("DeckScreenInventory.cs is missing Object References.");
             #endif
         }
@@ -67,7 +68,7 @@ namespace _Game.Scripts.UI
 
         private void Populate()
         {
-            List<CardInstance> ownedCards = _gameManager.GetOwnedCards();
+            List<CardInstance> ownedCards = _gameManager.GetOwnedCards().Where(x => x.HasAbility).ToList();
             if(ownedCards.Count is 0) return;
 
             List<int> removedIndeces = new List<int>();
@@ -102,7 +103,7 @@ namespace _Game.Scripts.UI
 
                 GameObject cardObject = Instantiate(_cardObjectPrefab, _columnTransforms[columnIndex]);
                 cardObject.transform.localPosition = Vector2.zero;
-                cardObject.GetComponent<CardObject>().Initialise(card);
+                cardObject.GetComponent<CardObject>().Initialise(card, true, () => _deckScreenHandler.ClickHandling(card));
 
                 cardObject.transform.localPosition = new Vector2(cardObject.transform.localPosition.x, (-1) * (-_heightOffset) * rowIndex);
                 _displayedCards.Add(cardObject.transform, columnIndex * rowIndex);

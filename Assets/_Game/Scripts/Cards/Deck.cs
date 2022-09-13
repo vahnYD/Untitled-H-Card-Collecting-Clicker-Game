@@ -42,6 +42,16 @@ namespace _Game.Scripts.Cards
             DeckSizeChangedEvent.Invoke();
         }
 
+        public void RemoveMultipleCards(CardInstance[] cards)
+        {
+            if(cards.Length is 0) return;
+            foreach(CardInstance card in cards)
+            {
+                _decklist.Remove(card);
+            }
+            DeckSizeChangedEvent?.Invoke();
+        }
+
         public List<CardInstance> GetCardsByName(string name) => _decklist.FindAll((CardInstance card) => card.Name == name);
         public List<CardInstance> GetCardsByType(Card.CardType type) => _decklist.FindAll((CardInstance card) => card.CardRef.Type == type);
         public List<CardInstance> GetCardsByRarity(Card.CardRarity rarity) => _decklist.FindAll((CardInstance card) => card.CardRef.Rarity == rarity);
@@ -67,6 +77,11 @@ namespace _Game.Scripts.Cards
                 _decklist[k] = _decklist[n];
                 _decklist[n] = card;
             }
+        }
+
+        public void OverwriteDecklist(List<CardInstance> cards)
+        {
+            _decklist = cards;
         }
         #endregion
     }

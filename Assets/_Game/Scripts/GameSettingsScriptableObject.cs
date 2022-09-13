@@ -42,6 +42,8 @@ public class GameSettingsScriptableObject : ScriptableObject
     public int AutoclickerAbilityInterval => _autoclickerIntervalAbility;
 
     //Gacha Settings
+    [SerializeField] private List<float> _gachaPullWeights;
+    public List<float> GachaPullWeights => _gachaPullWeights;
     [SerializeField, Min(0)] private int _baseGachaPullCost;
     public int BaseGachaPullCost => _baseGachaPullCost;
     [SerializeField, Min(0)] private float _baseGachaPullIncrement;
@@ -93,6 +95,7 @@ public class GameSettingsScriptableObject : ScriptableObject
         SerializedProperty _spAutoclickerIntervalAbility;
 
         //Gacha
+        SerializedProperty _spGachaPullWeights;
         SerializedProperty _spBaseGachaPullCost;
         SerializedProperty _spBaseGachaPullIncrement;
         SerializedProperty _spGachaPullCostIncreaseReductions;
@@ -131,6 +134,7 @@ public class GameSettingsScriptableObject : ScriptableObject
             _spAutoclickerIntervalAbility = serializedObject.FindProperty("_autoclickerIntervalAbility");
 
             //Gacha
+            _spGachaPullWeights = serializedObject.FindProperty("_gachaPullWeights");
             _spBaseGachaPullCost = serializedObject.FindProperty("_baseGachaPullCost");
             _spBaseGachaPullIncrement = serializedObject.FindProperty("_baseGachaPullIncrement");
             _spGachaPullCostIncreaseReductions = serializedObject.FindProperty("_gachaPullCostIncreaseReductions");
@@ -197,6 +201,10 @@ public class GameSettingsScriptableObject : ScriptableObject
             _showGachaSettings = EditorGUILayout.Foldout(_showGachaSettings, "Gacha Settings");
             if(_showGachaSettings)
             {
+                EditorGUILayout.PropertyField(_spGachaPullWeights);
+
+                GUILayout.Space(3f);
+                
                 EditorGUILayout.PropertyField(_spBaseGachaPullCost);
 
                 GUILayout.Space(3f);

@@ -3,8 +3,7 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
-	
-
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -37,6 +36,34 @@ namespace _Game.Scripts.Cards
         public Card GetRandomCard()
         {
             return _cards[Random.Range(0, _cards.Count)];
+        }
+
+        public Card RollWeightedCard(GameSettingsScriptableObject gameSettings)
+        {
+            int roll = Random.Range(0, 100);
+            Card.CardRarity pulledRarity = Card.CardRarity.Common;
+
+
+            if(roll > 100 - gameSettings.GachaPullWeights[0])
+            {
+                pulledRarity = Card.CardRarity.Common;
+            }
+            else if(roll > 100 - gameSettings.GachaPullWeights[1])
+            {
+                pulledRarity = Card.CardRarity.Rare;
+            }
+            else if(roll > 100 - gameSettings.GachaPullWeights[2])
+            {
+                pulledRarity = Card.CardRarity.VeryRare;
+            }
+            else if(roll > 100 - gameSettings.GachaPullWeights[3])
+            {
+                pulledRarity = Card.CardRarity.Special;
+            }
+
+            List<Card> cardsOfPulledRarity = _cards.Where(x => x.Rarity == pulledRarity).ToList();
+
+            return cardsOfPulledRarity[Random.Range(0, cardsOfPulledRarity.Count)];
         }
         #endregion
 

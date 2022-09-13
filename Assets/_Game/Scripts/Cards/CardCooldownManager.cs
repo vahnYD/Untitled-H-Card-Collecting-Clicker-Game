@@ -39,6 +39,11 @@ namespace _Game.Scripts.Cards
             _cardCooldowns.Add(card, remainingCooldown);
         }
 
+        public void RemoveCardFromTracking(CardInstance card)
+        {
+            _cardCooldowns.Remove(card);
+        }
+
         public void ReduceCooldownForCard(CardInstance card, float reduction, bool isFlat)
         {
             if(!_cardCooldowns.ContainsKey(card)) return;
@@ -54,12 +59,16 @@ namespace _Game.Scripts.Cards
             for(;;)
             {
                 yield return new WaitForSeconds(1f);
+                if(!_cardCooldowns.ContainsKey(card)) break;
                 _cardCooldowns[card]--;
                 if(_cardCooldowns[card] < 1) break; 
             }
-            GameManager.Instance.TriggerCooldownEndForCard(card);
-            card.OffCooldown();
-            _cardCooldowns.Remove(card);
+            if(_cardCooldowns.ContainsKey(card))
+            {
+                GameManager.Instance.TriggerCooldownEndForCard(card);
+                card.OffCooldown();
+                _cardCooldowns.Remove(card);
+            }
         }
     }
 }

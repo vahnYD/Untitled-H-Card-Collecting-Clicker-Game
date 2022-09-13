@@ -3,6 +3,7 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using _Game.Scripts.Extensions;
@@ -26,6 +27,7 @@ namespace _Game.Scripts.Cards
         [SerializeField] private TMP_Text _abilityText = null;
         private bool _isInitialised = false;
         private bool _isClickable = false;
+        private Action _clickExecute = null;
         #endregion
 
         #region Unity Event Functions
@@ -49,7 +51,7 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #region Methods
-        public void Initialise(CardInstance card, bool isClickable = false)
+        public void Initialise(CardInstance card, bool isClickable = false, Action clickExecute = null)
         {
             this.name = card.Name + "_" + transform.parent.gameObject.name;
             _card = card;
@@ -82,6 +84,7 @@ namespace _Game.Scripts.Cards
             card.AbilityUpgradeEvent += CatchAbilityUpgrade;
             _isInitialised = true;
             _isClickable = isClickable;
+            _clickExecute = clickExecute;
         }
 
         private void CatchAbilityUpgrade()
@@ -92,6 +95,7 @@ namespace _Game.Scripts.Cards
         public void Click()
         {
             if(!_isClickable) return;
+            _clickExecute?.Invoke();
         }
         #endregion
     }

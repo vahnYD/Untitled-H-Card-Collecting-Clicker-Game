@@ -5,6 +5,8 @@
  */
 	
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace _Game.Scripts.Cards
@@ -20,12 +22,12 @@ namespace _Game.Scripts.Cards
         public Sprite CardArt => _cardArt;
         [SerializeField] private bool _hasAbility;
         public bool HasAbility => _hasAbility;
-        public Abilities.Ability CardAbility => _card.Ability;
+        public List<Abilities.Ability> CardAbilities => _card.Abilities;
         [SerializeField] private bool _onCooldown;
         public bool OnCooldown => _onCooldown;
         [SerializeField] private int _level;
         public int Level => _level;
-        [SerializeField] private int _nextUpgradeCost;
+        [SerializeField] private int _nextUpgradeCost = 0;
         public int NextUpgradeCost => _nextUpgradeCost;
         [SerializeField, TextArea(1, 4)] private string _abilityText;
         public string AbilityText => _abilityText;
@@ -37,17 +39,25 @@ namespace _Game.Scripts.Cards
             _name = card.Name;
             _cardArt = card.GetRandomCardArt();
             _hasAbility = card.HasAbility;
-            if(_hasAbility)_nextUpgradeCost = card.Ability.BaseUpgradeCost;
-            _level = (_hasAbility && _card.Ability.MaxLevel >= 2) ? 1 : 0;
+            if(_hasAbility)
+                foreach(Abilities.Ability ability in card.Abilities)
+                {
+                    _nextUpgradeCost += ability.GetUpgradeCostForLevel(2);
+                }
+            _level = (_hasAbility && _card.Abilities.Where(x=>x.MaxLevel >=2).Count() >= 1) ? 1 : 0;
         }
 
         public void ActivateAbility()
         {
             if(!_hasAbility) return;
             if(_onCooldown) return;
-            _card.Ability.ActivateAbility(_level);
+            foreach(Abilities.Ability ability in _card.Abilities)
+                ability.ActivateAbility(_level);
             _onCooldown = true;
-            CardCooldownManager.Instance.StartCooldownForCard(this, _card.Ability.CooldownInSec);
+            int cooldown = 0;
+                foreach(Abilities.Ability ability in _card.Abilities)
+                cooldown += ability.CooldownInSec;
+            CardCooldownManager.Instance.StartCooldownForCard(this, cooldown);
             GameManager.Instance.MoveSpecificCard(this, GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave);
         }
 
@@ -57,7 +67,7 @@ namespace _Game.Scripts.Cards
         {
             if(_nextUpgradeCost > GameManager.Instance.CoinTotal) return false;
             if(_level == 0) return false;
-            if(_level == _card.Ability.MaxLevel) return false;
+            if(_level == _card.Abilities.Max(x=>x.MaxLevel)) return false;
             Upgrade();
             return true;
         }
@@ -67,13 +77,29 @@ namespace _Game.Scripts.Cards
             _level++;
             UpdateAbilityText();
             GameManager.Instance.RemoveCoins(_nextUpgradeCost);
-            _nextUpgradeCost = _card.Ability.GetUpgradeCostForLevel(_level+1);
+            _nextUpgradeCost = 0;
+            foreach(Abilities.Ability ability in _card.Abilities)
+            {
+                if(_level !>= ability.MaxLevel)
+                    _nextUpgradeCost += ability.GetUpgradeCostForLevel(_level);
+            }
             AbilityUpgradeEvent?.Invoke();
         }
 
         private void UpdateAbilityText()
         {
-            _abilityText = _card.Ability.GetUpdatedAbilityText(_level);
+            _abilityText = "";
+            foreach(Abilities.Ability ability in _card.Abilities)
+            {
+                if(_level !>= ability.MaxLevel) 
+                {
+                    _abilityText += ability.GetUpdatedAbilityText(_level) + " ";
+                } 
+                else 
+                {
+                    _abilityText += ability.GetUpdatedAbilityText(ability.MaxLevel) + " ";
+                }
+            }
         }
     }
 }

@@ -33,8 +33,8 @@ namespace _Game.Scripts.Cards
         public string FlavourText => _flavourText;
         [SerializeField] private bool _hasAbility;
         public bool HasAbility => _hasAbility;
-        [SerializeField] private Ability _ability;
-        public Ability Ability => _ability;
+        [SerializeField] private List<Ability> _abilities;
+        public List<Ability> Abilities => _abilities;
         [SerializeField] private List<Sprite> _cardArt = new List<Sprite>();
         public List<Sprite> CardArt => _cardArt;
         #endregion

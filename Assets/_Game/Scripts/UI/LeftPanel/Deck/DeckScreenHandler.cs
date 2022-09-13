@@ -3,8 +3,8 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
+using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,23 +21,30 @@ namespace _Game.Scripts.UI
         [SerializeField] private TMP_Text _abilityText = null;
         [SerializeField] private Transform _abilityTextScrollViewContentObj = null;
         [SerializeField] private Transform _cardObjSpawnTransform = null;
+        [SerializeField] private Button _applyBtn = null;
+        [SerializeField] private Button _addBtn = null;
+        [SerializeField] private Button _removeBtn = null;
         private GameManager _gameManager = null;
         private GameSettingsScriptableObject _gameSettings = null;
         private Dictionary<Transform, int> _displayedCards = new Dictionary<Transform, int>();
         private List<CardInstance> _selectedCards = new List<CardInstance>();
+        private KeyValuePair<CardInstance, bool> _displayedSelectedCard;
 
         private bool _applyAllowed = false;
         private bool _modifyAllowed = true;
         private int _currentDeckSize = 10;
+        private int _amountOfRareCardsInSelection = 0;
         private int _amountOfVRareCardsInSelection = 0;
         private int _amountOfSpecialCardsInSelection = 0;
         #endregion
+
+        public event Action<int, int, int, int> SelectedCardsChangeEvent;
 
         #region Unity Event Functions
         #if UNITY_EDITOR
         private void Awake()
         {
-            if(_cardObjectDeckPrefab is null || _cardArtImageObj is null || _abilityText is null || _abilityTextScrollViewContentObj is null || _cardObjSpawnTransform is null)
+            if(_cardObjectDeckPrefab is null || _cardArtImageObj is null || _abilityText is null || _abilityTextScrollViewContentObj is null || _cardObjSpawnTransform is null || _applyBtn is null || _addBtn is null || _removeBtn is null)
                 Debug.LogWarning("DeckScreenHandler.cs is missing Object References.");
         }
         #endif
@@ -47,25 +54,20 @@ namespace _Game.Scripts.UI
             _gameManager = GameManager.Instance;
             _gameSettings = _gameManager.GameSettingsRef;
             _currentDeckSize = _gameSettings.DefaultDeckSize;
-        }
-
-        private void OnEnable()
-        {
-            GameManager.GraveSizeChangedEvent += CatchGraveSizeChange;
-        }
-
-        private void OnDisable()
-        {
-            GameManager.GraveSizeChangedEvent -= CatchGraveSizeChange;
+            #if UNITY_EDITOR
+            if(_removeBtn != null && _addBtn != null && _applyBtn != null)
+            {
+            #endif
+                _removeBtn.interactable = false;
+                _addBtn.interactable = false;
+                _applyBtn.interactable = false;
+            #if UNITY_EDITOR
+            }
+            #endif
         }
         #endregion
         
-        #region Methods
-        private void CatchGraveSizeChange(int newVal)
-        {
-            _modifyAllowed = (newVal > 0) ? false : true;
-        }
-
+        #region Deck CardObject Spawning
         private void Populate(int newVal)
         {
             if(_displayedCards.Count is 0 && newVal is 0) return;
@@ -94,7 +96,7 @@ namespace _Game.Scripts.UI
                 else offsetMult = _displayedCards.Count;
 
                 cardObject.transform.localPosition = new Vector2(0, -(cardObject.GetComponent<RectTransform>().sizeDelta.y * offsetMult));
-                cardObject.GetComponent<CardObject_Deck>().Initialise(card, this);
+                cardObject.GetComponent<CardObject_Deck>().Initialise(card, this, true, () => ClickHandling(card));
                 _displayedCards.Add(cardObject.transform, offsetMult);
             }
 
@@ -140,28 +142,72 @@ namespace _Game.Scripts.UI
                 }
             }
         }
+        #endregion
 
-        public void Click(CardInstance card)
+        #region Deck Editing
+        public void ClickHandling(CardInstance card)
         {
             _cardArtImageObj.sprite = card.CardArt;
             _abilityText.text = card.AbilityText;
+            bool state = _displayedCards.Keys.ToList().Exists(x => x.GetComponent<CardObject_Deck>().CardInstanceRef.CardArt == card.CardArt);
+            _displayedSelectedCard = new KeyValuePair<CardInstance, bool>(card, state);
+            if(state)
+            {
+                _addBtn.interactable = false;
+                _removeBtn.interactable = true;
+            }
+            else
+            {
+                _removeBtn.interactable = false;
+                _addBtn.interactable = true;
+            }
         }
 
-        private void SelectCard(CardInstance card)
+        public void AddCard() => SelectCard(_displayedSelectedCard.Key);
+        public void RemoveCard() => DeselectCard(_displayedSelectedCard.Key);
+        private void DeselectCard(CardInstance card) => SelectCard(card, true);
+        private void SelectCard(CardInstance card, bool isRemoval = false)
         {
-            //TODO Dynamically Check increasing deck size limitation
+            //Dynamically Check increasing deck size limitation
+            if(card.CardRef.Rarity is Card.CardRarity.Rare)
+            {
+                _amountOfRareCardsInSelection += (isRemoval) ? -1 : 1;
+            }
+            else if(card.CardRef.Rarity is Card.CardRarity.VeryRare)
+            {
+                _amountOfVRareCardsInSelection += (isRemoval) ? -1 : 1;
+                _currentDeckSize += (isRemoval) ? -_gameSettings.DeckSizeIncreasePerVeryRare : _gameSettings.DeckSizeIncreasePerVeryRare;
+            }
+            else if(card.CardRef.Rarity is Card.CardRarity.Special)
+            {
+                _amountOfSpecialCardsInSelection += (isRemoval) ? -1 : 1;
+                _currentDeckSize += (isRemoval) ? -_gameSettings.DeckSizeIncreasePerSpecial : _gameSettings.DeckSizeIncreasePerSpecial;
+            }
 
-            _selectedCards.Add(card);
+            SelectedCardsChangeEvent?.Invoke(_selectedCards.Count, _amountOfRareCardsInSelection, _amountOfVRareCardsInSelection, _amountOfSpecialCardsInSelection);
+
+            if(!isRemoval)_selectedCards.Add(card);
+            else _selectedCards.Remove(card);
             Populate(_selectedCards.Count);
 
-            //TODO Check if apply is allowed
+            //Check if apply is allowed
+            if(_selectedCards.Count == _currentDeckSize && _amountOfVRareCardsInSelection !> _gameSettings.MaximumVRareCardsAllowedInDeckAtBase && _amountOfSpecialCardsInSelection !> _gameSettings.MaximumSpecialCardsAllowedInDeckAtBase && _gameManager.HandSize is 0 && _gameManager.GraveSize is 0)
+            {
+                _applyAllowed = true;
+                _applyBtn.interactable = true;
+            }
+            else
+            {
+                _applyAllowed = false;
+                _applyBtn.interactable = false;
+            }
         }
 
         public void Apply()
         {
             if(!_applyAllowed) return;
 
-            foreach(CardInstance card in _selectedCards) _gameManager.AddCardToDeck(card);
+            _gameManager.OverwriteDecklist(_selectedCards);
         }
         #endregion
     }

@@ -368,7 +368,10 @@ public class GameManager : MonoBehaviour
         for(int i = 0; i < cardsToMove.Length; i++)
             if(cardsToMove[i] != null) emptySelection = false;
         if(emptySelection) return;
-
+        if(moveFrom == CardGameStates.Grave) 
+            foreach(CardInstance card in cardsToMove) CardCooldownManager.Instance.RemoveCardFromTracking(card);
+            
+        placeToMoveFrom?.RemoveMultipleCards(cardsToMove);
         placeToMoveTo?.AddMultipleCards(cardsToMove);
         if(moveTo == CardGameStates.Grave || moveFrom == CardGameStates.Grave) GraveSizeChangedEvent?.Invoke(_grave.DeckList.Count);
     }
@@ -406,8 +409,10 @@ public class GameManager : MonoBehaviour
         }
 
         if(!placeToMoveFrom.DeckList.Contains(card)) return;
+        if(moveFrom == CardGameStates.Grave) CardCooldownManager.Instance.RemoveCardFromTracking(card);
         placeToMoveFrom.RemoveCard(card);
         placeToMoveTo.AddCard(card);
+
         if(moveTo == CardGameStates.Grave || moveFrom == CardGameStates.Grave) GraveSizeChangedEvent?.Invoke(_grave.DeckList.Count);
     }
 
@@ -482,7 +487,7 @@ public class GameManager : MonoBehaviour
             CardCooldownManager.Instance.ReduceCooldownForCard(cards[i], reductionAmount, reductionIsFlat);
     }
 
-    public void TriggerCooldownEndForCard(CardInstance card)
+    public void TriggerCooldownEndForCard(CardInstance card, bool noCooldownAnim = false)
     {
         if(!_grave.DeckList.Contains(card)) return;
         _grave.RemoveCard(card);
@@ -504,6 +509,11 @@ public class GameManager : MonoBehaviour
         DeckSizeChangedEvent?.Invoke(_deck.GetCardList().Count);
     }
 
+    public void OverwriteDecklist(List<CardInstance> cards)
+    {
+        _deck.OverwriteDecklist(cards);
+    }
+
     // Gacha interactions
     public Dictionary<CardInstance, bool> GachaPull(bool isTenPull = false)
     {
@@ -512,7 +522,7 @@ public class GameManager : MonoBehaviour
         Dictionary<CardInstance, bool> pulledCards = new Dictionary<CardInstance, bool>();
         for(int i = 0; i < amount; i++)
         {
-            CardInstance card = new CardInstance(_cardList.GetRandomCard());
+            CardInstance card = new CardInstance(_cardList.RollWeightedCard(_gameSettings));
             bool isDupe = _cardInventory.CheckIfCardIsDuplicate(card);
             if(!isDupe) _cardInventory.AddCard(card);
             else AddCrystals(card.CardRef.Rarity);

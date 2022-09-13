@@ -25,6 +25,8 @@ namespace _Game.Scripts.Cards
         [SerializeField] private TMP_Text _strengthText = null;
         private DeckScreenHandler _deckHandler = null;
         private bool _isInitialised = false;
+        private bool _isClickable = false;
+        private Action _clickExecute = null;
         #endregion
 
         #region Unity Event Functions
@@ -38,7 +40,7 @@ namespace _Game.Scripts.Cards
         #endregion
         
         #region Methods
-        public void Initialise(CardInstance card, DeckScreenHandler handler)
+        public void Initialise(CardInstance card, DeckScreenHandler handler, bool isClickable = false, Action clickExecute = null)
         {
             this.name = card.Name + "_" + transform.parent.gameObject.name;
             _cardInstance = card;
@@ -65,9 +67,10 @@ namespace _Game.Scripts.Cards
             _isInitialised = true;
         }
 
-        public void Clicked()
+        public void Click()
         {
-            _deckHandler.Click(_cardInstance);
+            if(!_isClickable) return;
+            _clickExecute?.Invoke();
         }
         #endregion
     }

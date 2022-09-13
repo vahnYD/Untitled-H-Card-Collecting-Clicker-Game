@@ -23,20 +23,26 @@ MonoBehaviour:
   _upgradeCostMultAdditivePart: 0
   _upgradeCostMultMultiplicativePart: 0
   _effectMultPerLevel: 0
+  _overwriteEffectMultipliers: 0
+  _effectMultPerLevelOverwrites: []
   _coinGainEffect: 1
   _coinGain: 0
   _coinPerClickIncrease: 0
   _coinPerClickIncreaseManual: 0
   _coinPerClickDuration: 0
+  _coinEffectIgnoresLevel: 0
   _soulGainEffect: 0
   _soulGain: 0
   _soulPerClickGain: 0
   _soulPerClickGainManual: 0
   _soulPerClickDuration: 0
+  _soulEffectIgnoresLevel: 0
   _drawCards: 0
   _drawCardsAmount: 0
+  _drawEffectIgnoresLevel: 0
   _deckSearch: 0
   _deckSearchAmount: 0
+  _deckSearchAmountIgnoresLevel: 0
   _deckSearchByProperty: 0
   _propertyToSearchDeck: 2
   _nameToSearchDeck: 
@@ -44,6 +50,7 @@ MonoBehaviour:
   _rarityToSearchDeck: 1
   _graveSearch: 0
   _graveSearchAmount: 0
+  _graveSearchAmountIgnoresLevel: 0
   _graveSearchByProperty: 0
   _propertyToSearchGrave: 1
   _nameToSearchGrave: 
@@ -51,6 +58,7 @@ MonoBehaviour:
   _rarityToSearchGrave: 0
   _returnCardsFromHand: 0
   _amountOfCardsToReturnHand: 0
+  _returnFromHandAmountIgnoresLevel: 0
   _returnCardsByPropertyHand: 0
   _propertyReturnCardsHand: 0
   _nameReturnCardsHand: 
@@ -58,6 +66,7 @@ MonoBehaviour:
   _rarityReturnCardsHand: 0
   _returnCardsFromGrave: 0
   _amountOfCardsToReturnGrave: 0
+  _returnFromGraveAmountIgnoresLevel: 0
   _returnCardsByPropertyGrave: 0
   _propertyReturnCardsGrave: 0
   _nameReturnCardsGrave: 
@@ -65,6 +74,7 @@ MonoBehaviour:
   _rarityReturnCardsGrave: 0
   _sendGraveHand: 0
   _amountToSendGraveHand: 0
+  _sendFromHandAmountIgnoresLevel: 0
   _sendGraveByPropertyHand: 0
   _propertyToSendGraveHand: 0
   _nameToSendGraveHand: 
@@ -72,6 +82,7 @@ MonoBehaviour:
   _rarityToSentGraveHand: 0
   _sendGraveDeck: 0
   _amountToSendGraveDeck: 0
+  _sendFromDeckAmountIgnoresLevel: 0
   _sendGraveByPropertyDeck: 0
   _propertyToSendGraveDeck: 0
   _nameToSendGraveDeck: 
@@ -79,8 +90,10 @@ MonoBehaviour:
   _rarityToSendGraveDeck: 0
   _cooldownReduction: 0
   _amountCardsCooldownReduction: 0
+  _cdReductionCardAmountIgnoresLevel: 0
   _amountReductionCooldownReduction: 0
   _flatCooldownReduction: 0
+  _cdReductionReductionAmountIgnoresLevel: 0
   _cooldownReductionByProperty: 0
   _propertyCooldownReduction: 0
   _nameCooldownReduction: 
@@ -88,9 +101,12 @@ MonoBehaviour:
   _rarityCooldownReduction: 0
   _manipulateGachaPullCost: 0
   _gachaPullCostChange: 0
+  _gachaPullCostChangeIsFlat: 0
   _blockOtherGachaCostChanges: 0
+  _gachaPullCostChangeAmountIgnoresLevel: 0
   _destroyCards: 0
   _amountOfCardsToDestroy: 0
+  _destroyAmountIgnoresLevel: 0
   _destroyCardsByProperty: 0
   _propertyDestroyCards: 0
   _nameDestroyCards: 
@@ -98,8 +114,10 @@ MonoBehaviour:
   _rarityDestroyCards: 0
   _gainStars: 0
   _gainStarsAmount: 0
+  _starAmountIgnoresLevel: 0
   _gainAutoclicker: 0
   _autoclickerDuration: 0
+  _autoclickerDurationIgnoresLevel: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
