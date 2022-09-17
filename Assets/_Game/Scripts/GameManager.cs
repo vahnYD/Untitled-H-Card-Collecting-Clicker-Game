@@ -530,19 +530,24 @@ public class GameManager : MonoBehaviour
         }
         _totalGachaPullAmount += amount;
         if(_totalGachaPullAmount > 10) _tenPullDisabled.Value = false;
-        if(_firstRound && _totalGachaPullAmount < _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1] -10) _tenPullDisabled.Value = true;
+        if(_firstRound && _totalGachaPullAmount > _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1] -10) _tenPullDisabled.Value = true;
         if(_firstRound && _totalGachaPullAmount >= _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1]) _reachedFirstRoundCap.Value = true;
-        UpdateGachaPullCost();
+        UpdateGachaPullCost(isTenPull);
         UpdateLewdPoints();
         return pulledCards;
     }
 
-    private void UpdateGachaPullCost()
+    private void UpdateGachaPullCost(bool isTenPull = false)
     {
         List<int> bounds = _gameSettings.GachaPullCostIncreaseReductionUpperBounds;
         List<float> mults = _gameSettings.GachaPullCostIncreaseReductions;
+        int counter = (isTenPull) ? 10 : 1;
         int singleCost = _gachaPullCost.Value;
-        _gachaPullCost.Value = CalcGachaCost(singleCost, bounds, mults);
+        for(int i = 0; i < counter; i++)
+        {
+            singleCost = _gachaPullCost.Value;
+            _gachaPullCost.Value = CalcGachaCost(singleCost, bounds, mults);
+        }
 
         int cost = _gachaPullCost.Value;
         for(int i = 1; i < 10; i++)

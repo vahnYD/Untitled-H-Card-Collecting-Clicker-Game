@@ -163,11 +163,32 @@ namespace _Game.Scripts.UI
             }
         }
 
-        public void AddCard() => SelectCard(_displayedSelectedCard.Key);
-        public void RemoveCard() => DeselectCard(_displayedSelectedCard.Key);
+        //! needs Debugging, presently removes all selected cards when removing the displayed card if it was not picked from the deck section
+        //! also removes other cards when lower card in selection if there is a new card added above it
+
+        public void AddCard()
+        {
+            SelectCard(_displayedSelectedCard.Key);
+        }
+        public void RemoveCard()
+        {
+            DeselectCard(_displayedSelectedCard.Key);
+        }
+
         private void DeselectCard(CardInstance card) => SelectCard(card, true);
         private void SelectCard(CardInstance card, bool isRemoval = false)
         {
+            if(isRemoval)
+            {
+                _removeBtn.interactable = false;
+                _addBtn.interactable = true;
+            }
+            else
+            {
+                _addBtn.interactable = false;
+                _removeBtn.interactable = true;
+            }
+
             //Dynamically Check increasing deck size limitation
             if(card.CardRef.Rarity is Card.CardRarity.Rare)
             {
@@ -184,10 +205,12 @@ namespace _Game.Scripts.UI
                 _currentDeckSize += (isRemoval) ? -_gameSettings.DeckSizeIncreasePerSpecial : _gameSettings.DeckSizeIncreasePerSpecial;
             }
 
-            SelectedCardsChangeEvent?.Invoke(_selectedCards.Count, _amountOfRareCardsInSelection, _amountOfVRareCardsInSelection, _amountOfSpecialCardsInSelection);
-
             if(!isRemoval)_selectedCards.Add(card);
             else _selectedCards.Remove(card);
+
+            Debug.Log("fires, " + _displayedSelectedCard.Key.Name + ", Selected Count:" + _selectedCards.Count); 
+            SelectedCardsChangeEvent?.Invoke(_selectedCards.Count, _amountOfRareCardsInSelection, _amountOfVRareCardsInSelection, _amountOfSpecialCardsInSelection);
+
             Populate(_selectedCards.Count);
 
             //Check if apply is allowed

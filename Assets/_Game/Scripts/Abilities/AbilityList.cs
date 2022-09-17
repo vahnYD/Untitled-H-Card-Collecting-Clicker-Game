@@ -87,7 +87,7 @@ namespace _Game.Scripts.Abilities
                 {
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.Label("Name:");
-                    EditorGUILayout.TextField(_abilityName);
+                    _abilityName = EditorGUILayout.TextField(_abilityName);
 
                     if(GUILayout.Button("Confirm", GUILayout.MaxWidth(80f)))
                     {

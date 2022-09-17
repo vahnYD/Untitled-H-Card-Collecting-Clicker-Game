@@ -24,7 +24,7 @@ namespace _Game.Scripts.Abilities
         public int AbilityID => _id;
         [SerializeField] private string _name;
         public string Name => _name;
-        [SerializeField, TextArea(4, 10), Tooltip("{0} = Flat Coin Gain Amount\n{1} = Coin Per Click Increase Amount\n{2} = Coin Per Click Increase (Manual Only) Amount\n{3} = Coin Per Click Duration\n\n{4} = Flat Soul Gain Amount\n{5} = Soul Per Click Gain Amount\n{6} = Soul Per Click Gain (Manual Only) Amount\n{7} = Soul Per Click Duration\n\n{8} = Draw Cards Amount\n{9} = Search in Deck Amount\n{10} = Search in Deck Property\n{11} = Search in Deck Name\n{12} = Search in Deck Type\n{13} = Search in Deck Rarity\n\n{14} = Search in Grave Amount\n{15} = Search in Grave Property\n{16} = Search in Grave Name\n{17} = Search in Grave Type\n{18} = Search in Grave Rarity\n\n{19} = Return from Hand Amount\n{20} = Return from Hand Property\n{21} = Return from Hand Name\n{22} = Return from Hand Type\n{23} = Return from Hand Rarity\n\n{24} = Return from Grave Amount\n{25} = Return from Grave Property\n{26} = Return from Grave Name\n{27} = Return from Grave Type\n{28} = Return from Grave Rarity\n\n{29} = Send Cards from Hand Amount\n{30} = Send Cards from Hand Property\n{31} = Send Cards from Hand Name\n{32} = Send Cards from Hand Type\n{33} = Send Cards from Hand Rarity\n\n{34} = Send Cards from Deck Amount\n{35} = Send Cards from Deck Property\n{36} = Send Cards from Deck Name\n{37} = Send Cards from Deck Type\n{38} = Send Cards from Deck Rarity\n\n{39} = Cooldown Reduction Card Amount\n{40} = Cooldown Reduction Reduction Amount\n{41} = Cooldown Reduction Property\n{42} = Cooldown Reduction Name\n{43} = Cooldown Reduction Type\n{44} = Cooldown Reduction Rarity\n\n{45} = Gacha Pull Cost Change\n\n{46} = Destroy Cards Amount\n{47} = Destroy Cards Property\n{48} = Destroy Cards Name\n{49} = Destroy Cards Type\n{50} = Destroy Cards Rarity\n\n{51} = Gain Stars Amount\n\n{52} = Autoclicker Duration")] 
+        [SerializeField, TextArea(4, 10), Tooltip("{0} = Flat Coin Gain Amount\n{1} = Coin Per Click Increase Amount\n{2} = Coin Per Click Increase (Manual Only) Amount\n{3} = Coin Per Click Duration\n\n{4} = Flat Soul Gain Amount\n{5} = Soul Per Click Gain Amount\n{6} = Soul Per Click Gain (Manual Only) Amount\n{7} = Soul Per Click Duration\n\n{8} = Draw Cards Amount\n\n{9} = Search in Deck Amount\n{10} = Search in Deck Property\n{11} = Search in Deck Name\n{12} = Search in Deck Type\n{13} = Search in Deck Rarity\n\n{14} = Search in Grave Amount\n{15} = Search in Grave Property\n{16} = Search in Grave Name\n{17} = Search in Grave Type\n{18} = Search in Grave Rarity\n\n{19} = Return from Hand Amount\n{20} = Return from Hand Property\n{21} = Return from Hand Name\n{22} = Return from Hand Type\n{23} = Return from Hand Rarity\n\n{24} = Return from Grave Amount\n{25} = Return from Grave Property\n{26} = Return from Grave Name\n{27} = Return from Grave Type\n{28} = Return from Grave Rarity\n\n{29} = Send Cards from Hand Amount\n{30} = Send Cards from Hand Property\n{31} = Send Cards from Hand Name\n{32} = Send Cards from Hand Type\n{33} = Send Cards from Hand Rarity\n\n{34} = Send Cards from Deck Amount\n{35} = Send Cards from Deck Property\n{36} = Send Cards from Deck Name\n{37} = Send Cards from Deck Type\n{38} = Send Cards from Deck Rarity\n\n{39} = Cooldown Reduction Card Amount\n{40} = Cooldown Reduction Reduction Amount\n{41} = Cooldown Reduction Property\n{42} = Cooldown Reduction Name\n{43} = Cooldown Reduction Type\n{44} = Cooldown Reduction Rarity\n\n{45} = Gacha Pull Cost Change\n\n{46} = Destroy Cards Amount\n{47} = Destroy Cards Property\n{48} = Destroy Cards Name\n{49} = Destroy Cards Type\n{50} = Destroy Cards Rarity\n\n{51} = Gain Stars Amount\n\n{52} = Autoclicker Duration")] 
         private string _abilityText; 
         [SerializeField, Min(1), Tooltip("Max Level < 2 => Un-upgradable")] private int _maxLevel;
         public int MaxLevel => _maxLevel;
@@ -105,8 +105,8 @@ namespace _Game.Scripts.Abilities
         [SerializeField] private bool _sendGraveByPropertyHand;
         [SerializeField] private Card.SearchableProperties _propertyToSendGraveHand;
         [SerializeField] private string _nameToSendGraveHand;
-        [SerializeField] private Card.CardType _typeToSentGraveHand;
-        [SerializeField] private Card.CardRarity _rarityToSentGraveHand;
+        [SerializeField] private Card.CardType _typeToSendGraveHand;
+        [SerializeField] private Card.CardRarity _rarityToSendGraveHand;
         [SerializeField] private bool _sendGraveDeck;
         [SerializeField, Min(0)] private int _amountToSendGraveDeck;
         [SerializeField] private bool _sendFromDeckAmountIgnoresLevel;
@@ -175,7 +175,7 @@ namespace _Game.Scripts.Abilities
                 }
                 else
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, _nameToSendGraveHand, _typeToSentGraveHand, _rarityToSentGraveHand);
+                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, _nameToSendGraveHand, _typeToSendGraveHand, _rarityToSendGraveHand);
                 }
             }
 
@@ -390,7 +390,7 @@ namespace _Game.Scripts.Abilities
                 graveSearchAmountPostMult, _propertyToSearchGrave, _nameToSearchGrave, _typeToSearchGrave, _rarityToSearchGrave,
                 amountOfCardsToReturnHandPostMult, _propertyReturnCardsHand, _nameReturnCardsHand, _typeReturnCardsHand, _rarityReturnCardsHand,
                 amountOfCardsToReturnGravePostMult, _propertyReturnCardsGrave, _nameReturnCardsGrave, _typeReturnCardsGrave, _rarityReturnCardsGrave,
-                amountToSendGraveHandPostMult, _propertyToSendGraveHand, _nameToSendGraveHand, _typeToSentGraveHand, _rarityToSentGraveHand,
+                amountToSendGraveHandPostMult, _propertyToSendGraveHand, _nameToSendGraveHand, _typeToSendGraveHand, _rarityToSendGraveHand,
                 amountToSendGraveDeckPostMult, _propertyToSendGraveDeck, _nameToSendGraveDeck, _typeToSendGraveDeck, _rarityToSendGraveDeck, 
                 cooldownReductionCardAmountPostMult, cooldownReductionReductionAmountPostMult,
                 _propertyCooldownReduction, _nameCooldownReduction, _typeCooldownReduction, _rarityCooldownReduction,
@@ -430,7 +430,8 @@ namespace _Game.Scripts.Abilities
         protected void DeleteAbility()
         {
             _abilityLevelList.RemoveAbility(this);
-            Destroy(this);
+            Undo.DestroyObjectImmediate(this);
+            AssetDatabase.SaveAssets();
         }
 
         public void Initialise(AbilityList abilityList, string name, int id)
@@ -635,7 +636,7 @@ namespace _Game.Scripts.Abilities
                 _spRarityToSearchDeck = serializedObject.FindProperty("_rarityToSearchDeck");
                 _spGraveSearch = serializedObject.FindProperty("_graveSearch");
                 _spGraveSearchAmount = serializedObject.FindProperty("_graveSearchAmount");
-                _spGraveSearchAmountIgnoresLevel = serializedObject.FindProperty("graveSearchAmountIgnoresLevel");
+                _spGraveSearchAmountIgnoresLevel = serializedObject.FindProperty("_graveSearchAmountIgnoresLevel");
                 _spGraveSearchByProperty = serializedObject.FindProperty("_graveSearchByProperty");
                 _spPropertyToSearchGrave = serializedObject.FindProperty("_propertyToSearchGrave");
                 _spNameToSearchGrave = serializedObject.FindProperty("_nameToSearchGrave");

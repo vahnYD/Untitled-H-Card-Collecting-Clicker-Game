@@ -64,6 +64,8 @@ namespace _Game.Scripts.Cards
             _typeText.text = Enum.GetName(typeof(Card.CardType), card.CardRef.Type);
             _strengthText.text = card.CardRef.Strength.ToString();
             _deckHandler = handler;
+            _isClickable = isClickable;
+            _clickExecute = clickExecute;
             _isInitialised = true;
         }
 

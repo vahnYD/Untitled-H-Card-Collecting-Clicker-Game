@@ -145,7 +145,7 @@ namespace _Game.Scripts.UI
                     removedIndeces.Remove(removedIndeces.First());
                 }
                 else offsetMult = _displayedCards.Count;
-                cardObject.transform.localPosition = new Vector2((_cardSpotOffset + cardObject.GetComponent<RectTransform>().sizeDelta.x) * offsetMult, cardObject.transform.localPosition.y);
+                cardObject.transform.localPosition = new Vector2((_cardSpotOffset + cardObject.GetComponent<RectTransform>().sizeDelta.x/2) * offsetMult, cardObject.transform.localPosition.y);
                 cardObject.GetComponent<CardObject>().Initialise(card);
                 _displayedCards.Add(cardObject.transform, offsetMult);
             }

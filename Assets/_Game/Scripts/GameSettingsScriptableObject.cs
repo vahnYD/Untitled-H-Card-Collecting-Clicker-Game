@@ -232,6 +232,8 @@ public class GameSettingsScriptableObject : ScriptableObject
                 EditorGUILayout.PropertyField(_spCardTypeMultipliers);
                 EditorGUILayout.PropertyField(_spCardTypeMultiplierUpperBounds);
             }
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
     #endif

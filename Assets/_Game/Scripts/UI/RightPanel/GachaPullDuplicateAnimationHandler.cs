@@ -56,7 +56,7 @@ namespace _Game.Scripts.UI
                     break;
             }
             _obtainedCrystalsText.text = crystalAmount.ToString();
-            _duplicateAnimObj.GetComponent<RectTransform>().DOSizeDelta(new Vector2(110, 152), 0.05f);
+            _duplicateAnimObj.GetComponent<RectTransform>().DOSizeDelta(new Vector2(110, 152), 0.1f);
         }
 
         public void Reset()

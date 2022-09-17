@@ -33,6 +33,10 @@ namespace _Game.Scripts.UI
         [SerializeField] private float _singlePullScaleMult = 2f;
         private bool _buttonGachaLock = false;
         private List<Transform> _displayedGachaPulls = new List<Transform>();
+
+        // needed to remove the counter from Dupe Check Parameter list as the action in the 
+        // enumeration uses the counter value at the end of the tween not what it was when the tween started
+        private int DupeCheckCounter = 0;
         #endregion
 
         #region Unity Event Functions
@@ -152,6 +156,8 @@ namespace _Game.Scripts.UI
                     isDupe = pair.Value;
                 }
                 _gachaPullWindowObj.gameObject.SetActive(true);
+                foreach(GachaPullDuplicateAnimationHandler handler in _displayTenGachaPullsCoordinates) handler.Reset();
+                _displaySingleGachaPullCoordinate.Reset();
                 if(isDupe) _displaySingleGachaPullCoordinate.Duplicate(rarity);
                 _closeGachaPullsButton.interactable = true;
                 return;
@@ -165,6 +171,11 @@ namespace _Game.Scripts.UI
                 cardObj.GetComponent<CardObject>().Initialise(pair.Key);
             }
             _gachaPullWindowObj.gameObject.SetActive(true);
+            foreach(GachaPullDuplicateAnimationHandler duplicateHandler in _displayTenGachaPullsCoordinates)
+            {
+                duplicateHandler.Reset();
+            }
+            _displaySingleGachaPullCoordinate.Reset();
             StartCoroutine(GachaAnimCoroutine(pulledCards));
         }
 
@@ -177,15 +188,16 @@ namespace _Game.Scripts.UI
                 _displayedGachaPulls.Remove(ob);
                 Destroy(ob.gameObject);
             }
-            foreach(GachaPullDuplicateAnimationHandler handler in _displayTenGachaPullsCoordinates) handler.Reset();
             _buttonGachaLock = false;
             if(_coinAmount.Value > _singlePullCost.Value && !_reachedFirstRoundCapFlag.Value) _singlePullButton.interactable = true;
             if(_coinAmount.Value > _tenPullCost.Value && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag.Value) _tenPullButton.interactable = true;
         }
 
-        private void TriggerIfDupe(bool isDupe, int index, Card.CardRarity rarity)
+        private void TriggerIfDupe(bool isDupe, Card.CardRarity rarity)
         {
-            if(isDupe) _displayTenGachaPullsCoordinates[index].Duplicate(rarity);
+
+            if(isDupe) _displayTenGachaPullsCoordinates[DupeCheckCounter].Duplicate(rarity);
+            DupeCheckCounter = (DupeCheckCounter + 1 ) % _displayTenGachaPullsCoordinates.Length;
         }
         #endregion
 
@@ -198,7 +210,7 @@ namespace _Game.Scripts.UI
                 Card.CardRarity rarity = card.CardRef.Rarity;
                 bool isDupe = pulledCards[card];
                 obj.SetParent(_displayTenGachaPullsCoordinates[counter].transform);
-                obj.DOLocalMove(Vector3.zero, 0.2f).OnComplete(()=>TriggerIfDupe(isDupe, counter, rarity)).timeScale=1;
+                obj.DOLocalMove(Vector3.zero, 0.2f).OnComplete(()=>TriggerIfDupe(isDupe, rarity)).timeScale=1;
                 counter++;
                 yield return new WaitForSecondsRealtime(0.1f);
             }

@@ -7,6 +7,9 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace _Game.Scripts.Abilities
 {
@@ -15,7 +18,7 @@ namespace _Game.Scripts.Abilities
     {
         #region Properties
         [SerializeField] private List<AbilityList> _abilityLevels = new List<AbilityList>();
-        private static int _nextAbilityId = 0;
+        [SerializeField, HideInInspector] private int _nextAbilityId = 0;
         #endregion
 
         
@@ -30,5 +33,29 @@ namespace _Game.Scripts.Abilities
             return null;
         }
         #endregion
+
+        #if UNITY_EDITOR
+        [ContextMenu("Increase Next Ability ID")]
+        private void DebugIncreaseNextAbilityId() => _nextAbilityId++;
+
+        [CustomEditor(typeof(AbilityListManager))]
+        public class AbilityListManagerEditor : Editor
+        {
+            SerializedProperty _spNextAbilityId;
+
+            private void OnEnable()
+            {
+                _spNextAbilityId = serializedObject.FindProperty("_nextAbilityId");
+            }
+
+            public override void OnInspectorGUI()
+            {
+                base.OnInspectorGUI();
+
+                GUILayout.Space(5f);
+                GUILayout.Label("Next Ability ID: "+_spNextAbilityId.intValue.ToString());
+            }
+        }
+        #endif
     }
 }

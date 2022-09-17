@@ -40,10 +40,13 @@ namespace _Game.Scripts.Cards
             _cardArt = card.GetRandomCardArt();
             _hasAbility = card.HasAbility;
             if(_hasAbility)
+            {
                 foreach(Abilities.Ability ability in card.Abilities)
                 {
                     _nextUpgradeCost += ability.GetUpgradeCostForLevel(2);
                 }
+                UpdateAbilityText();
+            }
             _level = (_hasAbility && _card.Abilities.Where(x=>x.MaxLevel >=2).Count() >= 1) ? 1 : 0;
         }
 

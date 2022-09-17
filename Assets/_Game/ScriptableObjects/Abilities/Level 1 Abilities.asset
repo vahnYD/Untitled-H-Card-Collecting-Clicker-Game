@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-9098970142403686803
+--- !u!114 &-2547480010942536960
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10,14 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b16baa35ccf4a784f836df4e0ef7e8dc, type: 3}
-  m_Name: Placeholder name
+  m_Name: Coin Gain Increase #1
   m_EditorClassIdentifier: 
   _abilityLevelList: {fileID: 11400000}
-  _id: 0
-  _name: Placeholder name
-  _abilityText: 
+  _id: 6
+  _name: Coin Gain Increase #1
+  _abilityText: 'For 5 Minutes, every click you do will grant +{2} Coins. Cooldown:
+    40 Minutes.'
   _maxLevel: 0
-  _cooldownInSec: 0
+  _cooldownInSec: 2400
   CooldownInSec: 0
   _baseUpgradeCost: 0
   _upgradeCostMultAdditivePart: 0
@@ -28,8 +29,8 @@ MonoBehaviour:
   _coinGainEffect: 1
   _coinGain: 0
   _coinPerClickIncrease: 0
-  _coinPerClickIncreaseManual: 0
-  _coinPerClickDuration: 0
+  _coinPerClickIncreaseManual: 5
+  _coinPerClickDuration: 300
   _coinEffectIgnoresLevel: 0
   _soulGainEffect: 0
   _soulGain: 0
@@ -44,17 +45,17 @@ MonoBehaviour:
   _deckSearchAmount: 0
   _deckSearchAmountIgnoresLevel: 0
   _deckSearchByProperty: 0
-  _propertyToSearchDeck: 2
+  _propertyToSearchDeck: 0
   _nameToSearchDeck: 
   _typeToSearchDeck: 0
-  _rarityToSearchDeck: 1
+  _rarityToSearchDeck: 0
   _graveSearch: 0
   _graveSearchAmount: 0
   _graveSearchAmountIgnoresLevel: 0
   _graveSearchByProperty: 0
-  _propertyToSearchGrave: 1
+  _propertyToSearchGrave: 0
   _nameToSearchGrave: 
-  _typeToSearchGrave: 3
+  _typeToSearchGrave: 0
   _rarityToSearchGrave: 0
   _returnCardsFromHand: 0
   _amountOfCardsToReturnHand: 0
@@ -78,8 +79,8 @@ MonoBehaviour:
   _sendGraveByPropertyHand: 0
   _propertyToSendGraveHand: 0
   _nameToSendGraveHand: 
-  _typeToSentGraveHand: 0
-  _rarityToSentGraveHand: 0
+  _typeToSendGraveHand: 0
+  _rarityToSendGraveHand: 0
   _sendGraveDeck: 0
   _amountToSendGraveDeck: 0
   _sendFromDeckAmountIgnoresLevel: 0
@@ -132,5 +133,247 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _abilityContainer: {fileID: 11400000, guid: 7ce6f26d93005254aa8cc060f51a633f, type: 2}
   _abilityList:
-  - {fileID: -9098970142403686803}
+  - {fileID: 3434915313765408753}
+  - {fileID: -2547480010942536960}
+  - {fileID: 4310290368209529015}
   _level: 0
+--- !u!114 &3434915313765408753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b16baa35ccf4a784f836df4e0ef7e8dc, type: 3}
+  m_Name: Soul&Coin Gain #1
+  m_EditorClassIdentifier: 
+  _abilityLevelList: {fileID: 11400000}
+  _id: 0
+  _name: Soul&Coin Gain #1
+  _abilityText: 'Gain {4} Souls and {0} Coins.
+
+    Cooldown: 8 Minutes.'
+  _maxLevel: 0
+  _cooldownInSec: 480
+  CooldownInSec: 0
+  _baseUpgradeCost: 0
+  _upgradeCostMultAdditivePart: 0
+  _upgradeCostMultMultiplicativePart: 0
+  _effectMultPerLevel: 0
+  _overwriteEffectMultipliers: 0
+  _effectMultPerLevelOverwrites: []
+  _coinGainEffect: 1
+  _coinGain: 60
+  _coinPerClickIncrease: 0
+  _coinPerClickIncreaseManual: 0
+  _coinPerClickDuration: 0
+  _coinEffectIgnoresLevel: 0
+  _soulGainEffect: 1
+  _soulGain: 15
+  _soulPerClickGain: 0
+  _soulPerClickGainManual: 0
+  _soulPerClickDuration: 0
+  _soulEffectIgnoresLevel: 0
+  _drawCards: 0
+  _drawCardsAmount: 0
+  _drawEffectIgnoresLevel: 0
+  _deckSearch: 0
+  _deckSearchAmount: 0
+  _deckSearchAmountIgnoresLevel: 0
+  _deckSearchByProperty: 0
+  _propertyToSearchDeck: 0
+  _nameToSearchDeck: 
+  _typeToSearchDeck: 0
+  _rarityToSearchDeck: 0
+  _graveSearch: 0
+  _graveSearchAmount: 0
+  _graveSearchAmountIgnoresLevel: 0
+  _graveSearchByProperty: 0
+  _propertyToSearchGrave: 0
+  _nameToSearchGrave: 
+  _typeToSearchGrave: 0
+  _rarityToSearchGrave: 0
+  _returnCardsFromHand: 0
+  _amountOfCardsToReturnHand: 0
+  _returnFromHandAmountIgnoresLevel: 0
+  _returnCardsByPropertyHand: 0
+  _propertyReturnCardsHand: 0
+  _nameReturnCardsHand: 
+  _typeReturnCardsHand: 0
+  _rarityReturnCardsHand: 0
+  _returnCardsFromGrave: 0
+  _amountOfCardsToReturnGrave: 0
+  _returnFromGraveAmountIgnoresLevel: 0
+  _returnCardsByPropertyGrave: 0
+  _propertyReturnCardsGrave: 0
+  _nameReturnCardsGrave: 
+  _typeReturnCardsGrave: 0
+  _rarityReturnCardsGrave: 0
+  _sendGraveHand: 0
+  _amountToSendGraveHand: 0
+  _sendFromHandAmountIgnoresLevel: 0
+  _sendGraveByPropertyHand: 0
+  _propertyToSendGraveHand: 0
+  _nameToSendGraveHand: 
+  _typeToSendGraveHand: 0
+  _rarityToSendGraveHand: 0
+  _sendGraveDeck: 0
+  _amountToSendGraveDeck: 0
+  _sendFromDeckAmountIgnoresLevel: 0
+  _sendGraveByPropertyDeck: 0
+  _propertyToSendGraveDeck: 0
+  _nameToSendGraveDeck: 
+  _typeToSendGraveDeck: 0
+  _rarityToSendGraveDeck: 0
+  _cooldownReduction: 0
+  _amountCardsCooldownReduction: 0
+  _cdReductionCardAmountIgnoresLevel: 0
+  _amountReductionCooldownReduction: 0
+  _flatCooldownReduction: 0
+  _cdReductionReductionAmountIgnoresLevel: 0
+  _cooldownReductionByProperty: 0
+  _propertyCooldownReduction: 0
+  _nameCooldownReduction: 
+  _typeCooldownReduction: 0
+  _rarityCooldownReduction: 0
+  _manipulateGachaPullCost: 0
+  _gachaPullCostChange: 0
+  _gachaPullCostChangeIsFlat: 0
+  _blockOtherGachaCostChanges: 0
+  _gachaPullCostChangeAmountIgnoresLevel: 0
+  _destroyCards: 0
+  _amountOfCardsToDestroy: 0
+  _destroyAmountIgnoresLevel: 0
+  _destroyCardsByProperty: 0
+  _propertyDestroyCards: 0
+  _nameDestroyCards: 
+  _typeDestroyCards: 0
+  _rarityDestroyCards: 0
+  _gainStars: 0
+  _gainStarsAmount: 0
+  _starAmountIgnoresLevel: 0
+  _gainAutoclicker: 0
+  _autoclickerDuration: 0
+  _autoclickerDurationIgnoresLevel: 0
+--- !u!114 &4310290368209529015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b16baa35ccf4a784f836df4e0ef7e8dc, type: 3}
+  m_Name: Flat Coin Gain #1
+  m_EditorClassIdentifier: 
+  _abilityLevelList: {fileID: 11400000}
+  _id: 9
+  _name: Flat Coin Gain #1
+  _abilityText: 'Gain {0} Coins.
+
+    Cooldown: 2 hours'
+  _maxLevel: 0
+  _cooldownInSec: 7200
+  CooldownInSec: 0
+  _baseUpgradeCost: 0
+  _upgradeCostMultAdditivePart: 0
+  _upgradeCostMultMultiplicativePart: 0
+  _effectMultPerLevel: 0
+  _overwriteEffectMultipliers: 0
+  _effectMultPerLevelOverwrites: []
+  _coinGainEffect: 1
+  _coinGain: 200
+  _coinPerClickIncrease: 0
+  _coinPerClickIncreaseManual: 0
+  _coinPerClickDuration: 0
+  _coinEffectIgnoresLevel: 0
+  _soulGainEffect: 0
+  _soulGain: 0
+  _soulPerClickGain: 0
+  _soulPerClickGainManual: 0
+  _soulPerClickDuration: 0
+  _soulEffectIgnoresLevel: 0
+  _drawCards: 0
+  _drawCardsAmount: 0
+  _drawEffectIgnoresLevel: 0
+  _deckSearch: 0
+  _deckSearchAmount: 0
+  _deckSearchAmountIgnoresLevel: 0
+  _deckSearchByProperty: 0
+  _propertyToSearchDeck: 0
+  _nameToSearchDeck: 
+  _typeToSearchDeck: 0
+  _rarityToSearchDeck: 0
+  _graveSearch: 0
+  _graveSearchAmount: 0
+  _graveSearchAmountIgnoresLevel: 0
+  _graveSearchByProperty: 0
+  _propertyToSearchGrave: 0
+  _nameToSearchGrave: 
+  _typeToSearchGrave: 0
+  _rarityToSearchGrave: 0
+  _returnCardsFromHand: 0
+  _amountOfCardsToReturnHand: 0
+  _returnFromHandAmountIgnoresLevel: 0
+  _returnCardsByPropertyHand: 0
+  _propertyReturnCardsHand: 0
+  _nameReturnCardsHand: 
+  _typeReturnCardsHand: 0
+  _rarityReturnCardsHand: 0
+  _returnCardsFromGrave: 0
+  _amountOfCardsToReturnGrave: 0
+  _returnFromGraveAmountIgnoresLevel: 0
+  _returnCardsByPropertyGrave: 0
+  _propertyReturnCardsGrave: 0
+  _nameReturnCardsGrave: 
+  _typeReturnCardsGrave: 0
+  _rarityReturnCardsGrave: 0
+  _sendGraveHand: 0
+  _amountToSendGraveHand: 0
+  _sendFromHandAmountIgnoresLevel: 0
+  _sendGraveByPropertyHand: 0
+  _propertyToSendGraveHand: 0
+  _nameToSendGraveHand: 
+  _typeToSendGraveHand: 0
+  _rarityToSendGraveHand: 0
+  _sendGraveDeck: 0
+  _amountToSendGraveDeck: 0
+  _sendFromDeckAmountIgnoresLevel: 0
+  _sendGraveByPropertyDeck: 0
+  _propertyToSendGraveDeck: 0
+  _nameToSendGraveDeck: 
+  _typeToSendGraveDeck: 0
+  _rarityToSendGraveDeck: 0
+  _cooldownReduction: 0
+  _amountCardsCooldownReduction: 0
+  _cdReductionCardAmountIgnoresLevel: 0
+  _amountReductionCooldownReduction: 0
+  _flatCooldownReduction: 0
+  _cdReductionReductionAmountIgnoresLevel: 0
+  _cooldownReductionByProperty: 0
+  _propertyCooldownReduction: 0
+  _nameCooldownReduction: 
+  _typeCooldownReduction: 0
+  _rarityCooldownReduction: 0
+  _manipulateGachaPullCost: 0
+  _gachaPullCostChange: 0
+  _gachaPullCostChangeIsFlat: 0
+  _blockOtherGachaCostChanges: 0
+  _gachaPullCostChangeAmountIgnoresLevel: 0
+  _destroyCards: 0
+  _amountOfCardsToDestroy: 0
+  _destroyAmountIgnoresLevel: 0
+  _destroyCardsByProperty: 0
+  _propertyDestroyCards: 0
+  _nameDestroyCards: 
+  _typeDestroyCards: 0
+  _rarityDestroyCards: 0
+  _gainStars: 0
+  _gainStarsAmount: 0
+  _starAmountIgnoresLevel: 0
+  _gainAutoclicker: 0
+  _autoclickerDuration: 0
+  _autoclickerDurationIgnoresLevel: 0

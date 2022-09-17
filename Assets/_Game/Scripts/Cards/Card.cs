@@ -54,7 +54,8 @@ namespace _Game.Scripts.Cards
         protected void DeleteCard()
         {
             _cardList.RemoveCard(this);
-            Destroy(this);
+            Undo.DestroyObjectImmediate(this);
+            AssetDatabase.SaveAssets();
         }
 
         public void Initialise(CardList cardList, string name, int id)
@@ -64,6 +65,9 @@ namespace _Game.Scripts.Cards
             _name = name;
             this.name = _name;
         }
+
+        [ContextMenu("Increase ID")]
+        private void DebugIncreaseId() => _id++;
 
         [CustomEditor(typeof(Card))]
         public class CardEditor : Editor
@@ -79,7 +83,7 @@ namespace _Game.Scripts.Cards
             SerializedProperty _spStrength;
             SerializedProperty _spFlavourText;
             SerializedProperty _spHasAbility;
-            SerializedProperty _spAbility;
+            SerializedProperty _spAbilities;
             SerializedProperty _spCardArt;
             #endregion
 
@@ -97,7 +101,7 @@ namespace _Game.Scripts.Cards
                 _spStrength = serializedObject.FindProperty("_strength");
                 _spFlavourText = serializedObject.FindProperty("_flavourText");
                 _spHasAbility = serializedObject.FindProperty("_hasAbility");
-                _spAbility = serializedObject.FindProperty("_ability");
+                _spAbilities = serializedObject.FindProperty("_abilities");
                 _spCardArt = serializedObject.FindProperty("_cardArt");
             }
 
@@ -113,7 +117,7 @@ namespace _Game.Scripts.Cards
                 EditorGUILayout.PropertyField(_spSoulValue);
                 EditorGUILayout.PropertyField(_spHasAbility);
                 if(_spHasAbility.boolValue)
-                    EditorGUILayout.PropertyField(_spAbility);
+                    EditorGUILayout.PropertyField(_spAbilities);
                 EditorGUILayout.PropertyField(_spCardArt);
                 EditorGUILayout.PropertyField(_spFlavourText);
 
@@ -150,10 +154,10 @@ namespace _Game.Scripts.Cards
             Exhibitionism,
             Prostitution,
             Showoff,
-            EvilCorruption,
+            Corruption,
             Allsexual,
             Sluttification,
-            CockWorship
+            Worship
         }
 
         public enum SearchableProperties

@@ -31,6 +31,11 @@ MonoBehaviour:
   _capCoinsPerClickAtBase: 0
   _autoclickerIntervalLp: 11
   _autoclickerIntervalAbility: 3
+  _gachaPullWeights:
+  - 66.6
+  - 23
+  - 9
+  - 1.4
   _baseGachaPullCost: 10
   _baseGachaPullIncrement: 0.5
   _gachaPullCostIncreaseReductionUpperBounds: 0b00000033000000650000002d010000f5010000f8010000
@@ -45,3 +50,8 @@ MonoBehaviour:
   _crystalsPerStar: 100
   _drawCooldownInSec: 1800
   _maxDupesAllowedInDeck: 1
+  _defaultDeckSize: 10
+  _deckSizeIncreasePerVeryRare: 2
+  _maxVRareCardsAllowedInDeckBase: 5
+  _deckSizeIncreasePerSpecial: 4
+  _maxSpecialCardsAllowedInDeckBase: 2
