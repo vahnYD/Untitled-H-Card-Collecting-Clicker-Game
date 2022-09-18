@@ -21,6 +21,7 @@ namespace _Game.Scripts.UI
         [SerializeField] private TMP_Text _abilityText = null;
         [SerializeField] private Transform _abilityTextScrollViewContentObj = null;
         [SerializeField] private Transform _cardObjSpawnTransform = null;
+        [SerializeField] private Transform _deckDisplayScrollViewContentObj = null;
         [SerializeField] private Button _applyBtn = null;
         [SerializeField] private Button _addBtn = null;
         [SerializeField] private Button _removeBtn = null;
@@ -44,7 +45,7 @@ namespace _Game.Scripts.UI
         #if UNITY_EDITOR
         private void Awake()
         {
-            if(_cardObjectDeckPrefab is null || _cardArtImageObj is null || _abilityText is null || _abilityTextScrollViewContentObj is null || _cardObjSpawnTransform is null || _applyBtn is null || _addBtn is null || _removeBtn is null)
+            if(_cardObjectDeckPrefab is null || _cardArtImageObj is null || _abilityText is null || _abilityTextScrollViewContentObj is null || _cardObjSpawnTransform is null || _deckDisplayScrollViewContentObj is null || _applyBtn is null || _addBtn is null || _removeBtn is null)
                 Debug.LogWarning("DeckScreenHandler.cs is missing Object References.");
         }
         #endif
@@ -72,14 +73,17 @@ namespace _Game.Scripts.UI
         {
             if(_displayedCards.Count is 0 && newVal is 0) return;
 
-            List<CardInstance> deck = _selectedCards;
+            List<CardInstance> deck = new List<CardInstance>();
+            CardInstance[] carry1 = new CardInstance[_selectedCards.Count];
+            _selectedCards.CopyTo(carry1);
+            deck = carry1.ToList();
             List<int> removedIndeces = new List<int>();
             bool cardsWereRemoved = CheckForRemoval(deck, ref removedIndeces);
             if(!cardsWereRemoved && (newVal is 0 || newVal == _displayedCards.Count)) return;
 
-            CardInstance[] carry = new CardInstance[deck.Count];
-            deck.CopyTo(carry);
-            foreach(CardInstance card in carry)
+            CardInstance[] carry2 = new CardInstance[deck.Count];
+            deck.CopyTo(carry2);
+            foreach(CardInstance card in carry2)
                 if(_displayedCards.Where(x=>x.Key.GetComponent<CardObject_Deck>().CardInstanceRef.CardArt == card.CardArt).Count() > 0) deck.Remove(card);
 
             foreach(CardInstance card in deck)
@@ -102,6 +106,10 @@ namespace _Game.Scripts.UI
 
             if(removedIndeces.Count > 0)
                 FillEmptyIndeces(removedIndeces);
+
+            RectTransform firstCardSpot = _cardObjSpawnTransform.GetComponent<RectTransform>();
+            RectTransform scrollViewContent = _deckDisplayScrollViewContentObj.GetComponent<RectTransform>();
+            scrollViewContent.sizeDelta = new Vector2(scrollViewContent.sizeDelta.x, firstCardSpot.sizeDelta.y * _selectedCards.Count);
         }
 
         private bool CheckForRemoval(List<CardInstance> deck, ref List<int> removedIndeces)
@@ -137,7 +145,7 @@ namespace _Game.Scripts.UI
                 for(int j = i; j < sortedDisplayedCards.Count; j++)
                 {
                     KeyValuePair<Transform, int> pair = sortedDisplayedCards[j];
-                    pair.Key.localPosition = new Vector2(0, pair.Key.localPosition.y - pair.Key.GetComponent<RectTransform>().sizeDelta.y);
+                    pair.Key.localPosition = new Vector2(0, pair.Key.localPosition.y + pair.Key.GetComponent<RectTransform>().sizeDelta.y);
                     _displayedCards[pair.Key]--;
                 }
             }
@@ -163,8 +171,6 @@ namespace _Game.Scripts.UI
             }
         }
 
-        //! needs Debugging, presently removes all selected cards when removing the displayed card if it was not picked from the deck section
-        //! also removes other cards when lower card in selection if there is a new card added above it
 
         public void AddCard()
         {
@@ -208,7 +214,6 @@ namespace _Game.Scripts.UI
             if(!isRemoval)_selectedCards.Add(card);
             else _selectedCards.Remove(card);
 
-            Debug.Log("fires, " + _displayedSelectedCard.Key.Name + ", Selected Count:" + _selectedCards.Count); 
             SelectedCardsChangeEvent?.Invoke(_selectedCards.Count, _amountOfRareCardsInSelection, _amountOfVRareCardsInSelection, _amountOfSpecialCardsInSelection);
 
             Populate(_selectedCards.Count);

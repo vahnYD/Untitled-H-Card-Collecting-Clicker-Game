@@ -49,7 +49,7 @@ namespace _Game.Scripts.Cards
 
         private void UpdateCardType(Card.CardType type, int strength, bool isAdding = true)
         {
-            if(_ownedTypes.Count == 0)
+            if(!_ownedTypes.ContainsKey(type))
             {
                 if(!isAdding) return;
                 _ownedTypes.Add(type, strength);
