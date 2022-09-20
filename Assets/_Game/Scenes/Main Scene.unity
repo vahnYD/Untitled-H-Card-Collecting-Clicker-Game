@@ -3293,7 +3293,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000023609211}
+  m_AnchoredPosition: {x: 0, y: 0.000015607566}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &241217844
@@ -6275,6 +6275,7 @@ GameObject:
   - component: {fileID: 457908763}
   - component: {fileID: 457908762}
   - component: {fileID: 457908766}
+  - component: {fileID: 457908767}
   m_Layer: 5
   m_Name: UI
   m_TagString: Untagged
@@ -6386,6 +6387,7 @@ MonoBehaviour:
   _starAmount: {fileID: 11400000, guid: 213e47fa61376b24c9fb547b80c04999, type: 2}
   _devilTearAmount: {fileID: 11400000, guid: 53b9077c6eb341c4cab3285133313238, type: 2}
   _drawIsBlocked: {fileID: 11400000, guid: 2ceaa9138c1282144b19775ae48951be, type: 2}
+  _deckModifyIsBlocked: {fileID: 11400000, guid: 6f88d8e4fc107dd4d87f932e07674610, type: 2}
   _cardInventory:
     _cardInventory: []
   _deck:
@@ -6403,6 +6405,27 @@ MonoBehaviour:
   _gachaCostIsModified: {fileID: 11400000, guid: 5e0aefc5126f0a6448da73562084de43, type: 2}
   _gachaCostChangesAreBlocked: {fileID: 11400000, guid: 71a8847705adef44a819f3e375ac8246, type: 2}
   _starWasUsed: {fileID: 11400000, guid: 6ca866e31480e164a9f367ffb2e722f2, type: 2}
+--- !u!114 &457908767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457908761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0db36cd74ec38dd4d893c2f7d2abc4b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rarityIcons: {fileID: 11400000, guid: 188eae0112becc94e86832c2bb766e79, type: 2}
+  _cardViewWindowTransform: {fileID: 0}
+  _cardArtImageComponent: {fileID: 0}
+  _cardNameTextComponent: {fileID: 0}
+  _cardRarityImageComponent: {fileID: 0}
+  _cardFlavourTextComponent: {fileID: 0}
+  _cardAbilityTextComponent: {fileID: 0}
+  _closeMenuButton: {fileID: 0}
+  _pauseGameWhileViewing: 0
 --- !u!1 &459066216
 GameObject:
   m_ObjectHideFlags: 0
@@ -7521,6 +7544,7 @@ MonoBehaviour:
   _applyBtn: {fileID: 194151223}
   _addBtn: {fileID: 797521541}
   _removeBtn: {fileID: 430926529}
+  _modifyIsBlocked: {fileID: 11400000, guid: 6f88d8e4fc107dd4d87f932e07674610, type: 2}
 --- !u!1 &549187407
 GameObject:
   m_ObjectHideFlags: 0
@@ -21097,7 +21121,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1283438363}
   m_HandleRect: {fileID: 1283438362}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

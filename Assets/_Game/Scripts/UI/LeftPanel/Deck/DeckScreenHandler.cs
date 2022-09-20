@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using _Game.Scripts.Cards;
+using _Game.Scripts.Extensions;
 
 namespace _Game.Scripts.UI
 {
@@ -25,6 +26,7 @@ namespace _Game.Scripts.UI
         [SerializeField] private Button _applyBtn = null;
         [SerializeField] private Button _addBtn = null;
         [SerializeField] private Button _removeBtn = null;
+        [SerializeField] private BoolValue _modifyIsBlocked = null;
         private GameManager _gameManager = null;
         private GameSettingsScriptableObject _gameSettings = null;
         private Dictionary<Transform, int> _displayedCards = new Dictionary<Transform, int>();
@@ -32,7 +34,6 @@ namespace _Game.Scripts.UI
         private KeyValuePair<CardInstance, bool> _displayedSelectedCard;
 
         private bool _applyAllowed = false;
-        private bool _modifyAllowed = true;
         private int _currentDeckSize = 10;
         private int _amountOfRareCardsInSelection = 0;
         private int _amountOfVRareCardsInSelection = 0;
@@ -45,7 +46,7 @@ namespace _Game.Scripts.UI
         #if UNITY_EDITOR
         private void Awake()
         {
-            if(_cardObjectDeckPrefab is null || _cardArtImageObj is null || _abilityText is null || _abilityTextScrollViewContentObj is null || _cardObjSpawnTransform is null || _deckDisplayScrollViewContentObj is null || _applyBtn is null || _addBtn is null || _removeBtn is null)
+            if(_cardObjectDeckPrefab is null || _cardArtImageObj is null || _abilityText is null || _abilityTextScrollViewContentObj is null || _cardObjSpawnTransform is null || _deckDisplayScrollViewContentObj is null || _applyBtn is null || _addBtn is null || _removeBtn is null || _modifyIsBlocked is null)
                 Debug.LogWarning("DeckScreenHandler.cs is missing Object References.");
         }
         #endif
@@ -219,7 +220,7 @@ namespace _Game.Scripts.UI
             Populate(_selectedCards.Count);
 
             //Check if apply is allowed
-            if(_selectedCards.Count == _currentDeckSize && _amountOfVRareCardsInSelection !> _gameSettings.MaximumVRareCardsAllowedInDeckAtBase && _amountOfSpecialCardsInSelection !> _gameSettings.MaximumSpecialCardsAllowedInDeckAtBase && _gameManager.HandSize is 0 && _gameManager.GraveSize is 0)
+            if(_selectedCards.Count == _currentDeckSize && _amountOfVRareCardsInSelection !> _gameSettings.MaximumVRareCardsAllowedInDeckAtBase && _amountOfSpecialCardsInSelection !> _gameSettings.MaximumSpecialCardsAllowedInDeckAtBase && _modifyIsBlocked.Value == false)
             {
                 _applyAllowed = true;
                 _applyBtn.interactable = true;

@@ -19,6 +19,7 @@ using _Game.Scripts.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance {get; private set;}
+    
     #region Properties
     [SerializeField] private CardList _cardList;
     [SerializeField] private GameSettingsScriptableObject _gameSettings;
@@ -60,6 +61,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private BoolValue _drawIsBlocked;
     public bool isDrawingBlocked => _drawIsBlocked.Value;
     private Action UnblockDrawAction;
+    [SerializeField] private BoolValue _deckModifyIsBlocked;
+    public bool isDeckModifyBlocked => _deckModifyIsBlocked.Value;
     [SerializeField] private PlayerCardInventory _cardInventory = null;
     [SerializeField] private Deck _deck = null;
     public int DeckSize => _deck.DeckList.Count;
@@ -87,6 +90,7 @@ public class GameManager : MonoBehaviour
     #region Events
     public static event Action<int> GraveSizeChangedEvent;
     public static event Action<int> DeckSizeChangedEvent;
+    public static event Action<int> HandsizeChangedEvent;
     #endregion
 
     #region Unity Event Functions
@@ -103,7 +107,7 @@ public class GameManager : MonoBehaviour
         }
 
         #if UNITY_EDITOR
-        if(_cardList is null || _gameSettings is null || _coinAmount is null || _soulAmount is null || _lewdPointAmount is null || _crystalAmount is null || _starAmount is null || _devilTearAmount is null || _drawIsBlocked is null || _firstRound is null || _reachedFirstRoundCap is null || _tenPullDisabled is null || _gachaPullCost is null || _gachaPullCost10 is null || _gachaCostIsModified is null || _gachaCostChangesAreBlocked is null || _starWasUsed is null)
+        if(_cardList is null || _gameSettings is null || _coinAmount is null || _soulAmount is null || _lewdPointAmount is null || _crystalAmount is null || _starAmount is null || _devilTearAmount is null || _drawIsBlocked is null || _deckModifyIsBlocked is null || _firstRound is null || _reachedFirstRoundCap is null || _tenPullDisabled is null || _gachaPullCost is null || _gachaPullCost10 is null || _gachaCostIsModified is null || _gachaCostChangesAreBlocked is null || _starWasUsed is null)
             Debug.LogWarning("Game Manager is missing Object References");
         #endif
 
@@ -132,13 +136,36 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         StartCoroutine(AutoclickerGlobalTiming());
+        _deck.DeckSizeChangedEvent += CatchDeckSizeChange;
+        _hand.DeckSizeChangedEvent += CatchHandSizeChange;
+        _grave.DeckSizeChangedEvent += CatchGraveSizeChange;
     }
 
     private void OnDisable()
     {
         StopCoroutine(AutoclickerGlobalTiming());
+        _deck.DeckSizeChangedEvent -= CatchDeckSizeChange;
+        _hand.DeckSizeChangedEvent -= CatchHandSizeChange;
+        _grave.DeckSizeChangedEvent -= CatchGraveSizeChange;
     }
 	#endregion
+
+    #region Event Catching
+    private void CatchDeckSizeChange(int newCount)
+    {
+        DeckSizeChangedEvent?.Invoke(newCount);
+        if(_grave.DeckList.Count is 0 && _hand.DeckList.Count is 0) 
+        {
+            _deckModifyIsBlocked.Value = false;
+        }
+        else
+        {
+            _deckModifyIsBlocked.Value = true;
+        }
+    }
+    private void CatchHandSizeChange(int newCount) => HandsizeChangedEvent?.Invoke(newCount);
+    private void CatchGraveSizeChange(int newCount) => GraveSizeChangedEvent?.Invoke(newCount);
+    #endregion
 	
 	#region Methods
 
@@ -373,7 +400,6 @@ public class GameManager : MonoBehaviour
             
         placeToMoveFrom?.RemoveMultipleCards(cardsToMove);
         placeToMoveTo?.AddMultipleCards(cardsToMove);
-        if(moveTo == CardGameStates.Grave || moveFrom == CardGameStates.Grave) GraveSizeChangedEvent?.Invoke(_grave.DeckList.Count);
     }
 
     public void MoveSpecificCard(CardInstance card, GameManager.CardGameStates moveFrom, GameManager.CardGameStates moveTo)
@@ -412,8 +438,6 @@ public class GameManager : MonoBehaviour
         if(moveFrom == CardGameStates.Grave) CardCooldownManager.Instance.RemoveCardFromTracking(card);
         placeToMoveFrom.RemoveCard(card);
         placeToMoveTo.AddCard(card);
-
-        if(moveTo == CardGameStates.Grave || moveFrom == CardGameStates.Grave) GraveSizeChangedEvent?.Invoke(_grave.DeckList.Count);
     }
 
     public async void DestroyCards(int amount = 1, bool destroyByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
@@ -492,7 +516,6 @@ public class GameManager : MonoBehaviour
         if(!_grave.DeckList.Contains(card)) return;
         _grave.RemoveCard(card);
         _deck.AddCard(card);
-        GraveSizeChangedEvent?.Invoke(_grave.DeckList.Count);
     }
 
     public List<CardInstance> GetOwnedCardsOfType(Card.CardType type) => _cardInventory.GetCardListOfType(type);
@@ -501,12 +524,10 @@ public class GameManager : MonoBehaviour
     public void RemoveCardFromDeck(CardInstance card)
     {
         _deck.RemoveCard(card);
-        DeckSizeChangedEvent?.Invoke(_deck.GetCardList().Count);
     }
     public void AddCardToDeck(CardInstance card)
     {
         _deck.AddCard(card);
-        DeckSizeChangedEvent?.Invoke(_deck.GetCardList().Count);
     }
 
     public void OverwriteDecklist(List<CardInstance> cards)
