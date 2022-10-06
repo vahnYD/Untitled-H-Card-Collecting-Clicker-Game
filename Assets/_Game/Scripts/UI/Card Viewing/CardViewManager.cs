@@ -21,15 +21,20 @@ namespace _Game.Scripts.UI
         [SerializeField] private SpriteList _rarityIcons = null;
         [Space(3f)]
         [SerializeField] private Transform _cardViewWindowTransform = null;
+        [SerializeField] private Transform _cardGuiTransform = null;
         [SerializeField] private Image _cardArtImageComponent = null;
         [SerializeField] private TMP_Text _cardNameTextComponent = null;
         [SerializeField] private Image _cardRarityImageComponent = null;
+        [SerializeField] private TMP_Text _cardSoulValueTextComponent = null;
         [SerializeField] private TMP_Text _cardFlavourTextComponent = null;
+        [SerializeField] private TMP_Text _cardTypeTextComponent = null;
         [SerializeField] private TMP_Text _cardAbilityTextComponent = null;
+        [SerializeField] private Transform _cardAbilityTextContainer = null;
         [SerializeField] private Button _closeMenuButton = null;
         [Space(3f)]
         [SerializeField] private bool _pauseGameWhileViewing = false;
 
+        private bool _guiDisabled = false;
         #endregion
 
         #region Unity Event Functions
@@ -45,7 +50,7 @@ namespace _Game.Scripts.UI
             }
 
             #if UNITY_EDITOR
-            if(_rarityIcons is null || _cardViewWindowTransform is null || _cardArtImageComponent is null || _cardNameTextComponent is null || _cardRarityImageComponent is null || _cardFlavourTextComponent is null || _cardAbilityTextComponent is null || _closeMenuButton is null)
+            if(_rarityIcons is null || _cardViewWindowTransform is null || _cardGuiTransform is null || _cardArtImageComponent is null || _cardNameTextComponent is null || _cardRarityImageComponent is null || _cardSoulValueTextComponent is null || _cardFlavourTextComponent is null || _cardTypeTextComponent is null || _cardAbilityTextComponent is null || _cardAbilityTextContainer is null || _closeMenuButton is null)
                 Debug.LogWarning("CardViewManager.cs is missing Object References.");
             #endif
         }
@@ -56,6 +61,8 @@ namespace _Game.Scripts.UI
             if(_closeMenuButton != null)
             #endif
                 _closeMenuButton.onClick.AddListener(delegate {CloseMenu();});
+
+            _cardViewWindowTransform.gameObject.SetActive(false);
         }
         #endregion
         
@@ -84,11 +91,35 @@ namespace _Game.Scripts.UI
                     _cardRarityImageComponent.sprite = _rarityIcons[3];
                     break;
             }
+            _cardSoulValueTextComponent.text = card.CardRef.SoulValue.ToString();
 
             _cardFlavourTextComponent.text = card.CardRef.FlavourText;
-            _cardAbilityTextComponent.text = card.AbilityText;
+            _cardTypeTextComponent.text = "[ " + card.CardRef.Type + " - STR: " + card.CardRef.Strength + " ]";
+            if(card.HasAbility)
+            {
+                _cardAbilityTextComponent.text = card.AbilityText;
+                _cardAbilityTextContainer.gameObject.SetActive(true);
+            }
+            else
+            {
+                _cardAbilityTextContainer.gameObject.SetActive(false);
+            }
 
             _cardViewWindowTransform.gameObject.SetActive(true);
+        }
+
+        public void ToggleGui()
+        {
+            if(_guiDisabled)
+            {
+                _cardGuiTransform.gameObject.SetActive(true);
+                _guiDisabled = false;
+            }
+            else
+            {
+                _cardGuiTransform.gameObject.SetActive(false);
+                _guiDisabled = true;
+            }
         }
 
         private void CloseMenu()

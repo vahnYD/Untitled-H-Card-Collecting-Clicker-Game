@@ -6,8 +6,9 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using _Game.Scripts.Extensions;
 using TMPro;
+using _Game.Scripts.Extensions;
+using _Game.Scripts.UI;
 
 namespace _Game.Scripts.Cards
 {
@@ -21,23 +22,30 @@ namespace _Game.Scripts.Cards
         [SerializeField] private TMP_Text _nameText = null;
         [SerializeField] private Image _rarityIconImageObject = null;
         [SerializeField] private TMP_Text _soulValueText = null;
+        [SerializeField] private Button _inspectButton = null;
         [SerializeField] private TMP_Text _typeText = null;
         [SerializeField] private TMP_Text _flavourText = null;
         [SerializeField] private Transform _abilityContainerObj = null;
         [SerializeField] private TMP_Text _abilityText = null;
         private bool _isInitialised = false;
         private bool _isClickable = false;
+        private bool _clickIsInspection = false;
         private Action _clickExecute = null;
         #endregion
 
         #region Unity Event Functions
-        #if UNITY_EDITOR
         private void Awake()
         {
-            if(_rarityIconList is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObject is null || _soulValueText is null || _typeText is null || _flavourText is null || _abilityContainerObj is null || _abilityText is null)
+            #if UNITY_EDITOR
+            if(_rarityIconList is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObject is null || _soulValueText is null || _inspectButton is null || _typeText is null || _flavourText is null || _abilityContainerObj is null || _abilityText is null)
                 Debug.LogWarning("CardObject.cs of " + this.name + " is missing Object References.");
+            
+            if(_inspectButton != null)
+            #endif
+                _inspectButton.onClick.AddListener(delegate {InspectButtonClick();});
+
+            _inspectButton.gameObject.SetActive(false);
         }
-        #endif
 
         private void OnEnable()
         {
@@ -51,7 +59,7 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #region Methods
-        public void Initialise(CardInstance card, bool isClickable = false, Action clickExecute = null)
+        public void Initialise(CardInstance card, bool isClickable = false, bool clickIsInspection = false, Action clickExecute = null)
         {
             this.name = card.Name + "_" + transform.parent.gameObject.name;
             _card = card;
@@ -84,6 +92,7 @@ namespace _Game.Scripts.Cards
             card.AbilityUpgradeEvent += CatchAbilityUpgrade;
             _isInitialised = true;
             _isClickable = isClickable;
+            _clickIsInspection = clickIsInspection;
             _clickExecute = clickExecute;
         }
 
@@ -95,7 +104,27 @@ namespace _Game.Scripts.Cards
         public void Click()
         {
             if(!_isClickable) return;
+            if(_clickIsInspection)
+            {
+                InspectButtonClick();
+                return;
+            }
             _clickExecute?.Invoke();
+        }
+
+        public void OnHoverEnter()
+        {
+            _inspectButton.gameObject.SetActive(true);
+        }
+
+        public void OnHoverExit()
+        {
+            _inspectButton.gameObject.SetActive(false);
+        }
+
+        private void InspectButtonClick()
+        {
+            CardViewManager.Instance.ViewCard(_card);
         }
         #endregion
     }

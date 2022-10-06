@@ -103,7 +103,7 @@ namespace _Game.Scripts.UI
 
                 GameObject cardObject = Instantiate(_cardObjectPrefab, _columnTransforms[columnIndex]);
                 cardObject.transform.localPosition = Vector2.zero;
-                cardObject.GetComponent<CardObject>().Initialise(card, true, () => _deckScreenHandler.ClickHandling(card));
+                cardObject.GetComponent<CardObject>().Initialise(card, true, clickExecute: () => _deckScreenHandler.ClickHandling(card));
 
                 cardObject.transform.localPosition = new Vector2(cardObject.transform.localPosition.x, (-1) * (-_heightOffset) * rowIndex);
                 _displayedCards.Add(cardObject.transform, columnIndex * rowIndex);

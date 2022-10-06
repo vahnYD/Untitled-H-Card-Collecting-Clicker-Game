@@ -146,7 +146,7 @@ namespace _Game.Scripts.UI
                 }
                 else offsetMult = _displayedCards.Count;
                 cardObject.transform.localPosition = new Vector2((_cardSpotOffset + cardObject.GetComponent<RectTransform>().sizeDelta.x/2) * offsetMult, cardObject.transform.localPosition.y);
-                cardObject.GetComponent<CardObject>().Initialise(card);
+                cardObject.GetComponent<CardObject>().Initialise(card, true, true);
                 _displayedCards.Add(cardObject.transform, offsetMult);
             }
 
