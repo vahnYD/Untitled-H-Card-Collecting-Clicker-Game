@@ -129,7 +129,6 @@ namespace _Game.Scripts.UI
                 if(!ownedCards.Contains(card))
                 {
                     KeyValuePair<Transform, int> cardObject = _displayedCards.Where(x => x.Key.GetComponent<CardObject>().CardInstanceRef.CardArt == card.CardArt).FirstOrDefault();
-                    Debug.Log(cardObject);
                     _displayedCards.Remove(cardObject.Key);
                     removedIndeces.Add(cardObject.Value);
                     _columnCardCount[cardObject.Value % _columnTransforms.Length]--;

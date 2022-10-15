@@ -28,6 +28,11 @@ namespace _Game.Scripts.Cards
             this._totalStrength = 0;
             this._typeMultiplier = 0;
         }
+        public bool isEmpty()
+        {
+            if(_cardInventory.Count is 0) return true;
+            return false;
+        }
         public List<CardInstance> GetCardList() => _cardInventory;
         public List<CardInstance> GetCardListOfType(Card.CardType type) => _cardInventory.FindAll((CardInstance card) => card.CardRef.Type == type);
         public void AddCard(CardInstance card)

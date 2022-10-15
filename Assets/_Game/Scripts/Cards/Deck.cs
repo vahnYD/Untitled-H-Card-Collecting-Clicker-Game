@@ -19,6 +19,11 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #region Methods
+        public bool isEmpty()
+        {
+            if(_decklist.Count is 0) return true;
+            return false;
+        }
         public List<CardInstance> GetCardList() => _decklist;
         public void AddCard(CardInstance card)
         {

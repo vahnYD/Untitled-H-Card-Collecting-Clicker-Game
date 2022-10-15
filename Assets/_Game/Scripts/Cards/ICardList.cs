@@ -11,6 +11,7 @@ namespace _Game.Scripts.Cards
 {
     public interface ICardList
     {
+        bool isEmpty();
         void AddCard(CardInstance card);
         void RemoveCard(CardInstance card);
         List<CardInstance> GetCardList();
