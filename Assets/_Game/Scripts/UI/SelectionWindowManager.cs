@@ -19,16 +19,22 @@ namespace _Game.Scripts.UI
         #region Properties
         [SerializeField] private GameObject _cardObjectPrefab = null;
         [SerializeField] private Transform _selectionWindowTransform = null;
+        [SerializeField] private Transform _scrollViewContentTransform = null;
         [SerializeField] private Button _selectionConfirmButton = null;
         [SerializeField] private Button _selectionCancelButton = null;
         [SerializeField] private Transform _firstCardSpot = null;
 
         private List<Transform> _displayedCards = new List<Transform>();
-        private int _cardsPerRow = 4;
+        private int _cardsPerRow = 5;
+        private int _cardXOffset = 290;
+        private int _cardYOffset = -295;
         private List<CardInstance> _selectedCards = new List<CardInstance>();
         private int _selectionAmount = 0;
         private bool _isSelecting = false;
         private bool _wasCancelled = false;
+        private bool _isCooldownRelated = false;
+        private bool _cdReductionIsFlat = true;
+        private float _cdReductionAmount = 0f;
         #endregion
 
         #region Unity Event Functions
@@ -56,52 +62,62 @@ namespace _Game.Scripts.UI
             #if UNITY_EDITOR
             }
             #endif
-
-            //TODO Cards Per Row Dynamic Calculation
         }
         #endregion
         
         #region Methods
-        public async UniTask<CardInstance[]> SelectCards(ICardList cardPool, int amount = 1, bool cdReduction = false)
+        public async UniTask<CardInstance[]> SelectCards(ICardList cardPool, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
             if(cardPool.isEmpty()) return null;
             _selectedCards.Clear();
             _selectionAmount = amount;
-            await SelectCardsEnumerator(cardPool, cdReduction);
+            _isCooldownRelated = cdReduction;
+            _cdReductionIsFlat = cdReductionIsFlat;
+            _cdReductionAmount = cooldownReductionAmount;
+            await SelectCardsEnumerator(cardPool);
             return (_wasCancelled) ? null : _selectedCards.ToArray();
         }
 
-        public async UniTask<CardInstance[]> SelectCardsByName(ICardList cardPool, string name, int amount = 1, bool cdReduction = false)
+        public async UniTask<CardInstance[]> SelectCardsByName(ICardList cardPool, string name, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
             _selectedCards.Clear();
             _selectionAmount = amount;
+            _isCooldownRelated = cdReduction;
+            _cdReductionIsFlat = cdReductionIsFlat;
+            _cdReductionAmount = cooldownReductionAmount;
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Name, name: name);
             if(filteredCardPool.isEmpty()) return null;
-            await SelectCardsEnumerator(filteredCardPool, cdReduction);
+            await SelectCardsEnumerator(filteredCardPool);
             return (_wasCancelled) ? null : _selectedCards.ToArray();
         }
 
-        public async UniTask<CardInstance[]> SelectCardsByType(ICardList cardPool, Card.CardType type, int amount = 1, bool cdReduction = false)
+        public async UniTask<CardInstance[]> SelectCardsByType(ICardList cardPool, Card.CardType type, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
             _selectedCards.Clear();
             _selectionAmount = amount;
+            _isCooldownRelated = cdReduction;
+            _cdReductionIsFlat = cdReductionIsFlat;
+            _cdReductionAmount = cooldownReductionAmount;
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Type, type: type);
             if(filteredCardPool.isEmpty()) return null;
-            await SelectCardsEnumerator(filteredCardPool, cdReduction);
+            await SelectCardsEnumerator(filteredCardPool);
             return (_wasCancelled) ? null : _selectedCards.ToArray();
         }
 
-        public async UniTask<CardInstance[]> SelectCardsByRarity(ICardList cardPool, Card.CardRarity rarity, int amount = 1, bool cdReduction = false)
+        public async UniTask<CardInstance[]> SelectCardsByRarity(ICardList cardPool, Card.CardRarity rarity, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
             _selectedCards.Clear();
             _selectionAmount = amount;
+            _isCooldownRelated = cdReduction;
+            _cdReductionIsFlat = cdReductionIsFlat;
+            _cdReductionAmount = cooldownReductionAmount;
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Rarity, rarity: rarity);
             if(filteredCardPool.isEmpty()) return null;
-            await SelectCardsEnumerator(filteredCardPool, cdReduction);
+            await SelectCardsEnumerator(filteredCardPool);
             return (_wasCancelled) ? null : _selectedCards.ToArray();
         }
 
@@ -135,17 +151,27 @@ namespace _Game.Scripts.UI
             return output;
         }
 
-        private void Populate(ICardList cardList, bool isCooldownReduction)
+        private void Populate(ICardList cardList)
         {
 
         }
 
-        private void SelectCard()
+        public bool CardClicked(CardInstance card)
+        {
+            if(_selectedCards.Contains(card))
+            {
+                DeselectCard(card);
+                return false;
+            }
+            SelectCard(card);
+            return true;
+        }
+        private void SelectCard(CardInstance card)
         {
 
         }
 
-        private void DeselectCard()
+        private void DeselectCard(CardInstance card)
         {
 
         }
@@ -164,9 +190,9 @@ namespace _Game.Scripts.UI
         #endregion
 
         // selection methods await coroutine finish. Coroutine runs till the Confirm button in the selection window is pressed
-        private IEnumerator SelectCardsEnumerator(ICardList cardList, bool isCooldownReduction = false)
+        private IEnumerator SelectCardsEnumerator(ICardList cardList)
         {
-            Populate(cardList, isCooldownReduction);
+            Populate(cardList);
             _isSelecting = true;
             _selectionConfirmButton.interactable = false;
             _selectionWindowTransform.gameObject.SetActive(true);

@@ -42,6 +42,7 @@ namespace _Game.Scripts.Cards
         #region Methods
         public void Initialise(CardInstance card, DeckScreenHandler handler, bool isClickable = false, Action clickExecute = null)
         {
+            if(_isInitialised) return;
             this.name = card.Name + "_" + transform.parent.gameObject.name;
             _cardInstance = card;
             _cardArtImageObj.sprite = card.CardArt;

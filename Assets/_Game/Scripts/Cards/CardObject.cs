@@ -61,6 +61,7 @@ namespace _Game.Scripts.Cards
         #region Methods
         public void Initialise(CardInstance card, bool isClickable = false, bool clickIsInspection = false, Action clickExecute = null)
         {
+            if(_isInitialised) return;
             this.name = card.Name + "_" + transform.parent.gameObject.name;
             _card = card;
             _cardArtImageObj.sprite = card.CardArt;

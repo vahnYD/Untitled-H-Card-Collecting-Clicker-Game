@@ -483,20 +483,20 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0;
         if(!reduceByProperty)
         {
-            cards = await SelectionWindowManager.Instance.SelectCards(_grave, cardAmount, true);
+            cards = await SelectionWindowManager.Instance.SelectCards(_grave, cardAmount, true, reductionIsFlat, reductionAmount);
         }
         else
         {
             switch(property)
             {
                 case Card.SearchableProperties.Name:
-                    cards = await SelectionWindowManager.Instance.SelectCardsByName(_grave, name, cardAmount, true);
+                    cards = await SelectionWindowManager.Instance.SelectCardsByName(_grave, name, cardAmount, true, reductionIsFlat, reductionAmount);
                     break;
                 case Card.SearchableProperties.Type:
-                    cards = await SelectionWindowManager.Instance.SelectCardsByType(_grave, type, cardAmount, true);
+                    cards = await SelectionWindowManager.Instance.SelectCardsByType(_grave, type, cardAmount, true, reductionIsFlat, reductionAmount);
                     break;
                 case Card.SearchableProperties.Rarity:
-                    cards = await SelectionWindowManager.Instance.SelectCardsByRarity(_grave, rarity, cardAmount, true);
+                    cards = await SelectionWindowManager.Instance.SelectCardsByRarity(_grave, rarity, cardAmount, true, reductionIsFlat, reductionAmount);
                     break;
             }
         }

@@ -52,6 +52,13 @@ namespace _Game.Scripts.Cards
             else cd -= Mathf.RoundToInt(reduction);
             _cardCooldowns[card] = cd;
         }
+
+        public float? GetRemainingCooldownForCard(CardInstance card)
+        {
+            if(!_cardCooldowns.ContainsKey(card)) return null;
+
+            return _cardCooldowns[card];
+        }
         #endregion
 
         private IEnumerator CooldownCoroutine(CardInstance card)
