@@ -29,6 +29,7 @@ namespace _Game.Scripts.Cards
         [SerializeField] private Transform _abilityContainerObj = null;
         [SerializeField] private TMP_Text _abilityText = null;
         [SerializeField] private Transform _selectionIndicatorTransform = null;
+        [SerializeField] private Transform _cooldownContainer = null;
         [SerializeField] private TMP_Text _cooldownText = null;
         private bool _isInitialised = false;
         private bool _isCooldownRelated = false;
@@ -36,15 +37,21 @@ namespace _Game.Scripts.Cards
         private float _remainingCD = 0f;
         private float _cdReductionAmount = 0f;
         private bool _cdReductionIsFlat = true;
+        private bool _coroutineRunning = false;
         #endregion
 
         #region Unity Event Functions
         private void Awake()
         {
             #if UNITY_EDITOR
-            if(_rarityIconList is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null || _soulValueText is null || _typeText is null || _flavourText is null || _abilityContainerObj is null || _abilityText is null || _selectionIndicatorTransform is null || _cooldownText is null)
+            if(_rarityIconList is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null || _soulValueText is null || _typeText is null || _flavourText is null || _abilityContainerObj is null || _abilityText is null || _selectionIndicatorTransform is null || _cooldownContainer is null || _cooldownText is null)
                 Debug.LogWarning("CardObject_Selection.cs of " + this.name + " is missing Object References.");
             #endif
+        }
+
+        private void OnDestroy()
+        {
+            if(_coroutineRunning) StopCoroutine(CooldownTextUpdatingCoroutine());
         }
         #endregion
         
@@ -82,7 +89,7 @@ namespace _Game.Scripts.Cards
             _isInitialised = true;
             _isCooldownRelated = isCooldownRelated;
             float? remainingCD = CardCooldownManager.Instance.GetRemainingCooldownForCard(card);
-            if(!_isCooldownRelated || remainingCD is null) _cooldownText.gameObject.SetActive(false);
+            if(!_isCooldownRelated || remainingCD is null) _cooldownContainer.gameObject.SetActive(false);
             else
             {
                 _remainingCD = (float)remainingCD;
@@ -146,6 +153,7 @@ namespace _Game.Scripts.Cards
 
         private IEnumerator CooldownTextUpdatingCoroutine()
         {
+            _coroutineRunning = true;
             for(;;)
             {
                 UpdateCooldownText();

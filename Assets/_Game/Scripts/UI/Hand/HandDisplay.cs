@@ -6,6 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using _Game.Scripts.Cards;
 
 namespace _Game.Scripts.UI
 {
@@ -26,10 +27,26 @@ namespace _Game.Scripts.UI
         private void Start()
         {
             _gameManager = GameManager.Instance;
+            CatchHandSizeChange(0);
+        }
+
+        private void OnEnable()
+        {
+            
+        }
+
+        private void OnDisable()
+        {
+
         }
         #endregion
         
         #region Methods
+        private void CatchHandSizeChange(int newVal)
+        {
+            if(_gameManager is null) return;
+            Populate();
+        }
         private void Populate()
         {
             //TODO

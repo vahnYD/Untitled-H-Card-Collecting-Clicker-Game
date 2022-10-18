@@ -153,7 +153,28 @@ namespace _Game.Scripts.UI
 
         private void Populate(ICardList cardList)
         {
+            List<CardInstance> cards = cardList.GetCardList();
 
+            int columnIndex = 0;
+            int rowIndex = 0;
+
+            foreach(CardInstance card in cards)
+            {
+                GameObject cardObject = Instantiate(_cardObjectPrefab, _firstCardSpot);
+                cardObject.transform.localPosition = Vector2.zero;
+                cardObject.GetComponent<CardObject_Selection>().Initialise(card, _isCooldownRelated, _cdReductionIsFlat, _cdReductionAmount);
+
+                cardObject.transform.localPosition = new Vector2(columnIndex * _cardXOffset, rowIndex * _cardYOffset);
+
+                columnIndex++;
+                if(columnIndex >= _cardsPerRow)
+                {
+                    columnIndex = 0;
+                    rowIndex++;
+                }
+            }
+
+            _scrollViewContentTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(_scrollViewContentTransform.GetComponent<RectTransform>().sizeDelta.x, _cardYOffset * rowIndex);
         }
 
         public bool CardClicked(CardInstance card)
@@ -168,12 +189,16 @@ namespace _Game.Scripts.UI
         }
         private void SelectCard(CardInstance card)
         {
-
+            _selectedCards.Add(card);
+            if(_selectedCards.Count == _selectionAmount) _selectionConfirmButton.interactable = true;
+            else _selectionConfirmButton.interactable = false;
         }
 
         private void DeselectCard(CardInstance card)
         {
-
+            _selectedCards.Remove(card);
+            if(_selectedCards.Count == _selectionAmount) _selectionConfirmButton.interactable = true;
+            else _selectionConfirmButton.interactable = false;
         }
 
         private void ConfirmSelection()
@@ -196,10 +221,9 @@ namespace _Game.Scripts.UI
             _isSelecting = true;
             _selectionConfirmButton.interactable = false;
             _selectionWindowTransform.gameObject.SetActive(true);
-            while(_isSelecting)
-            {
-                yield return null;
-            }
+
+            yield return new WaitUntil(() => _isSelecting is false);
+
             _selectionWindowTransform.gameObject.SetActive(false);
             List<CardInstance> displayedCards = _displayedCards.Select(x => x.GetComponent<CardObject>().CardInstanceRef).ToList();
             foreach(CardInstance card in displayedCards)

@@ -3452,7 +3452,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000015607566}
+  m_AnchoredPosition: {x: 0, y: 0.00003883238}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &241217844
@@ -6853,7 +6853,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b60076f762a29884dbd945295a541a1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardObjectPrefab: {fileID: 0}
+  _cardObjectPrefab: {fileID: 2357590978826748022, guid: 6999131d77f55c84292febcdc9cc73e6, type: 3}
   _selectionWindowTransform: {fileID: 17410026}
   _scrollViewContentTransform: {fileID: 1283148008}
   _selectionConfirmButton: {fileID: 108026868}
