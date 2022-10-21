@@ -30,23 +30,75 @@ namespace _Game.Scripts.Cards
         #endregion
         
         #region Methods
+        ///<summary>
+        ///Searches for the Card with the given ID.
+        ///</summary>
+        ///<param name="id">Card ID to search for.</param>
+        ///<returns>Returns a Card if available, otherwise returns null.</returns>
         public Card SearchCardById(int id)
         {
-            //! needs implementation
+            if(_cards.Any(card => card.Id == id))
+            {
+                Card output = _cards.Where(card => card.Id == id).FirstOrDefault();
+                return output;
+            }
             return null;
         }
 
+        ///<summary>
+        ///Searches for Cards with a given Name.
+        ///</summary>
+        ///<param name="name">Name of the cards to search for as a string.</param>
+        ///<returns>Returns a List of Cards with the given name if available, otherwise returns null.</returns>
+        public List<Card> SearchCardsByName(string name)
+        {
+            if(_cards.Any(card => card.Name == name))
+            {
+                return _cards.Where(card => card.Name == name).ToList();
+            }
+            return null;
+        }
+
+        ///<summary>
+        ///Searches for Cards with a given type.
+        ///</summary>
+        ///<param name="type">Card.CardType enum value for the type to search by.</param>
+        ///<returns>Returns a List of Cards with the given type if available, otherwise returns null.</returns>
+        public List<Card> SearchCardsByType(Card.CardType type)
+        {
+            if(_cards.Any(card => card.Type == type))
+            {
+                return _cards.Where(card => card.Type == type).ToList();
+            }
+            return null;
+        }
+
+        ///<summary>
+        ///Searches for Cards with a given Rarity.
+        ///</summary>
+        ///<param name="cardRarity">Card.CardRarity Enum value for the rarity to search by.</param>
+        ///<returns>Returns a List of Cards with the given rarity if available, otherwise returns null.</returns>
         public List<Card> GetCardsByRarity(Card.CardRarity cardRarity)
         {
-            //! needs implementation
+            if(_cards.Any(card => card.Rarity == cardRarity))
+            {
+                return _cards.Where(card => card.Rarity == cardRarity).ToList();
+            }
             return null;
         }
 
+        ///<summary>
+        ///Returns a randomly chosen Card from the list.
+        ///</summary>
         public Card GetRandomCard()
         {
             return _cards[Random.Range(0, _cards.Count)];
         }
 
+        ///<summary>
+        ///Returns randomly chosen Card from the list, weighted by rarity.
+        ///</summary>
+        ///<param name="gameSettings">GameSettingsScriptableObject to read rarity weights from.</param>
         public Card RollWeightedCard(GameSettingsScriptableObject gameSettings)
         {
             int roll = Random.Range(0, 100);

@@ -5,7 +5,7 @@
  */
 	
 
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -29,9 +29,18 @@ namespace _Game.Scripts.Abilities
         #endregion
         
         #region Methods
+        ///<summary>
+        ///Searches for the Ability with the corresponding ID.
+        ///</summary>
+        ///<param name="id">Ability ID to search for.</param>
+        ///<returns>Returns an Ability if available, otherwise returns null.</returns>
         public Ability FindAbilityById(int id)
         {
-            //! needs implementation
+            if(_abilityList.Any(ability => ability.AbilityID == id))
+            {
+                Ability output = _abilityList.Where(x=>x.AbilityID == id).FirstOrDefault();
+                return output;
+            }
             return null;
         }
         #endregion

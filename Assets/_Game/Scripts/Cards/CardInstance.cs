@@ -33,6 +33,10 @@ namespace _Game.Scripts.Cards
         public string AbilityText => _abilityText;
         public event Action AbilityUpgradeEvent;
         
+        ///<summary>
+        ///Creates a CardInstance Object for the given card.
+        ///<summary>
+        ///<param name="card">Card object to use as base for the CardInstance.</param>
         public CardInstance(Card card)
         {
             _card = card;
@@ -50,6 +54,10 @@ namespace _Game.Scripts.Cards
             _level = (_hasAbility && _card.Abilities.Where(x=>x.MaxLevel >=2).Count() >= 1) ? 1 : 0;
         }
 
+        ///<summary>
+        ///Triggers the abilities this card posesses, start cooldown, and moves it from the hand to the grave yard after.
+        ///Will not trigger if on cooldown or there is no ability.
+        ///</summary>
         public void ActivateAbility()
         {
             if(!_hasAbility) return;
@@ -66,6 +74,11 @@ namespace _Game.Scripts.Cards
 
         public void OffCooldown() => _onCooldown = false;
 
+        ///<summary>
+        ///Attempts to Upgrade the ability of this card.
+        ///Fails if there isnt enough coins to afford the update, if this card isnt upgradable, or if this card is already at max level.
+        ///</summary>
+        ///<returns>Returns true if the card was upgraded, false if it failed.</returns>
         public bool AttemptUpgrade()
         {
             if(_nextUpgradeCost > GameManager.Instance.CoinTotal) return false;
@@ -74,6 +87,11 @@ namespace _Game.Scripts.Cards
             Upgrade();
             return true;
         }
+
+        ///<summary>
+        ///Increases the level of the card, updates the ability text, removes the cost of the upgrade from the game manager,
+        ///and calculates the next upgrade cost before invoking the an AbilityUpgradeEvent.
+        ///</summary>
 
         private void Upgrade()
         {
@@ -89,6 +107,9 @@ namespace _Game.Scripts.Cards
             AbilityUpgradeEvent?.Invoke();
         }
 
+        ///<summary>
+        ///Composits the ability text for this card by concatenating the ability text of all it's abilities in order.
+        ///</summary>
         private void UpdateAbilityText()
         {
             _abilityText = "";

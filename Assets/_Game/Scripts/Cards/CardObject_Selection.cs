@@ -56,6 +56,13 @@ namespace _Game.Scripts.Cards
         #endregion
         
         #region Methods
+        ///<summary>
+        ///Initialises the card object with the given parameters.
+        ///</summary>
+        ///<param name="card">CardInstance to use as Base for the Object.</param>
+        ///<param name="isCooldownRelated">Optional. Bool flag to set if this Object needs to display remanining Cooldown. Default is false.</param>
+        ///<param name="cdReductionIsFlat">Optional. Bool flag to set if the cooldown change on hover is flat or multiplicative. true is flat, false is multiplicative. Default is true.</param>
+        ///<param name="cdReductionAmount">Optional. Float value to change the displayed cooldown by on hover. Default is 0f.</param>
         public void Initialise(CardInstance card, bool isCooldownRelated = false, bool cdReductionIsFlat = true, float cdReductionAmount = 0f)
         {
             if(_isInitialised) return;
@@ -98,6 +105,10 @@ namespace _Game.Scripts.Cards
             }
         }
 
+        ///<summary>
+        ///Calls the CardClicked() Method on the SelectionWindowManager and uses the returned bool to toggle
+        ///the Selection Indicator UI element and adjust the cooldown display if applicable.
+        ///</summary>
         public void Click()
         {
             _isSelected = SelectionWindowManager.Instance.CardClicked(_card);
@@ -121,6 +132,9 @@ namespace _Game.Scripts.Cards
             }
         }
 
+        ///<summary>
+        ///Toggles the Selection Indicator UI Element on and reduces the displayed Cooldown if this card object hasn't already been selected.
+        ///</summary>
         public void OnHoverEnter()
         {
             if(_isSelected) return;
@@ -132,6 +146,9 @@ namespace _Game.Scripts.Cards
             }
         }
 
+        ///<summary>
+        ///Toggles the Selection Indicator UI Element off and resets the displayed Cooldown if this card object hasn't already been selected.
+        ///</summary>
         public void OnHoverExit()
         {
             if(_isSelected) return;
@@ -143,6 +160,9 @@ namespace _Game.Scripts.Cards
             }
         }
 
+        ///<summary>
+        ///Updates the UI Text Component for the Cooldown with the internal _remainingCD value.
+        ///</summary>
         private void UpdateCooldownText()
         {
             if(_remainingCD < 0f) _remainingCD = 0f;
@@ -151,6 +171,9 @@ namespace _Game.Scripts.Cards
         }
         #endregion
 
+        ///<summary>
+        ///Reduces the remaning Cooldown displayed by 1 second every in-game second.
+        ///</summary>
         private IEnumerator CooldownTextUpdatingCoroutine()
         {
             _coroutineRunning = true;

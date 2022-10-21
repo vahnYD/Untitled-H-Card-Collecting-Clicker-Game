@@ -40,6 +40,10 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #region Methods
+        ///<summary>
+        ///Returns a randomly chosen sprite out of the available card art sprite options.
+        ///</summary>
+        ///<returns>Returns card art as sprite.</returns>
         public Sprite GetRandomCardArt()
         {
             if(_cardArt.Count == 0) return Sprite.Create(new Texture2D(1, 1), new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1);

@@ -61,7 +61,10 @@ namespace _Game.Scripts.UI
                 _selectionCancelButton.onClick.AddListener(delegate {CancelSelection();});
             #if UNITY_EDITOR
             }
+
+            if(_selectionWindowTransform != null)
             #endif
+                _selectionWindowTransform.gameObject.SetActive(false);
         }
         #endregion
         

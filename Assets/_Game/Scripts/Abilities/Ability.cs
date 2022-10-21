@@ -159,8 +159,11 @@ namespace _Game.Scripts.Abilities
         #endregion
 
         #region Methods
-        //checks for all possible abilities.
-        //If they apply, calculates the right amount/modifier for the given level, then sends the neded informations to the Game Manager
+        ///<summary>
+        ///Checks for all possible abilities.
+        ///If they apply, calculates the right amount/modifier for the given level, then sends the neded informations to the Game Manager
+        ///</summary>
+        ///<param name="level">Level at which the ability activates.</param>
         public void ActivateAbility(int level = 1)
         {
             GameManager gameManager = GameManager.Instance;
@@ -348,12 +351,23 @@ namespace _Game.Scripts.Abilities
             }
         }
 
+        ///<summary>
+        ///Calculates upgrade cost for the given level.
+        ///Floors to int.
+        ///</summary>
+        ///<param name="level">Level for which to calculate the upgrade cost as int.</param>
+        ///<returns>Upgrade Cost for level as int.</returns>
         public int GetUpgradeCostForLevel(int level)
         {
-            return (int)Mathf.Floor(_baseUpgradeCost * ((_upgradeCostMultAdditivePart + (_upgradeCostMultMultiplicativePart * level))/100));
+            return Mathf.FloorToInt(_baseUpgradeCost * ((_upgradeCostMultAdditivePart + (_upgradeCostMultMultiplicativePart * level))/100));
         }
 
-        // if the ability is upgradable calculates the effect multipliers for the given level, then replaces the numbers in the ability text and returns the string
+        ///<summary>
+        ///If the ability is upgradable calculates the effect multipliers for the given level,
+        ///then replaces the numbers in the ability text and returns the string
+        ///</summary>
+        ///<param name="level">Level for which to get the ability text as int.</param>
+        ///<returns>Ability text as string with updated values for the given level.</returns>
         public string GetUpdatedAbilityText(int level = 1)
         {
             int coinGainPostMult = (_maxLevel < 2) ? _coinGain : CalculateEffectForLevel(_coinGain, level);
@@ -401,6 +415,12 @@ namespace _Game.Scripts.Abilities
                 );
         }
 
+        ///<summary>
+        ///Calculates a given Effect Value to account for the given level.
+        ///</summary>
+        ///<param name="effectVal">Effect Value as float to adjust for the level.</param>
+        ///<param name="level">Level for which to adjust the Effect Value.</param>
+        ///<returns>Adjusted Effect Value as float.</returns>
         private float CalculateEffectForLevel(float effectVal, int level)
         {
             float effectMultPerLevel = 0f;
@@ -419,9 +439,29 @@ namespace _Game.Scripts.Abilities
             return effectVal * (effectMultPerLevel * level);
         }
 
+        ///<summary>
+        ///Calculates a given Effect Value to account for a given level.
+        ///Floors to int.
+        ///</summary>
+        ///<param name="effectVal">Effect Value as float to adjust for the level.</param>
+        ///<param name="level">Level for which to adjust the Effect Value.</param>
+        ///<returns>Adjusted Effect Value as float.</returns>
         private int CalculateEffectForLevel(int effectVal, int level)
         {
-            return (int)Mathf.Floor(effectVal * (_effectMultPerLevel * level));
+            float effectMultPerLevel = 0;
+            if(!_overwriteEffectMultipliers)
+            {
+                effectMultPerLevel = _effectMultPerLevel;
+            }
+            else if(level - 1 < _effectMultPerLevelOverwrites.Count)
+            {
+                effectMultPerLevel = _effectMultPerLevelOverwrites[level-1];
+            }
+            else
+            {
+                effectMultPerLevel = _effectMultPerLevelOverwrites[_effectMultPerLevelOverwrites.Count-1];
+            }
+            return Mathf.FloorToInt(effectVal * (effectMultPerLevel * level));
         }
         #endregion
 

@@ -27,9 +27,18 @@ namespace _Game.Scripts.Abilities
         public int GetNextAbilityId() => _nextAbilityId;
         public void IncreaseNextAbilityId() => _nextAbilityId++;
 
+        ///<summary>
+        ///Searches for the Ability with the corresponding ID.
+        ///</summary>
+        ///<param name="id">Ability ID to search for.</param>
+        ///<returns>Returns an Ability if available, otherwise returns null.</returns>
         public Ability FindAbilityById(int id)
         {
-            //! needs implementation
+            foreach(AbilityList list in _abilityLevels)
+            {
+                Ability output = list.FindAbilityById(id);
+                if(output != null) return output;
+            }
             return null;
         }
         #endregion

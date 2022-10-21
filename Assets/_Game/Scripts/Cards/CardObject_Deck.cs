@@ -40,6 +40,13 @@ namespace _Game.Scripts.Cards
         #endregion
         
         #region Methods
+        ///<summary>
+        ///Initialises the card object with the given parameters.
+        ///</summary>
+        ///<param name="card">CardInstance to use as Base for the Object.</param>
+        ///<param name="handler">DeckScreenHandler that Instantiated this Object.</param>
+        ///<param name="isClickable">Optional. Bool flag to set if this Object is clickable. Defaults to false.</param>
+        ///<param name="clickExecute">Optional. System.Action that'll get invoked when clicked. Defaults to null.</param>
         public void Initialise(CardInstance card, DeckScreenHandler handler, bool isClickable = false, Action clickExecute = null)
         {
             if(_isInitialised) return;
@@ -70,6 +77,10 @@ namespace _Game.Scripts.Cards
             _isInitialised = true;
         }
 
+        ///<summary>
+        ///Invokes the ClickExecute Action if there was given one during Initialisation.
+        ///Fails if the isClickable Flag wasnt set as true during Initialisation.
+        ///</summary>
         public void Click()
         {
             if(!_isClickable) return;
