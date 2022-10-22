@@ -518,7 +518,7 @@ public class GameManager : MonoBehaviour
         _deck.AddCard(card);
     }
 
-    public List<CardInstance> GetOwnedCardsOfType(Card.CardType type) => _cardInventory.GetCardListOfType(type);
+    public List<CardInstance> GetOwnedCardsOfType(Card.CardType type) => _cardInventory.GetCardsByType(type);
     public List<CardInstance> GetOwnedCards() => _cardInventory.CardInventory;
     public List<CardInstance> GetDeckList() => _deck.GetCardList();
     public void RemoveCardFromDeck(CardInstance card)

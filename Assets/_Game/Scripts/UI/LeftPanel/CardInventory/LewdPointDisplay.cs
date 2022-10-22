@@ -59,6 +59,9 @@ namespace _Game.Scripts.UI
         #endregion
         
         #region Methods
+        ///<summary>
+        ///Updates the lewd point display text whenever the lewd point amount changes.
+        ///</summary>
         private void CatchLewdPointValueChange(int newVal)
         {
             if(_gameManager is null) return;

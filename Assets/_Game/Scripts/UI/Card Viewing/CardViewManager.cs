@@ -67,6 +67,10 @@ namespace _Game.Scripts.UI
         #endregion
         
         #region Methods
+        ///<summary>
+        ///Uses the given CardInstance to populate the elements on the card viewing screen before enabling it.
+        ///</summary>
+        ///<param name="card">CardInstance to inspect.</param>
         public void ViewCard(CardInstance card)
         {
             if(_pauseGameWhileViewing) Time.timeScale = 0f;
@@ -108,6 +112,9 @@ namespace _Game.Scripts.UI
             _cardViewWindowTransform.gameObject.SetActive(true);
         }
 
+        ///<summary>
+        ///Toggles the GUI of the inspected card.
+        ///</summary>
         public void ToggleGui()
         {
             if(_guiDisabled)

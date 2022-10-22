@@ -60,9 +60,9 @@ namespace _Game.Scripts.Cards
         ///Initialises the card object with the given parameters.
         ///</summary>
         ///<param name="card">CardInstance to use as Base for the Object.</param>
-        ///<param name="isCooldownRelated">Optional. Bool flag to set if this Object needs to display remanining Cooldown. Default is false.</param>
-        ///<param name="cdReductionIsFlat">Optional. Bool flag to set if the cooldown change on hover is flat or multiplicative. true is flat, false is multiplicative. Default is true.</param>
-        ///<param name="cdReductionAmount">Optional. Float value to change the displayed cooldown by on hover. Default is 0f.</param>
+        ///<param name="isCooldownRelated">Optional. Bool flag to set if this Object needs to display remanining Cooldown. Defaults to false.</param>
+        ///<param name="cdReductionIsFlat">Optional. Bool flag to set if the cooldown change on hover is flat or multiplicative. true is flat, false is multiplicative. Defaults to true.</param>
+        ///<param name="cdReductionAmount">Optional. Float value to change the displayed cooldown by on hover. Defaults to 0f.</param>
         public void Initialise(CardInstance card, bool isCooldownRelated = false, bool cdReductionIsFlat = true, float cdReductionAmount = 0f)
         {
             if(_isInitialised) return;

@@ -70,6 +70,9 @@ namespace _Game.Scripts.UI
         #endregion
         
         #region Deck CardObject Spawning
+        ///<summary>
+        ///Updates the deck portion of the deck tab with the selected cards by removing unselected cards and spawning newly selected cards.
+        ///</summary>
         private void Populate(int newVal)
         {
             if(_displayedCards.Count is 0 && newVal is 0) return;
@@ -78,15 +81,20 @@ namespace _Game.Scripts.UI
             CardInstance[] carry1 = new CardInstance[_selectedCards.Count];
             _selectedCards.CopyTo(carry1);
             deck = carry1.ToList();
+
+            //removes any unselected card objects and saves their position
             List<int> removedIndeces = new List<int>();
             bool cardsWereRemoved = CheckForRemoval(deck, ref removedIndeces);
             if(!cardsWereRemoved && (newVal is 0 || newVal == _displayedCards.Count)) return;
 
+            //removes already displayed cards from the list of cards to spawn
             CardInstance[] carry2 = new CardInstance[deck.Count];
             deck.CopyTo(carry2);
             foreach(CardInstance card in carry2)
                 if(_displayedCards.Where(x=>x.Key.GetComponent<CardObject_Deck>().CardInstanceRef.CardArt == card.CardArt).Count() > 0) deck.Remove(card);
 
+            //spawn any newly selected cards
+            //position priority for spots where cards were previously removed
             foreach(CardInstance card in deck)
             {
                 GameObject cardObject = Instantiate(_cardObjectDeckPrefab, _cardObjSpawnTransform);
@@ -105,14 +113,22 @@ namespace _Game.Scripts.UI
                 _displayedCards.Add(cardObject.transform, offsetMult);
             }
 
+            //fill any left over empty spots when there were not enough newly spawned cards by moving the cards past the empty positions
             if(removedIndeces.Count > 0)
                 FillEmptyIndeces(removedIndeces);
 
+            //Update the size of the scroll view content object to fit the amount of displayed cards
             RectTransform firstCardSpot = _cardObjSpawnTransform.GetComponent<RectTransform>();
             RectTransform scrollViewContent = _deckDisplayScrollViewContentObj.GetComponent<RectTransform>();
             scrollViewContent.sizeDelta = new Vector2(scrollViewContent.sizeDelta.x, firstCardSpot.sizeDelta.y * _selectedCards.Count);
         }
 
+        ///<summary>
+        ///Removes any card objects that arent supposed to be shown anymore, and saves the index of their position.
+        ///</summary>
+        ///<param name="deck">List of CardInstance Objects that is the List of cards that are supposed to be displayed.</param>
+        ///<param name="removedIndeces">List of ints as reference to save the indeces of positions of any removed cards to.</param>
+        ///<returns>Returns true if any cards were removed, false if there were no cards that needed removing.</returns>
         private bool CheckForRemoval(List<CardInstance> deck, ref List<int> removedIndeces)
         {
             bool cardsWereRemoved = false;
@@ -134,13 +150,19 @@ namespace _Game.Scripts.UI
             return cardsWereRemoved;
         }
 
+        ///<summary>
+        ///Fills any empty positions by moving cards with higher indeces backwards to fill them.
+        ///</summary>
+        ///<param name="emptyIndeces">List of empty Indeces as int.</param>
         private void FillEmptyIndeces(List<int> emptyIndeces)
         {
+            //sorts the list of displayed cards by their indeces
             List<KeyValuePair<Transform, int>> sortedDisplayedCards = _displayedCards.ToList();
             sortedDisplayedCards.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
 
             emptyIndeces.Sort((i, j) => i.CompareTo(j));
 
+            //moves all cards with positions after the first empty index backwards by 1 for each empty index
             foreach(int i in emptyIndeces)
             {
                 for(int j = i; j < sortedDisplayedCards.Count; j++)
@@ -154,6 +176,10 @@ namespace _Game.Scripts.UI
         #endregion
 
         #region Deck Editing
+        ///<summary>
+        ///Displays the clicked card and link the de-/selection buttons to it.
+        ///</summary>
+        ///<param name="card">CardInstance of the card to display.</param>
         public void ClickHandling(CardInstance card)
         {
             _cardArtImageObj.sprite = card.CardArt;
@@ -232,6 +258,10 @@ namespace _Game.Scripts.UI
             }
         }
 
+        ///<summary>
+        ///Applies the selected cards to the deck object on the GameManager.
+        ///Fails if applyAllowed flag is false.
+        ///</summary>
         public void Apply()
         {
             if(!_applyAllowed) return;

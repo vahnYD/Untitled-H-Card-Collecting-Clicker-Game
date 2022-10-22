@@ -102,7 +102,7 @@ namespace _Game.Scripts.UI
         {
             if(_gameManager is null) return;
             Populate();
-
+            //checks for game manager state to get around an OnEnable null exception.
         }
 
         private void CatchScrollbarValueChange(float newVal)
@@ -116,14 +116,19 @@ namespace _Game.Scripts.UI
             }
         }
 
+        ///<summary>
+        ///Updates the displayed card objects, deleting wrong ones and spawning missing ones.
+        ///</summary>
         private void Populate()
         {
             List<CardInstance> cards = _gameManager.GetOwnedCardsOfType(_type);
             if(cards.Count is 0) return;
 
+            //Removing displayed cards that arent contained in the cart list anymore and saving their positions.
             List<int> removedIndeces = new List<int>();
             bool cardsWereRemoved = RemoveExtraCards(cards, ref removedIndeces);
 
+            //Adding up the strength of all cards of the type to display it and removing any cards from the list of cards that are already being displayed
             int strength = 0;
             CardInstance[] carry = new CardInstance[cards.Count];
             cards.CopyTo(carry);
@@ -134,6 +139,8 @@ namespace _Game.Scripts.UI
             }
             _typeStrengthText.text = strength.ToString();
 
+            //instantiating the new card objects
+            //using the places of cards that were removed with priority of applicable
             foreach(CardInstance card in cards)
             {
                 GameObject cardObject = Instantiate(_cardObjectPrefab, _firstCardSpot);
@@ -150,13 +157,22 @@ namespace _Game.Scripts.UI
                 _displayedCards.Add(cardObject.transform, offsetMult);
             }
 
+            //filling any positions that are left empty because not enough new cards needed spawning to fill them all
+            //by moving the cards after the unfilled positions backwards
             if(removedIndeces.Count > 0)
                 FillEmptyIndeces(removedIndeces);
 
+            //adjusting the scroll view content object size to fit the amount of cards actually spawned
             RectTransform _firstCardSpotRect = _firstCardSpot.GetComponent<RectTransform>();
             _scrollviewContent.sizeDelta = new Vector2( (_firstCardSpotRect.sizeDelta.x + (2*(_cardSpotOffset-(_firstCardSpotRect.sizeDelta.x/2))))*_displayedCards.Count, _scrollviewContent.sizeDelta.y);
         }
 
+        ///<summary>
+        ///Removes any card objects that arent supposed to be shown anymore, and saves the index of their position.
+        ///</summary>
+        ///<param name="ownedCards">List of CardInstance Objects that is the List of cards that are supposed to be displayed.</param>
+        ///<param name="removedIndeces">List of ints as reference to save the indeces of positions of any removed cards to.</param>
+        ///<returns>Returns true if any cards were removed, false if there were no cards that needed removing.</returns>
         private bool RemoveExtraCards(List<CardInstance> ownedCards, ref List<int> removedIndeces)
         {
             bool cardsWereRemoved = false;
@@ -178,13 +194,19 @@ namespace _Game.Scripts.UI
             return cardsWereRemoved;
         }
 
+        ///<summary>
+        ///Fills any empty positions by moving cards with higher indeces backwards to fill them.
+        ///</summary>
+        ///<param name="emptyIndeces">List of empty Indeces as int.</param>
         private void FillEmptyIndeces(List<int> emptyIndeces)
         {
+            //sorts the list of displayed cards by their indeces
             List<KeyValuePair<Transform, int>> sortedDisplayedCards = _displayedCards.ToList();
             sortedDisplayedCards.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
 
             emptyIndeces.Sort((i, j) => i.CompareTo(j));
 
+            //moves all cards with positions after the first empty indeces back by 1 for each empty index
             foreach(int i in emptyIndeces)
             {
                 for(int j = i; j < sortedDisplayedCards.Count; j++)

@@ -59,6 +59,13 @@ namespace _Game.Scripts.Cards
         #endregion
 
         #region Methods
+        ///<summary>
+        ///Initialises the card object with the given parameters.
+        ///</summary>
+        ///<param name="card">CardInstance to use as Base for the Object.</param>
+        ///<param name="isClickable">Optional. Bool flag to set if this Object is clickable. Defaults to false.</param>
+        ///<param name="clickIsInspection">Optional. Bool flag to set of the click is used to inspect the Object. Overwrides the clickExecute Action. Defaults to false.</param>
+        ///<param name="clickExecute">Optional. System.Action that'll get invoked when clicked. Defaults to null.</param>
         public void Initialise(CardInstance card, bool isClickable = false, bool clickIsInspection = false, Action clickExecute = null)
         {
             if(_isInitialised) return;
@@ -102,6 +109,10 @@ namespace _Game.Scripts.Cards
             _abilityText.text = _card.AbilityText;
         }
 
+        ///<summary>
+        ///Calls ViewCard() on the CardViewManager if the clickIsInspection flag was set to true during Initialisation, otherwise invokes the clickExecute Action.
+        ///Fails if the isClickable flag was not set to true during Initialisation.
+        ///</summary>
         public void Click()
         {
             if(!_isClickable) return;
@@ -113,11 +124,17 @@ namespace _Game.Scripts.Cards
             _clickExecute?.Invoke();
         }
 
+        ///<summary>
+        ///Enables the Inspection Button on the Object.
+        ///</summary>
         public void OnHoverEnter()
         {
             _inspectButton.gameObject.SetActive(true);
         }
 
+        ///<summary>
+        ///Disables the Inspection Button on the Object.
+        ///</summary>
         public void OnHoverExit()
         {
             _inspectButton.gameObject.SetActive(false);
