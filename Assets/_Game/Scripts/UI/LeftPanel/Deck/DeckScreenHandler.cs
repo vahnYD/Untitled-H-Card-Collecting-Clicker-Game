@@ -16,6 +16,8 @@ namespace _Game.Scripts.UI
 {
     public class DeckScreenHandler : MonoBehaviour
     {
+        //TODO dynamic deck size stuff needs to be adjusted for burning medal effects
+        
         #region Properties
         [SerializeField] private GameObject _cardObjectDeckPrefab = null;
         [SerializeField] private Image _cardArtImageObj = null;

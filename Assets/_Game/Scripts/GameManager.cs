@@ -170,18 +170,27 @@ public class GameManager : MonoBehaviour
 	#region Methods
 
     //Clicker Interactions
+    ///<summary>
+    ///Manual mouse click.
+    ///</summary>
     public void ManualClick()
     {
         AddCoins(_currentClickCoinAmountManual);
         AddSouls(_currentClickSoulAmountManual);
     }
 
+    ///<summary>
+    ///Periodic click done by autoclickers.
+    ///</summary>
     public void Click()
     {
         AddCoins(_currentClickCoinAmount);
         AddSouls(_currentClickSoulAmount);
     }
 
+    ///<summary>
+    ///Increases internal auto clicker duration by the specified amount.
+    ///</summary>
     public void GainAutoclicker(int duration)
     {
         _runningAutoClickerDuration += duration;
@@ -189,12 +198,19 @@ public class GameManager : MonoBehaviour
 
 
     // Currency Interactions
+    ///<summary>
+    ///Adds the specified amount of coins to the possessed coin amount and total coins earned.
+    ///</summary>
     public void AddCoins(int coins)
     {
         _coinAmount.Value += coins;
         _totalCoinsEarned += coins;
     }
 
+    ///<summary>
+    ///Removes the specified amount of coins.
+    ///Possessed coin amount can't fall below 0.
+    ///</summary>
     public void RemoveCoins(int coins)
     {
         if(_coinAmount.Value - coins <= 0)
@@ -205,6 +221,13 @@ public class GameManager : MonoBehaviour
         _coinAmount.Value -= coins;
     }
 
+    ///<summary>
+    ///Increases the amount of coins gained whenever Click() or ManualClick() is called.
+    ///<paramref name="isManual"> determines if both get affected by the increase or only ManualClick().
+    ///</summary>
+    ///<param name="increase">Amount by which to increase as int.</param>
+    ///<param name="duration">Duration for which the increase should last in seconds as int.</param>
+    ///<param name="isManual">Optional. Determines if both or only ManualClick() will be affected. Defaults to false.</param>
     public void IncreaseCoinsPerClick(int increase, int duration, bool isManual = false)
     {
         if(!isManual)
@@ -223,6 +246,8 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CoroutineExtensions.InvokeActionAfterSeconds(ReduceCoinsPerClickManualAction, duration));
     }
 
+    //called when the ReduceCoinsPerClick Actions get invoked
+    //reduces the corresponding coinPerClick amount based on the value given out by the Queue that tracks increases.
     private void ReduceCoinsPerClick(ref int val, bool isManual = false)
     {
         int lowerBound = (_gameSettings.isCoinGainLowerBoundAtBase) ? _gameSettings.BaseCoinGainPerClick : 0;
@@ -238,6 +263,9 @@ public class GameManager : MonoBehaviour
         else val = lowerBound;
     }
 
+    ///<summary>
+    ///Adds the specified amount of souls to the possessed soul amount.
+    ///</summary>
     public void AddSouls(int souls)
     {
         if(_soulAmount.Value > _gameSettings.MaxSoulsAtBase) return;
@@ -245,6 +273,10 @@ public class GameManager : MonoBehaviour
         if(_soulAmount.Value > _gameSettings.MaxSoulsAtBase) _soulAmount.Value = _gameSettings.MaxSoulsAtBase;
     }
 
+    ///<summary>
+    ///Removes the specified amount of souls from the possessed soul amount.
+    ///Can't fall below 0.
+    ///</summary>
     public void RemoveSouls(int souls)
     {
         if(_soulAmount.Value - souls <= 0)
@@ -255,6 +287,13 @@ public class GameManager : MonoBehaviour
         _soulAmount.Value -= souls;
     }
 
+    ///<summary>
+    ///Increases the amount of souls gained whenever Click() or ManualClick() is called.
+    ///<paramref name="isManual"> determines if both get affected by the increase or only ManualClick().
+    ///</summary>
+    ///<param name="increase">Amount by which to increase as int.</param>
+    ///<param name="duration">Duration for which the increase should last in seconds as int.</param>
+    ///<param name="isManual">Optional. Determines if both or only ManualClick() will be affected. Defaults to false.</param>
     public void IncreaseSoulsPerClick(int increase, int duration, bool isManual = false)
     {
         if(!isManual)
@@ -273,6 +312,8 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CoroutineExtensions.InvokeActionAfterSeconds(ReduceSoulsPerClickManualAction, duration));
     }
 
+    //called when the ReduceSoulsPerClick Actions get invoked
+    //reduces the corresponding soulPerClick amount based on the value given out by the Queue that tracks increases.
     private void ReduceSoulsPerClick(ref int val, bool isManual = false)
     {
         if(!isManual)
@@ -288,10 +329,13 @@ public class GameManager : MonoBehaviour
         return;
     }
 
+    //Updates the amount of lewd points
+    //updates whenever the amount of cards in the player inventory changes
     private void UpdateLewdPoints()
     {
         _lewdPointAmount.Value = Mathf.FloorToInt(_cardInventory.TotalStrength * _cardInventory.TypeMultiplier * GetSoulMult());
 
+        //manually reapplies any coinPerClick increases after the old value has been overwritten
         _currentClickCoinAmount = _lewdPointAmount.Value;
         Queue<int> autoIncreases = _coinPerClickIncreases;
         for(int i = 0; i < autoIncreases.Count; i++)
@@ -307,6 +351,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    ///<summary>
+    ///Caluclates the soul multiplier used in the lewd point calculation based on the amount of souls owned.
+    ///</summary>
     private float GetSoulMult()
     {
         List<float> soulMults = _gameSettings.SoulMultipliers;
@@ -321,6 +368,10 @@ public class GameManager : MonoBehaviour
     }
 
     // Card Interactions
+    ///<summary>
+    ///Draws the specified amount of cards from the top of the deck and adds them to the hand.
+    ///</summary>
+    ///<param name="amount">Optional. Specifies the amount of cards to pull. Defaults to 1.</param>
     public void DrawCard(int amount = 1)
     {
         if(amount < 1) return;
@@ -333,6 +384,18 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CoroutineExtensions.InvokeActionAfterSeconds(UnblockDrawAction, _gameSettings.DrawCooldownInSec));
     }
 
+    ///<summary>
+    ///Moves the specified <paramref name="amount"> of cards from the specified location <paramref name="moveFrom"> to the specified location <paramref name="moveTo"> after selecting them.
+    ///Fails if the <paramref name="amount"> is 0 and if <paramref name="moveTo"> and <paramref name="moveFrom"> are the same place.
+    ///</summary>
+    ///<param name="moveFrom">CardGameStates enum value to indicate from where the cards are to be moved from.</param>
+    ///<param name="moveTo">CardGameStates enum value to indicate to where the cards are to be moved to.</param>
+    ///<param name="amount">Optional. Amount of cards to be moved as int. Defaults to 1.</param>
+    ///<param name="movedByProperty">Optional. Bool flag to set if there are restrictions placed on which cards can be moved. Defaults to false.</param>
+    ///<param name="property">Optional. Card.SearchableProperties enum value to determine which property restricts the cards to be moved. Defaults to Card.SearchableProperties.Type.</param>
+    ///<param name="name">Optional. Name of the cards allowed to be moved as string. Defaults to an empty string.</param>
+    ///<param name="type">Optional. Card.CardType enum value of the cards allowed to be moved. Defaults to Card.CardType.Allsexual.</param>
+    ///<param name="rarity">Optional. Card.CardRarity enum value of the cards allowed to be moved. Defaults to Card.CardRarity.Common.</param>
     public async void MoveCards(CardGameStates moveFrom, CardGameStates moveTo, int amount = 1, bool movedByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
     {
         if(amount < 1) return;
@@ -341,7 +404,7 @@ public class GameManager : MonoBehaviour
         Deck placeToMoveFrom = null;
         Deck placeToMoveTo = null;
 
-
+        //Grabs the right Deck Object to move from
         switch(moveFrom)
         {
             case CardGameStates.Deck:
@@ -355,6 +418,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
+        //Grabs the right Deck Object to move to
         switch(moveTo)
         {
             case CardGameStates.Deck:
@@ -369,6 +433,7 @@ public class GameManager : MonoBehaviour
         }
         bool emptySelection = true;
 
+        //awaiting card selection to get the array of cards to be moved
         Time.timeScale = 0;
         if(!movedByProperty)
         {
@@ -391,17 +456,30 @@ public class GameManager : MonoBehaviour
         }
         Time.timeScale = 1;
 
+        //returns if there were no cards selected
         if(cardsToMove is null) return;
+
+        //checks to make sure the array isnt empty
         for(int i = 0; i < cardsToMove.Length; i++)
             if(cardsToMove[i] != null) emptySelection = false;
         if(emptySelection) return;
+
+        //remove cards from cooldown tracking if they are being moved out of the grave
         if(moveFrom == CardGameStates.Grave) 
             foreach(CardInstance card in cardsToMove) CardCooldownManager.Instance.RemoveCardFromTracking(card);
             
+        //removes the cards from the old Deck Object and adds them to the new Deck Object
         placeToMoveFrom?.RemoveMultipleCards(cardsToMove);
         placeToMoveTo?.AddMultipleCards(cardsToMove);
     }
 
+    ///<summary>
+    ///Moves a specific CardInstance without any sort of selection.
+    ///Fails if the specified card isnt actually in the place it's supposed to be moved from or if the place its being moved from is the same as the place it's being moved to.
+    ///</summary>
+    ///<param name="card">CardInstance to move.</param>
+    ///<param name="moveFrom">CardGameStates enum value to move the card from.</param>
+    ///<param name="moveTo">CardGameStates enum value to move the card to.</param>
     public void MoveSpecificCard(CardInstance card, GameManager.CardGameStates moveFrom, GameManager.CardGameStates moveTo)
     {
         if(moveFrom == moveTo) return;
@@ -440,6 +518,8 @@ public class GameManager : MonoBehaviour
         placeToMoveTo.AddCard(card);
     }
 
+    ///<summary>
+    ///</summary>
     public async void DestroyCards(int amount = 1, bool destroyByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
     {
         if(amount < 1) return;

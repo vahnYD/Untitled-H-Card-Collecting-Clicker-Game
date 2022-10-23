@@ -69,65 +69,139 @@ namespace _Game.Scripts.UI
         #endregion
         
         #region Methods
+        ///<summary>
+        ///Opens the selection window and returns an array of CardInstance Objects if exactly the specified <paramref name="amount"> of cards were selected, otherwise returns null.
+        ///Fails if the specified <paramref name="amount"> is 0.
+        ///Fails if the given <paramref name="cardPool"> is empty.
+        ///</summary>
+        ///<param name="cardPool">ICardList Interface Object to select from.</param>
+        ///<param name="amount">Optional. Amount of cards that need to be selected as int. Defaults to 1</param>
+        ///<param name="cdReduction">Optional. Bool flag to set if the selection is cooldown reduction related and needs to show cooldown in the selection window. Defaults to false.</param>
+        ///<param name="cdReductionIsFlat">Optional. Bool flag to set if the cooldown reduction is additive or multiplicative. true for additive, false for multiplicative. Defaults to true.</param>
+        ///<param name="cooldownReductionAmount">Optional. Amount by which the cooldown will be reduced as a float. Defaults to 0f.</param>
         public async UniTask<CardInstance[]> SelectCards(ICardList cardPool, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
             if(cardPool.isEmpty()) return null;
+
             _selectedCards.Clear();
+
             _selectionAmount = amount;
             _isCooldownRelated = cdReduction;
             _cdReductionIsFlat = cdReductionIsFlat;
             _cdReductionAmount = cooldownReductionAmount;
+
             await SelectCardsEnumerator(cardPool);
+
             return (_wasCancelled) ? null : _selectedCards.ToArray();
         }
 
+        ///<summary>
+        ///Opens the selection window and returns an array of CardInstance Objects if exactly the specified <paramref name="amount"> of cards were selected, otherwise returns null.
+        ///Filters the <paramref name="cardPool"> by the given <paramref name="name">.
+        ///Fails if the specified <paramref name="amount"> is 0.
+        ///Fails if the given <paramref name="cardPool"> is empty after filtering by <paramref name="name">.
+        ///</summary>
+        ///<param name="cardPool">ICardList Interface Object to select from.</param>
+        ///<param name="name">Name by which to filter the card list by as string.</param>
+        ///<param name="amount">Optional. Amount of cards that need to be selected as int. Defaults to 1</param>
+        ///<param name="cdReduction">Optional. Bool flag to set if the selection is cooldown reduction related and needs to show cooldown in the selection window. Defaults to false.</param>
+        ///<param name="cdReductionIsFlat">Optional. Bool flag to set if the cooldown reduction is additive or multiplicative. true for additive, false for multiplicative. Defaults to true.</param>
+        ///<param name="cooldownReductionAmount">Optional. Amount by which the cooldown will be reduced as a float. Defaults to 0f.</param>
         public async UniTask<CardInstance[]> SelectCardsByName(ICardList cardPool, string name, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
+
             _selectedCards.Clear();
+
             _selectionAmount = amount;
             _isCooldownRelated = cdReduction;
             _cdReductionIsFlat = cdReductionIsFlat;
             _cdReductionAmount = cooldownReductionAmount;
+
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Name, name: name);
             if(filteredCardPool.isEmpty()) return null;
+
             await SelectCardsEnumerator(filteredCardPool);
+
             return (_wasCancelled) ? null : _selectedCards.ToArray();
         }
 
+        ///<summary>
+        ///Opens the selection window and returns an array of CardInstance Objects if exactly the specified <paramref name="amount"> of cards were selected, otherwise returns null.
+        ///Filters the <paramref name="cardPool"> by the given <paramref name="type">.
+        ///Fails if the specified <paramref name="amount"> is 0.
+        ///Fails if the given <paramref name="cardPool"> is empty after filtering by <paramref name="type">.
+        ///</summary>
+        ///<param name="cardPool">ICardList Interface Object to select from.</param>
+        ///<param name="type">Card.CardType by which to filter the card list.</param>
+        ///<param name="amount">Optional. Amount of cards that need to be selected as int. Defaults to 1</param>
+        ///<param name="cdReduction">Optional. Bool flag to set if the selection is cooldown reduction related and needs to show cooldown in the selection window. Defaults to false.</param>
+        ///<param name="cdReductionIsFlat">Optional. Bool flag to set if the cooldown reduction is additive or multiplicative. true for additive, false for multiplicative. Defaults to true.</param>
+        ///<param name="cooldownReductionAmount">Optional. Amount by which the cooldown will be reduced as a float. Defaults to 0f.</param>
         public async UniTask<CardInstance[]> SelectCardsByType(ICardList cardPool, Card.CardType type, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
+
             _selectedCards.Clear();
+
             _selectionAmount = amount;
             _isCooldownRelated = cdReduction;
             _cdReductionIsFlat = cdReductionIsFlat;
             _cdReductionAmount = cooldownReductionAmount;
+
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Type, type: type);
             if(filteredCardPool.isEmpty()) return null;
+
             await SelectCardsEnumerator(filteredCardPool);
+
             return (_wasCancelled) ? null : _selectedCards.ToArray();
         }
 
+        ///<summary>
+        ///Opens the selection window and returns an array of CardInstance Objects if exactly the specified <paramref name="amount"> of cards were selected, otherwise returns null.
+        ///Filters the <paramref name="cardPool"> by the given <paramref name="rarity">.
+        ///Fails if the specified <paramref name="amount"> is 0.
+        ///Fails if the given <paramref name="cardPool"> is empty after filtering by <paramref name="rarity">.
+        ///</summary>
+        ///<param name="cardPool">ICardList Interface Object to select from.</param>
+        ///<param name="rarity">Card.CardRarity by which to filter the card list.</param>
+        ///<param name="amount">Optional. Amount of cards that need to be selected as int. Defaults to 1</param>
+        ///<param name="cdReduction">Optional. Bool flag to set if the selection is cooldown reduction related and needs to show cooldown in the selection window. Defaults to false.</param>
+        ///<param name="cdReductionIsFlat">Optional. Bool flag to set if the cooldown reduction is additive or multiplicative. true for additive, false for multiplicative. Defaults to true.</param>
+        ///<param name="cooldownReductionAmount">Optional. Amount by which the cooldown will be reduced as a float. Defaults to 0f.</param>
         public async UniTask<CardInstance[]> SelectCardsByRarity(ICardList cardPool, Card.CardRarity rarity, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
+
             _selectedCards.Clear();
+
             _selectionAmount = amount;
             _isCooldownRelated = cdReduction;
             _cdReductionIsFlat = cdReductionIsFlat;
             _cdReductionAmount = cooldownReductionAmount;
+
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Rarity, rarity: rarity);
             if(filteredCardPool.isEmpty()) return null;
+
             await SelectCardsEnumerator(filteredCardPool);
+
             return (_wasCancelled) ? null : _selectedCards.ToArray();
         }
 
+        ///<summary>
+        ///Filters the given ICardList Interface Instance by the given <paramref name="property">.
+        ///</summary>
+        ///<param name="cardList">The ICardList Interface Instance to filter.</param>
+        ///<param name="property">The Card.SearchableProperties enum value by which to filter.</param>
+        ///<param name="name">Optional. The name by which to filter as string. Default to an empty string.</param>
+        ///<param name="type">Optional. The Card.CardType enum value by which to filter. Defaults to Card.CardType.Allsexual.</param>
+        ///<param name="rarity">Optional. The Card.CardRarity enum value by which to filter. Default to Card.CardRarity.Common.</param>
         private ICardList FilterCardList(ICardList cardList, Card.SearchableProperties property, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
         {
             ICardList output = new Deck();
 
+            //Adds every CardInstance from the ICardList Interface Instance to the output Instance where the property is the same as the given value
             switch(property)
             {
                 case Card.SearchableProperties.Name:
@@ -154,6 +228,10 @@ namespace _Game.Scripts.UI
             return output;
         }
 
+        ///<summary>
+        ///Populates the Selection Window by spawning CardObject_Selection Instances for each CardInstance in the give <paramref name="cardList">.
+        ///</summary>
+        ///<param name="cardList">ICardList Interface Instance to populate the window with.</param>
         private void Populate(ICardList cardList)
         {
             List<CardInstance> cards = cardList.GetCardList();
@@ -180,6 +258,11 @@ namespace _Game.Scripts.UI
             _scrollViewContentTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(_scrollViewContentTransform.GetComponent<RectTransform>().sizeDelta.x, _cardYOffset * rowIndex);
         }
 
+        ///<summary>
+        ///De-/Selects the given <paramref name="card"> based on wether or not it was de-/selected prior.
+        ///</summary>
+        ///<param name="card">CardInstance of the card that was clicked.</param>
+        ///<returns>Returns true if the card is now selected, false if it is now deselected.</returns>
         public bool CardClicked(CardInstance card)
         {
             if(_selectedCards.Contains(card))
@@ -220,14 +303,19 @@ namespace _Game.Scripts.UI
         // selection methods await coroutine finish. Coroutine runs till the Confirm button in the selection window is pressed
         private IEnumerator SelectCardsEnumerator(ICardList cardList)
         {
+            //populates the selection window
             Populate(cardList);
+
             _isSelecting = true;
             _selectionConfirmButton.interactable = false;
             _selectionWindowTransform.gameObject.SetActive(true);
 
+            //waits until either the cancel or confirm button was pressed
             yield return new WaitUntil(() => _isSelecting is false);
 
             _selectionWindowTransform.gameObject.SetActive(false);
+
+            //destroys all the card objects after the window was closed
             List<CardInstance> displayedCards = _displayedCards.Select(x => x.GetComponent<CardObject>().CardInstanceRef).ToList();
             foreach(CardInstance card in displayedCards)
             {

@@ -32,6 +32,8 @@ namespace _Game.Scripts.UI
             #endif
         }
         #endregion
+
+        // Toggles off every tab above the selected tab, but keeps every tab below the selected tab on
         
         #region Methods
         public void OpenCardList()

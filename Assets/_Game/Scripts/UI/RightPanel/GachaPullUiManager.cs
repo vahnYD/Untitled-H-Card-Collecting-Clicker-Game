@@ -136,33 +136,51 @@ namespace _Game.Scripts.UI
 
         private void GachaAnimationTrigger(Dictionary<CardInstance, bool> pulledCards, bool isTenPull)
         {
+            //disables button for the duration of the gacha pull animation and till the window is closed
             _buttonGachaLock = true;
             _singlePullButton.interactable = false;
             _tenPullButton.interactable = false;
             _closeGachaPullsButton.interactable = false;
 
+            //Single Pull
             if(!isTenPull)
             {
+                //Instantiates
                 GameObject cardObj = Instantiate(_cardObjectPrefab, _displaySingleGachaPullCoordinate.transform);
                 _displayedGachaPulls.Add(cardObj.transform);
                 _displayedGachaPulls[0].localScale = new Vector3(1,1,1);
                 _displayedGachaPulls[0].localPosition = Vector3.zero;
+
+                //bool flags
                 bool isDupe = false;
                 Card.CardRarity rarity = Card.CardRarity.Common;
+
+                //initialisation and bool flag setting
                 foreach(KeyValuePair<CardInstance, bool> pair in pulledCards)
                 {
                     cardObj.GetComponent<CardObject>().Initialise(pair.Key);
                     rarity = pair.Key.CardRef.Rarity;
                     isDupe = pair.Value;
                 }
+
                 _gachaPullWindowObj.gameObject.SetActive(true);
+
+                //resets gacha pull positions to get rid of leftover duplicate animations
                 foreach(GachaPullDuplicateAnimationHandler handler in _displayTenGachaPullsCoordinates) handler.Reset();
                 _displaySingleGachaPullCoordinate.Reset();
+
+                //toggles duplicate animation
                 if(isDupe) _displaySingleGachaPullCoordinate.Duplicate(rarity);
+
+                //enables button to close the window
                 _closeGachaPullsButton.interactable = true;
                 return;
             }
 
+
+            //Ten Pull
+
+            //spawns objects and initialises them
             foreach(KeyValuePair<CardInstance, bool> pair in pulledCards)
             {
                 GameObject cardObj = Instantiate(_cardObjectPrefab, _gachaPullWindowObj);
@@ -170,32 +188,42 @@ namespace _Game.Scripts.UI
                 _displayedGachaPulls.Add(cardObj.transform);
                 cardObj.GetComponent<CardObject>().Initialise(pair.Key);
             }
+
             _gachaPullWindowObj.gameObject.SetActive(true);
+
+            //resets gacha pull positions to get rid of leftover duplicate animations
             foreach(GachaPullDuplicateAnimationHandler duplicateHandler in _displayTenGachaPullsCoordinates)
             {
                 duplicateHandler.Reset();
             }
             _displaySingleGachaPullCoordinate.Reset();
+
+            //Starts animation to move all 10 cards from the center to their respective positions
             StartCoroutine(GachaAnimCoroutine(pulledCards));
         }
 
         public void GachaCloseBtn()
         {
             _gachaPullWindowObj.gameObject.SetActive(false);
+
+            //Destroys the displayed card objects
             for(int i = _displayedGachaPulls.Count - 1; i >= 0; i--)
             {
                 Transform ob = _displayedGachaPulls[i];
                 _displayedGachaPulls.Remove(ob);
                 Destroy(ob.gameObject);
             }
+
             _buttonGachaLock = false;
             if(_coinAmount.Value > _singlePullCost.Value && !_reachedFirstRoundCapFlag.Value) _singlePullButton.interactable = true;
             if(_coinAmount.Value > _tenPullCost.Value && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag.Value) _tenPullButton.interactable = true;
         }
 
+        ///<summary>
+        ///Triggers a duplicate animation for a given dupe.
+        ///</summary>
         private void TriggerIfDupe(bool isDupe, Card.CardRarity rarity)
         {
-
             if(isDupe) _displayTenGachaPullsCoordinates[DupeCheckCounter].Duplicate(rarity);
             DupeCheckCounter = (DupeCheckCounter + 1 ) % _displayTenGachaPullsCoordinates.Length;
         }
@@ -204,17 +232,26 @@ namespace _Game.Scripts.UI
         private IEnumerator GachaAnimCoroutine(Dictionary<CardInstance, bool> pulledCards)
         {
             int counter = 0;
+
             foreach(Transform obj in _displayedGachaPulls)
             {
+                //grabs card instance to grab parameters
                 CardInstance card = obj.gameObject.GetComponent<CardObject>().CardInstanceRef;
                 Card.CardRarity rarity = card.CardRef.Rarity;
                 bool isDupe = pulledCards[card];
+
+                //sets new parrent
                 obj.SetParent(_displayTenGachaPullsCoordinates[counter].transform);
+
+                //starts tween with lambda OnComplete to trigger duplicate animation for dupes once the move animation ends
                 obj.DOLocalMove(Vector3.zero, 0.2f).OnComplete(()=>TriggerIfDupe(isDupe, rarity)).timeScale=1;
                 counter++;
                 yield return new WaitForSecondsRealtime(0.1f);
             }
+
             yield return new WaitForSecondsRealtime(0.2f);
+
+            //makes button to close the window interactable after the animation ends
             _closeGachaPullsButton.interactable = true;
         }
     }

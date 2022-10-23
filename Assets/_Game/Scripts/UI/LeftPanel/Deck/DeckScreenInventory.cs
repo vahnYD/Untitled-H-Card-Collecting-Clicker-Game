@@ -66,14 +66,20 @@ namespace _Game.Scripts.UI
             Populate();
         }
 
+        ///<summary>
+        ///Updates the inventory portion of the deck tab. Deletes card objects that arent owned anymore
+        ///and spawns new objects for cards that aren't being displayed yet.
+        ///</summary>
         private void Populate()
         {
             List<CardInstance> ownedCards = _gameManager.GetOwnedCards().Where(x => x.HasAbility).ToList();
             if(ownedCards.Count is 0) return;
 
+            //removes any displayed cards that arent owned anymore and saves their positions
             List<int> removedIndeces = new List<int>();
             bool cardsWereRemoved = RemoveExtraCards(ownedCards, ref removedIndeces);
 
+            //removes already displayed cards from the list of cards to be spawned
             CardInstance[] carry = new CardInstance[ownedCards.Count];
             ownedCards.CopyTo(carry);
             foreach(CardInstance card in carry)
@@ -81,6 +87,8 @@ namespace _Game.Scripts.UI
                 if(_displayedCards.Where(x=> x.Key.GetComponent<CardObject>().CardInstanceRef.CardArt == card.CardArt).Count() > 0) ownedCards.Remove(card);
             }
 
+            //spawns any newly owned cards
+            //position priority is given to spots were previously displayed cards were deleted in
             foreach(CardInstance card in ownedCards)
             {
                 int columnIndex = 0;
@@ -109,15 +117,24 @@ namespace _Game.Scripts.UI
                 _displayedCards.Add(cardObject.transform, columnIndex * rowIndex);
                 _columnCardCount[columnIndex] += 1;
             }
+
+            //fills any leftover empty positions by moving card objects in positions past them backwards
             if(removedIndeces.Count > 0)
                 FillEmptyIndeces(removedIndeces);
 
+            //adjusts the scroll view content object size to fit the amount of cards being displayed
             int tallestColumnCount = 0;
             for(int i = 0; i < _columnCardCount.Length; i++)
                 if(tallestColumnCount < _columnCardCount[i]) tallestColumnCount = _columnCardCount[i];
             _scrollviewContentObj.GetComponent<RectTransform>().sizeDelta = new Vector2(_scrollviewContentObj.GetComponent<RectTransform>().sizeDelta.x, _heightOffset * tallestColumnCount);
         }
 
+        ///<summary>
+        ///Removes any card objects that arent supposed to be shown anymore, and saves the index of their position.
+        ///</summary>
+        ///<param name="ownedCards">List of CardInstance Objects that is the List of cards that are supposed to be displayed.</param>
+        ///<param name="removedIndeces">List of ints as reference to save the indeces of positions of any removed cards to.</param>
+        ///<returns>Returns true if any cards were removed, false if there were no cards that needed removing.</returns>
         private bool RemoveExtraCards(List<CardInstance> ownedCards, ref List<int> removedIndeces)
         {
             bool cardsWereRemoved = false;
@@ -140,13 +157,19 @@ namespace _Game.Scripts.UI
             return cardsWereRemoved;
         }
 
+        ///<summary>
+        ///Fills any empty positions by moving cards with higher indeces backwards to fill them.
+        ///</summary>
+        ///<param name="emptyIndeces">List of empty Indeces as int.</param>
         private void FillEmptyIndeces(List<int> emptyIndeces)
         {
+            //sorts the displayed cards by the index of their positions
             List<KeyValuePair<Transform, int>> sortedDisplayedCards = _displayedCards.ToList();
             sortedDisplayedCards.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
 
             emptyIndeces.Sort((i, j) => i.CompareTo(j));
 
+            //moves all cards after the first empty position backwards by 1 for every empty empty position
             foreach(int i in emptyIndeces)
             {
                 for(int j = i; i < sortedDisplayedCards.Count; j++)
