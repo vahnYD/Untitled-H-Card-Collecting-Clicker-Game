@@ -386,7 +386,7 @@ public class GameManager : MonoBehaviour
 
     ///<summary>
     ///Moves the specified <paramref name="amount"> of cards from the specified location <paramref name="moveFrom"> to the specified location <paramref name="moveTo"> after selecting them.
-    ///Fails if the <paramref name="amount"> is 0 and if <paramref name="moveTo"> and <paramref name="moveFrom"> are the same place.
+    ///Fails if the <paramref name="amount"> is less than 1 and if <paramref name="moveTo"> and <paramref name="moveFrom"> are the same place.
     ///</summary>
     ///<param name="moveFrom">CardGameStates enum value to indicate from where the cards are to be moved from.</param>
     ///<param name="moveTo">CardGameStates enum value to indicate to where the cards are to be moved to.</param>
@@ -519,7 +519,15 @@ public class GameManager : MonoBehaviour
     }
 
     ///<summary>
+    ///Removes the specified <paramref name="amount"> from the players inventory.
+    ///Fails if the <paramref name="amount"> is less than 1.
     ///</summary>
+    ///<param name="amount">Optional. Amount of Cards to be removed from the players inventory. Defaults to 1.</param>
+    ///<param name="destroyByProperty">Optional. Bool flag to set any restrictions on which cards can be removed. Defaults to false.</param>
+    ///<param name="property">Optional. Card.SearchableProperties enum value to determine to which property restricts the cards to be removed. Defaults to Card.SearchableProperties.Type</param>
+    ///<param name="name">Optional. Name of the cards that can be selected for removal as string. Defaults to an empty string.</param>
+    ///<param name="type">Optional. Card.CardType enum value of the cards that can be selected for removal. Defaults to Card.CardType.AllSexual.</param>
+    ///<param name="rarity">Optional. Card.CardRarity enum value of the cards that can be selected for removal. Defaults to Card.CardRarity.Common.</param>
     public async void DestroyCards(int amount = 1, bool destroyByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
     {
         if(amount < 1) return;
@@ -553,6 +561,18 @@ public class GameManager : MonoBehaviour
         UpdateLewdPoints();
     }
 
+    ///<summary>
+    ///Reduces the cooldown for the specified <paramref name="cardAmount">.
+    ///Fails if the <paramref name="cardAmount"> is less than 1 or if the <paramref name="reductionAmount"> is 0.
+    ///</summary>
+    ///<param name="reductionAmount">Amount by which to reduce the cooldown as float.</param>
+    ///<param name="reductionIsFlat">Bool flag to set if the reduction is additive or multiplicative. True for additive, false for multiplicative.</param>
+    ///<param name="cardAmount">Optional. Amount of cards for which to reduce the cooldown. Defaults to 1.</param>
+    ///<param name="reduceByProperty">Optional. Bool flag to set restictions on which cards can get their cooldown reduced. Defaults to false.</param>
+    ///<param name="property">Optional. Card.SearchableProperties enum value to determine which property restricts the cards to have their cooldowns reduced. Defaults to Card.SearchableProperties.Type.</param>
+    ///<param name="name">Optional. Name of the cards to get their cooldown reduced as string. Defaults to an empty string.</param>
+    ///<param name="type">Optional. Card.CardType enum value of the cards that can get their cooldown reduced. Defaults to Card.CardType.AllSexual.</param>
+    ///<param name="rarity">Optional. Card.CardRarity enum value of the cards that can get their cooldown reduced. Defaults to Card.CardRarity.Common.</param>
     public async void ReduceCooldownOfCards(float reductionAmount, bool reductionIsFlat, int cardAmount = 1, bool reduceByProperty = false, Card.SearchableProperties property = Card.SearchableProperties.Type, string name = "", Card.CardType type = Card.CardType.Allsexual, Card.CardRarity rarity = Card.CardRarity.Common)
     {
         if(cardAmount < 1) return;
@@ -591,65 +611,131 @@ public class GameManager : MonoBehaviour
             CardCooldownManager.Instance.ReduceCooldownForCard(cards[i], reductionAmount, reductionIsFlat);
     }
 
+    ///<Summary>
+    ///Removes a card from the grave and adds it to the deck. Plays animation unless otherwise specified.
+    ///(Animation not yet implemented)
+    ///</summary>
+    ///<param name="card">CardInstance of the card to move.</param>
+    ///<param name="noCooldownAnim">Optional. Bool flag to set if a end-of-cooldown animation should play or not. False to play animation, true to skip. Default to false.</param>
     public void TriggerCooldownEndForCard(CardInstance card, bool noCooldownAnim = false)
     {
         if(!_grave.DeckList.Contains(card)) return;
+        //TODO cooldown animation stuffs
         _grave.RemoveCard(card);
         _deck.AddCard(card);
     }
 
+    ///<summary>
+    ///Returns the cards the player has in their inventory of a specific <paramref name="type">.
+    ///</summary>
+    ///<param name="type">Card.CardType enum value.</param>
+    ///<returns>List of CardInstance Objects.</returns>
     public List<CardInstance> GetOwnedCardsOfType(Card.CardType type) => _cardInventory.GetCardsByType(type);
+
+    ///<summary>
+    ///Returns the cards the player has in their inventory.
+    ///</summary>
+    ///<returns>List of CardInstance Objects.</returns>
     public List<CardInstance> GetOwnedCards() => _cardInventory.CardInventory;
+
+    ///<summary>
+    ///Returns the cards the player has presently in their deck.
+    ///</summary>
+    ///<returns>List of CardInstance Objects.</returns>
     public List<CardInstance> GetDeckList() => _deck.GetCardList();
+
+    ///<summary>
+    ///Removes a single <paramref name="card"> from the deck.
+    ///</summary>
+    ///<param name="card">CardInstance to be removed.</param>
     public void RemoveCardFromDeck(CardInstance card)
     {
         _deck.RemoveCard(card);
     }
+
+    ///<summary>
+    ///Adds a single <paramref name="card"> to the deck.
+    ///</summary>
+    ///<param name="card">CardInstance to be added.</param>
     public void AddCardToDeck(CardInstance card)
     {
         _deck.AddCard(card);
     }
 
+    ///<summary>
+    ///Overwrites the present decklist with the provided <paramref name="cards">.
+    ///</summary>
+    ///<param name="cards">List of CardInstance Objects.</param>
     public void OverwriteDecklist(List<CardInstance> cards)
     {
         _deck.OverwriteDecklist(cards);
     }
 
     // Gacha interactions
+    ///<summary>
+    ///Removes the correct coin amount from the player owned total, then rolls for the cards with their rarity weights and adds them to the player inventory if they're not dupes.
+    ///Recalculates gacha pull costs and lewd point amounts before returning the pulled cards.
+    ///</summary>
+    ///<param name="isTenPull">Optional. Bool flag to set if the pull is a 10pull or a single pull. Defaults to false.</param>
+    ///<returns>Returns a Dictionary of CardInstances as Keys and a bool for wether or not they're dupes as their corresponding values.</returns>
     public Dictionary<CardInstance, bool> GachaPull(bool isTenPull = false)
     {
+        //pull amount based on the bool flag
         int amount = (isTenPull) ? 10 : 1;
+
+        //removes pull cost from coin total for the given amount
         RemoveCoins((isTenPull) ? _gachaPullCost10.Value : _gachaPullCost.Value);
+
+        //rolls cards and saves them in a dictionary
         Dictionary<CardInstance, bool> pulledCards = new Dictionary<CardInstance, bool>();
         for(int i = 0; i < amount; i++)
         {
             CardInstance card = new CardInstance(_cardList.RollWeightedCard(_gameSettings));
             bool isDupe = _cardInventory.CheckIfCardIsDuplicate(card);
+
+            //adds cards to inventory if they're not dupes, otherwise adds crystals based on the cards rarity
             if(!isDupe) _cardInventory.AddCard(card);
             else AddCrystals(card.CardRef.Rarity);
+
             pulledCards.Add(card, isDupe);
         }
+
+        //increases gacha pull count
         _totalGachaPullAmount += amount;
+
+        //triggers potential bool flags
         if(_totalGachaPullAmount > 10) _tenPullDisabled.Value = false;
         if(_firstRound && _totalGachaPullAmount > _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1] -10) _tenPullDisabled.Value = true;
         if(_firstRound && _totalGachaPullAmount >= _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1]) _reachedFirstRoundCap.Value = true;
+
+        //recalcs gacha pull cost and lewd point amount
         UpdateGachaPullCost(isTenPull);
         UpdateLewdPoints();
+
         return pulledCards;
     }
 
+    ///<summary>
+    ///Recalculates single- and 10-pull coin costs.
+    ///Updates single cost first based on the amount of newely pulled cards, then updates 10-pull cost based on the new single cost.
+    ///</summary>
+    ///<param name="isTenPull">Optional. Bool flag to set if single pull cost updating needs to account for a single or for ten recently pulled cards. Defaults to false.</param>
     private void UpdateGachaPullCost(bool isTenPull = false)
     {
         List<int> bounds = _gameSettings.GachaPullCostIncreaseReductionUpperBounds;
         List<float> mults = _gameSettings.GachaPullCostIncreaseReductions;
         int counter = (isTenPull) ? 10 : 1;
         int singleCost = _gachaPullCost.Value;
+
+        //updates single cost
         for(int i = 0; i < counter; i++)
         {
             singleCost = _gachaPullCost.Value;
             _gachaPullCost.Value = CalcGachaCost(singleCost, bounds, mults);
         }
 
+
+        //updates 10-pull cost
         int cost = _gachaPullCost.Value;
         for(int i = 1; i < 10; i++)
         {
@@ -658,6 +744,9 @@ public class GameManager : MonoBehaviour
         }
         _gachaPullCost10.Value = cost;
     }
+
+
+    //TODO redo gacha cost calc with new number class to make the correct scaling possible
 
     private int CalcGachaCost(int singlePullCost, List<int> bounds, List<float> mults, int pullIncrease = 0)
     {
@@ -703,13 +792,24 @@ public class GameManager : MonoBehaviour
         return output;
     }
 
-    public void ModifyGachaCost(float amount, bool isFlat = false, bool isBlocking = false, bool starWasUsed = false)
+    ///<summary>
+    ///Modifies gacha pull cost.
+    ///Fails if the change is from a star when a star was already used prior. Also fails if gacha cost changes are presently blocked.
+    ///</summary>
+    ///<param name="amount">Optional. Amount by which to modify the gacha cost as float if the change wasnt from a star. Defaults to 0.5f.</param>
+    ///<param name="isFlat">Optional. Bool flag to set if the gacha cost change is additive or multiplicative. True for additive, false for multiplicative. Defaults to false. Is ignored for star usage.</param>
+    ///<param name="isBlocking">Optional. Bool flag to set if this change will prevent further gacha cost modifications to take place. Defaults to false.</param>
+    ///<param name="starWasUsed">Optional. Bool flag to set if this modification comes from a star consumable, in which case the modification amount only applies to 10-pull cost and the amount is hard-coded. Defaults to false.</param>
+    public void ModifyGachaCost(float amount = 0.5f, bool isFlat = false, bool isBlocking = false, bool starWasUsed = false)
     {
         if(starWasUsed is true && _starWasUsed.Value is true) return;
         if(_gachaCostChangesAreBlocked) return;
+
         if(!isFlat && !starWasUsed) _gachaPullCost.Value = Mathf.RoundToInt(_gachaPullCost.Value + (_gachaPullCost.Value * amount));
         else if(!starWasUsed) _gachaPullCost.Value += Mathf.RoundToInt(amount);
+
         if(isBlocking) _gachaCostChangesAreBlocked.Value = true;
+
         if(starWasUsed is true)
         {
             _starWasUsed.Value = true;
@@ -717,6 +817,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    ///<summary>
+    ///Increases the player owned crystal amount based on the given rarity.
+    ///Increases the player owned star amount when the crystal amount reaches a given threshold and removes the corresponding crystal amount.
+    ///</summary>
+    ///<param name="rarity">Card.CardRarity enum value to determine how many crystals the player gets.</param>
     public void AddCrystals(Card.CardRarity rarity)
     {
         switch(rarity)
@@ -742,11 +847,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    ///<summary>
+    ///Adds the specified <paramref name="amount"> of stars to the player owned total.
+    ///</summary>
+    ///<param name="amount">Optional. Amount by which to increase the star count as int. Defaults to 1.</param>
     public void AddStar(int amount = 1)
     {
         _starAmount.Value += amount;
     }
 
+    ///<summary>
+    ///Removes the specified <paramref name="amount"> of stars from the player owned total.
+    ///Can't fall below 0.
+    ///</summary>
+    ///<param name="amount">Optional. Amount by which to decrease the star count as int. Defaults to 1.</param>
     public void RemoveStar(int amount = 1)
     {
         _starAmount.Value -= amount;
@@ -755,6 +869,10 @@ public class GameManager : MonoBehaviour
 	#endregion
 
     #region Coroutines
+    ///<summary>
+    ///Will execute the Click()-Method every lewd point interval. Additionally will also execute the Click()-Method every auto clicker interval whenever there is an auto clicker active.
+    ///While an auto clicker is active, will remove 1 second from its duration every WaitForSeconds(1).
+    ///</summary>
     private IEnumerator AutoclickerGlobalTiming()
     {
         int counter = 0;
