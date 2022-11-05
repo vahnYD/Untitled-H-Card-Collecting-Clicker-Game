@@ -645,6 +645,12 @@ public class GameManager : MonoBehaviour
     public List<CardInstance> GetDeckList() => _deck.GetCardList();
 
     ///<summary>
+    ///Returns the cards the player presently has in their hand.
+    ///</summary>
+    ///<returns>List of CardInstance Objects.</returns>
+    public List<CardInstance> GetHandList() => _hand.GetCardList();
+
+    ///<summary>
     ///Removes a single <paramref name="card"> from the deck.
     ///</summary>
     ///<param name="card">CardInstance to be removed.</param>
