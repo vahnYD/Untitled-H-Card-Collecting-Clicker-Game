@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using _Game.Scripts.Extensions;
+using _Game.Scripts.UI;
 
 namespace _Game.Scripts.Cards
 {
@@ -29,6 +30,8 @@ namespace _Game.Scripts.Cards
         [SerializeField] private TMP_Text _abilityText = null;
         private bool _isInitialised = false;
         private Action _clickExecute = null;
+        private float _originalPosX = 0;
+        private HandDisplay _handler = null;
         #endregion
 
         #region Unity Event Functions
@@ -42,14 +45,60 @@ namespace _Game.Scripts.Cards
         #endregion
         
         #region Methods
+        public void Initialise(CardInstance card, HandDisplay handler)
+        {
+            if(_isInitialised) return;
+
+            this.name = card.Name + "_Hand";
+            _cardInstance = card;
+            _cardArtImageObj.sprite = card.CardArt;
+            _nameText.text = card.Name;
+            switch(card.CardRef.Rarity)
+            {
+                case Card.CardRarity.Common:
+                    _rarityIconImageObj.sprite = _rarityIconList[0];
+                    break;
+                case Card.CardRarity.Rare:
+                    _rarityIconImageObj.sprite = _rarityIconList[1];
+                    break;
+                case Card.CardRarity.VeryRare:
+                    _rarityIconImageObj.sprite = _rarityIconList[2];
+                    break;
+                case Card.CardRarity.Special:
+                    _rarityIconImageObj.sprite = _rarityIconList[3];
+                    break;
+            }
+            _typeText.text = Enum.GetName(typeof(Card.CardType), card.CardRef.Type);
+            _handler = handler;
+            _clickExecute = () => handler.CardClicked(this._cardInstance);
+            _isInitialised = true;
+        }
+
         public async Task Spawn()
         {
-            
+            //TODO
         }
 
         public async Task Despawn()
         {
-            
+            //TODO            
+        }
+
+        public void SetPositionOffSetX(float x) => this._originalPosX = x;
+
+        public void OnClick()
+        {
+            //TODO
+        }
+
+        public void OnHoverEnter()
+        {
+            //TODO
+        }
+
+        public void OnHoverExit()
+        {
+            //TODO
         }
         #endregion
     }

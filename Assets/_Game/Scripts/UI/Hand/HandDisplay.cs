@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 using _Game.Scripts.Cards;
 
 namespace _Game.Scripts.UI
@@ -15,8 +16,10 @@ namespace _Game.Scripts.UI
     public class HandDisplay : MonoBehaviour
     {
         #region Properties
+        [SerializeField] private GameObject _cardObjectPrefab = null;
         [SerializeField] private Transform _cardInspectWindowTransform = null;
-        [SerializeField] private Transform _firstCardSpotTransform = null;
+        [SerializeField] private RectTransform _handTransform = null;
+        [SerializeField] private Transform _centerCardSpotTransform = null;
         private Dictionary<Transform, int> _displayedCards = new Dictionary<Transform, int>();
         private GameManager _gameManager;
         #endregion
@@ -64,8 +67,24 @@ namespace _Game.Scripts.UI
             //Move the remaining cards back together
             FillEmptyIndeces(removedIndeces);
 
+            //remove cards form list to be spawned that are already being displayed
+            CardInstance[] carry = new CardInstance[cardsInHand.Count];
+            cardsInHand.CopyTo(carry);
+            foreach(CardInstance card in carry)
+            {
+                if(_displayedCards.Where(displayedCard => displayedCard.Key.GetComponent<CardObject_Hand>().CardInstanceRef.CardArt == card.CardArt).Count() > 0)
+                    cardsInHand.Remove(card);
+            }
+
             //spawn new cards from the right and adjust individual card position and spacing based on new hand size
-            //TODO
+            foreach(CardInstance card in cardsInHand)
+            {
+                GameObject cardObject = Instantiate(_cardObjectPrefab, _centerCardSpotTransform);
+                CardObject_Hand cardObjComp = cardObject.GetComponent<CardObject_Hand>();
+                cardObjComp.Initialise(card, this);
+                await cardObjComp.Spawn();
+                AdjustCardSpacing();
+            }
         }
 
         ///<summary>
@@ -118,7 +137,33 @@ namespace _Game.Scripts.UI
 
         private void AdjustCardSpacing()
         {
-            //TODO
+            if(_displayedCards.Count is 0) return;
+
+            bool centerIsInteger = _displayedCards.Count % 2 > 0;
+            float center = (centerIsInteger) ? Mathf.CeilToInt(_displayedCards.Count / 2) : _displayedCards.Count / 2 + 0.5f;
+
+            float maxWidth = _handTransform.sizeDelta.x;
+            float halvedWidth = maxWidth / 2;
+
+            int usedCardAmount = Mathf.Max(5, _displayedCards.Count);
+            int usedCardAmountHalved = Mathf.FloorToInt(usedCardAmount / 2);
+
+            float cardDistance = halvedWidth / usedCardAmountHalved;
+
+            //TODO needs to be tweened rather then set
+
+            _displayedCards.OrderBy(pair => pair.Value);
+            foreach(KeyValuePair<Transform, int> pair in _displayedCards)
+            {
+                pair.Key.GetComponent<RectTransform>().DOLocalMoveX((pair.Value - center) * cardDistance, 0.1f);
+                pair.Key.GetComponent<CardObject_Hand>().SetPositionOffSetX((pair.Value - center) * cardDistance);
+                pair.Key.SetSiblingIndex(pair.Value);
+            }
+        }
+
+        public void CardClicked(CardInstance card)
+        {
+
         }
         #endregion
     }
