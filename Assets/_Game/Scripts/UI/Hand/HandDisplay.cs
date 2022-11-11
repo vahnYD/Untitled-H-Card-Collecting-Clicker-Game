@@ -3,13 +3,16 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using DG.Tweening;
 using _Game.Scripts.Cards;
+using _Game.Scripts.Extensions;
 
 namespace _Game.Scripts.UI
 {
@@ -17,33 +20,54 @@ namespace _Game.Scripts.UI
     {
         #region Properties
         [SerializeField] private GameObject _cardObjectPrefab = null;
-        [SerializeField] private Transform _cardInspectWindowTransform = null;
+        [SerializeField] private BoolValue _drawIsBlockedFlag = null;
+        [SerializeField] private HandDisplayCardPopUp _cardInspectWindowHandler = null;
         [SerializeField] private RectTransform _handTransform = null;
         [SerializeField] private Transform _centerCardSpotTransform = null;
+        [SerializeField] private Button _drawButton = null;
+        [SerializeField] private TMPro.TMP_Text _cooldownText = null;
+        [SerializeField] private Button _inspectGraveButton = null;
+        [SerializeField] private Canvas _rootCanvas = null;
         private Dictionary<Transform, int> _displayedCards = new Dictionary<Transform, int>();
         private GameManager _gameManager;
+        private int _drawCooldown;
+        private bool _cooldownCoroutineRunning = false;
         #endregion
 
         #region Unity Event Functions
         private void Awake()
         {
-            
+            #if UNITY_EDITOR
+            if(_cardObjectPrefab is null || _drawIsBlockedFlag is null || _cardInspectWindowHandler is null || _handTransform is null || _centerCardSpotTransform is null || _drawButton is null || _cooldownText is null || _inspectGraveButton is null || _rootCanvas is null)
+                Debug.LogWarning("HandDisplay.cs is missing Object References.");
+            #endif
         }
 
         private void Start()
         {
             _gameManager = GameManager.Instance;
+            _drawCooldown = _gameManager.GameSettingsRef.DrawCooldownInSec;
             CatchHandSizeChange(0);
         }
 
         private void OnEnable()
         {
-            
+            _drawIsBlockedFlag.ValueChangedEvent += CatchDrawBlock;
+            _drawButton?.onClick.AddListener(delegate {DrawCard();});
+            _inspectGraveButton?.onClick.AddListener(delegate {InspectGrave();});
         }
 
         private void OnDisable()
         {
+            _drawIsBlockedFlag.ValueChangedEvent -= CatchDrawBlock;
+            _drawButton?.onClick.RemoveListener(delegate {DrawCard();});
+            _inspectGraveButton?.onClick.RemoveListener(delegate {InspectGrave();});
 
+            if(_cooldownCoroutineRunning)
+            {
+                StopCoroutine(DrawCooldownTextCoroutine());
+                _cooldownText.text = "";
+            }
         }
         #endregion
         
@@ -81,7 +105,7 @@ namespace _Game.Scripts.UI
             {
                 GameObject cardObject = Instantiate(_cardObjectPrefab, _centerCardSpotTransform);
                 CardObject_Hand cardObjComp = cardObject.GetComponent<CardObject_Hand>();
-                cardObjComp.Initialise(card, this);
+                cardObjComp.Initialise(card, this, _rootCanvas.scaleFactor);
                 await cardObjComp.Spawn();
                 AdjustCardSpacing();
             }
@@ -150,7 +174,7 @@ namespace _Game.Scripts.UI
 
             float cardDistance = halvedWidth / usedCardAmountHalved;
 
-            //TODO needs to be tweened rather then set
+            //TODO needs to be adjusted to account for card drag n drop
 
             _displayedCards.OrderBy(pair => pair.Value);
             foreach(KeyValuePair<Transform, int> pair in _displayedCards)
@@ -163,8 +187,44 @@ namespace _Game.Scripts.UI
 
         public void CardClicked(CardInstance card)
         {
+            _cardInspectWindowHandler.DisplayCard(card);
+        }
 
+        private void DrawCard()
+        {
+            _gameManager.DrawCard();
+        }
+
+        private void CatchDrawBlock(bool newVal)
+        {
+            if(newVal)
+            {
+                _drawButton.interactable = false;
+                StartCoroutine(DrawCooldownTextCoroutine());
+                return;
+            }
+
+            _drawButton.interactable = true;
+        }
+
+        private void InspectGrave()
+        {
+            _gameManager.ViewCards(GameManager.CardGameStates.Grave);
         }
         #endregion
+
+        private IEnumerator DrawCooldownTextCoroutine()
+        {
+            _cooldownCoroutineRunning = true;
+            TimeSpan cd;
+            for(int i = _drawCooldown; i <= 0; i--)
+            {
+                cd = TimeSpan.FromSeconds(i);
+                _cooldownText.text = cd.Hours + ":" + cd.Minutes + ":" + cd.Seconds;
+                yield return new WaitForSeconds(1f);
+            }
+            _cooldownText.text = "";
+            _cooldownCoroutineRunning = false;
+        }
     }
 }

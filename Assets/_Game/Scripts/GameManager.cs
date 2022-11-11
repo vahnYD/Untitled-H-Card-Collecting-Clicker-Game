@@ -384,6 +384,23 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CoroutineExtensions.InvokeActionAfterSeconds(UnblockDrawAction, _gameSettings.DrawCooldownInSec));
     }
 
+    public void ViewCards(CardGameStates placeToDisplay)
+    {
+        switch(placeToDisplay)
+        {
+            case CardGameStates.Deck:
+                SelectionWindowManager.Instance.ViewCards(_deck);
+                break;
+            case CardGameStates.Grave:
+                SelectionWindowManager.Instance.ViewCards(_grave);
+                break;
+            case CardGameStates.Hand:
+                SelectionWindowManager.Instance.ViewCards(_hand);
+                break;
+
+        }
+    }
+
     ///<summary>
     ///Moves the specified <paramref name="amount"> of cards from the specified location <paramref name="moveFrom"> to the specified location <paramref name="moveTo"> after selecting them.
     ///Fails if the <paramref name="amount"> is less than 1 and if <paramref name="moveTo"> and <paramref name="moveFrom"> are the same place.

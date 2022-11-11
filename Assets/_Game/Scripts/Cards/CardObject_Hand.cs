@@ -9,13 +9,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using _Game.Scripts.Extensions;
 using _Game.Scripts.UI;
 
 namespace _Game.Scripts.Cards
 {
-    public class CardObject_Hand : MonoBehaviour
+    public class CardObject_Hand : MonoBehaviour, IPointerDownHandler, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
     {
         #region Properties
         [SerializeField] private CardInstance _cardInstance = null;
@@ -24,28 +25,30 @@ namespace _Game.Scripts.Cards
         [SerializeField] private Image _cardArtImageObj = null;
         [SerializeField] private TMP_Text _nameText = null;
         [SerializeField] private Image _rarityIconImageObj = null;
-        [SerializeField] private TMP_Text _typeText = null;
-        [SerializeField] private TMP_Text _flavourText = null;
-        [SerializeField] private Transform _abilityContainerObj = null;
-        [SerializeField] private TMP_Text _abilityText = null;
         private bool _isInitialised = false;
         private Action _clickExecute = null;
         private float _originalPosX = 0;
         private HandDisplay _handler = null;
+        private RectTransform _localRectTransform = null;
+        private CanvasGroup _localCanvasGroup = null;
+        private float _canvasScaleFactor = 1;
         #endregion
 
         #region Unity Event Functions
         private void Awake()
         {
             #if UNITY_EDITOR
-            if(_rarityIconList is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null || _typeText is null || _flavourText is null || _abilityContainerObj is null || _abilityText is null)
+            if(_rarityIconList is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null)
                 Debug.LogWarning("CardObject_Hand.cs " + this.name + " is missing Object References.");
             #endif
+
+            _localRectTransform = gameObject.GetComponent<RectTransform>();
+            _localCanvasGroup = gameObject.GetComponent<CanvasGroup>();
         }
         #endregion
         
         #region Methods
-        public void Initialise(CardInstance card, HandDisplay handler)
+        public void Initialise(CardInstance card, HandDisplay handler, float canvasScaleFactor)
         {
             if(_isInitialised) return;
 
@@ -68,8 +71,8 @@ namespace _Game.Scripts.Cards
                     _rarityIconImageObj.sprite = _rarityIconList[3];
                     break;
             }
-            _typeText.text = Enum.GetName(typeof(Card.CardType), card.CardRef.Type);
             _handler = handler;
+            this._canvasScaleFactor = canvasScaleFactor;
             _clickExecute = () => handler.CardClicked(this._cardInstance);
             _isInitialised = true;
         }
@@ -86,19 +89,34 @@ namespace _Game.Scripts.Cards
 
         public void SetPositionOffSetX(float x) => this._originalPosX = x;
 
-        public void OnClick()
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            _clickExecute?.Invoke();
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
         {
             //TODO
         }
 
-        public void OnHoverEnter()
+        public void OnPointerExit(PointerEventData eventData)
         {
             //TODO
         }
 
-        public void OnHoverExit()
+        public void OnDrag(PointerEventData eventData)
         {
-            //TODO
+            _localRectTransform.anchoredPosition += eventData.delta / _canvasScaleFactor;
+        }
+
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            _localCanvasGroup.blocksRaycasts = false;
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            _localCanvasGroup.blocksRaycasts = true;
         }
         #endregion
     }

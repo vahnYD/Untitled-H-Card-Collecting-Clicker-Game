@@ -91,6 +91,7 @@ namespace _Game.Scripts.UI
             _cdReductionIsFlat = cdReductionIsFlat;
             _cdReductionAmount = cooldownReductionAmount;
 
+            _selectionConfirmButton.gameObject.SetActive(true);
             await SelectCardsEnumerator(cardPool);
 
             return (_wasCancelled) ? null : _selectedCards.ToArray();
@@ -122,6 +123,7 @@ namespace _Game.Scripts.UI
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Name, name: name);
             if(filteredCardPool.isEmpty()) return null;
 
+            _selectionConfirmButton.gameObject.SetActive(true);
             await SelectCardsEnumerator(filteredCardPool);
 
             return (_wasCancelled) ? null : _selectedCards.ToArray();
@@ -153,6 +155,7 @@ namespace _Game.Scripts.UI
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Type, type: type);
             if(filteredCardPool.isEmpty()) return null;
 
+            _selectionConfirmButton.gameObject.SetActive(true);
             await SelectCardsEnumerator(filteredCardPool);
 
             return (_wasCancelled) ? null : _selectedCards.ToArray();
@@ -184,9 +187,24 @@ namespace _Game.Scripts.UI
             ICardList filteredCardPool = FilterCardList(cardPool, Card.SearchableProperties.Rarity, rarity: rarity);
             if(filteredCardPool.isEmpty()) return null;
 
+            _selectionConfirmButton.gameObject.SetActive(true);
             await SelectCardsEnumerator(filteredCardPool);
 
             return (_wasCancelled) ? null : _selectedCards.ToArray();
+        }
+
+        ///<summary>
+        ///Displays the give card list, but hides the confirm button.
+        ///Intended for viewing.
+        ///</summary>
+        ///<property name="cardPool">ICardList Interface Object to display.</property>
+        public async void ViewCards(ICardList cardPool)
+        {
+            if(cardPool.GetCardList().Count is 0) return;
+
+            _selectionConfirmButton.gameObject.SetActive(false);
+            await SelectCardsEnumerator(cardPool);
+            _selectionConfirmButton.gameObject.SetActive(true);
         }
 
         ///<summary>
