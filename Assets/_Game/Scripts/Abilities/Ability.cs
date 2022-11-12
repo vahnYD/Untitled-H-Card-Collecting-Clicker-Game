@@ -15,6 +15,8 @@ namespace _Game.Scripts.Abilities
     public class Ability : ScriptableObject
     {
 
+        //! Need to change ActivateAbility() to check if skill activation is available and then return a list of Actions that need to get activated, or null if any of the chosen ability options cant trigger
+
         #region Properties
         [SerializeField, HideInInspector] private AbilityList _abilityLevelList;
         public AbilityList AbilityLevelListRef => _abilityLevelList;

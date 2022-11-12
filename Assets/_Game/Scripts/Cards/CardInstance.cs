@@ -14,6 +14,9 @@ namespace _Game.Scripts.Cards
     [Serializable]
     public class CardInstance
     {
+
+        //! need to adjust ActivateAbility() to account for Lists of Actions returned form the ability in case any null returns and fails ability activation of any of the owned activations.
+
         [SerializeField] private Card _card;
         public Card CardRef => _card;
         [SerializeField] private string _name;

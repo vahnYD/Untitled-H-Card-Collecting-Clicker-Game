@@ -15,6 +15,9 @@ namespace _Game.Scripts.UI
 {
     public class SelectionWindowManager : MonoBehaviour
     {
+        
+        //! Need to make selection uncanclable to work around ability limitations
+
         public static SelectionWindowManager Instance {get; private set;}
         #region Properties
         [SerializeField] private GameObject _cardObjectPrefab = null;
