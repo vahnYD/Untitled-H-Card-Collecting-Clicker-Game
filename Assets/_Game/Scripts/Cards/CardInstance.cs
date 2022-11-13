@@ -6,6 +6,7 @@
 	
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,9 +15,6 @@ namespace _Game.Scripts.Cards
     [Serializable]
     public class CardInstance
     {
-
-        //! need to adjust ActivateAbility() to account for Lists of Actions returned form the ability in case any null returns and fails ability activation of any of the owned activations.
-
         [SerializeField] private Card _card;
         public Card CardRef => _card;
         [SerializeField] private string _name;
@@ -61,18 +59,34 @@ namespace _Game.Scripts.Cards
         ///Triggers the abilities this card posesses, start cooldown, and moves it from the hand to the grave yard after.
         ///Will not trigger if on cooldown or there is no ability.
         ///</summary>
-        public void ActivateAbility()
+        public async Task<bool> ActivateAbility()
         {
-            if(!_hasAbility) return;
-            if(_onCooldown) return;
+            if(!_hasAbility) return false;
+            if(_onCooldown) return false;
+
+            Queue<Action> abilities = new Queue<Action>();
+            Queue<Action> carry;
+
             foreach(Abilities.Ability ability in _card.Abilities)
-                ability.ActivateAbility(_level);
+            {
+                carry = ability.GetAbilityActions(_level);
+                if(carry is null) return false;
+                for(int i = 0; i < carry.Count; i++)
+                    abilities.Enqueue(carry.Dequeue());
+            }
+
+            //! Presently causes issues if multiple abilities that use the selection window get activated quickly.
+
+            for(int i = 0; i < abilities.Count; i++)
+                abilities.Dequeue().Invoke();
+
             _onCooldown = true;
             int cooldown = 0;
                 foreach(Abilities.Ability ability in _card.Abilities)
                 cooldown += ability.CooldownInSec;
             CardCooldownManager.Instance.StartCooldownForCard(this, cooldown);
             GameManager.Instance.MoveSpecificCard(this, GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave);
+            return true;
         }
 
         public void OffCooldown() => _onCooldown = false;

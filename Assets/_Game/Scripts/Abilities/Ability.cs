@@ -3,6 +3,8 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using _Game.Scripts.Cards;
@@ -14,9 +16,6 @@ namespace _Game.Scripts.Abilities
 {
     public class Ability : ScriptableObject
     {
-
-        //! Need to change ActivateAbility() to check if skill activation is available and then return a list of Actions that need to get activated, or null if any of the chosen ability options cant trigger
-
         #region Properties
         [SerializeField, HideInInspector] private AbilityList _abilityLevelList;
         public AbilityList AbilityLevelListRef => _abilityLevelList;
@@ -163,12 +162,23 @@ namespace _Game.Scripts.Abilities
         #region Methods
         ///<summary>
         ///Checks for all possible abilities.
-        ///If they apply, calculates the right amount/modifier for the given level, then sends the neded informations to the Game Manager
+        ///If they apply, calculates the right amount/modifier for the given level, then adds an System.Action to the return Queue.
+        ///Returns null if any of the used abilities doesnt meet its minimum requirements.
         ///</summary>
         ///<param name="level">Level at which the ability activates.</param>
-        public void ActivateAbility(int level = 1)
+        ///<returns>Queue of System.Action delegates, or null if any minimum requirements for activation arent met.
+        public Queue<Action> GetAbilityActions(int level = 1)
         {
             GameManager gameManager = GameManager.Instance;
+            List<CardInstance> deck = gameManager.GetDeckList();
+            List<CardInstance> hand = gameManager.GetHandList();
+            List<CardInstance> grave = gameManager.GetGraveList();
+
+            int cardsBeingRemovedFromGrave = 0;
+            int cardsBeingRemovedFromHand = 0;
+            int cardsBeingRemovedFromDeck = 0;
+
+            Queue<Action> ability = new Queue<Action>();
 
             if(_sendGraveHand)
             {
@@ -176,12 +186,31 @@ namespace _Game.Scripts.Abilities
 
                 if(!_sendGraveByPropertyHand)
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult);
+                    if(hand.Count < amountToSendPostMult + cardsBeingRemovedFromHand) return null;
+                    ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult));
                 }
                 else
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, _nameToSendGraveHand, _typeToSendGraveHand, _rarityToSendGraveHand);
+                    switch(_propertyToSendGraveHand)
+                    {
+                        case Card.SearchableProperties.Name:
+                            if(hand.Where(cardInstance => cardInstance.Name == _nameToSendGraveHand).ToList().Count < amountToSendPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, name: _nameToSendGraveHand));
+                            break;
+
+                        case Card.SearchableProperties.Type:
+                            if(hand.Where(cardInstance => cardInstance.CardRef.Type == _typeToSendGraveHand).ToList().Count < amountToSendPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, type: _typeToSendGraveHand));
+                            break;
+
+                        case Card.SearchableProperties.Rarity:
+                            if(hand.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityToSendGraveHand).ToList().Count < amountToSendPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, rarity: _rarityToSendGraveHand));
+                            break;
+                    }
                 }
+                cardsBeingRemovedFromHand += amountToSendPostMult;
+                cardsBeingRemovedFromGrave -= amountToSendPostMult;
             }
 
             if(_sendGraveDeck)
@@ -190,12 +219,31 @@ namespace _Game.Scripts.Abilities
 
                 if(!_sendGraveByPropertyDeck)
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Grave ,amountToSendPostMult);
+                    if(deck.Count < amountToSendPostMult + cardsBeingRemovedFromDeck) return null;
+                    ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Grave ,amountToSendPostMult));
                 }
                 else
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveDeck, _nameToSendGraveDeck, _typeToSendGraveDeck, _rarityToSendGraveDeck);
+                    switch(_propertyToSendGraveDeck)
+                    {
+                        case Card.SearchableProperties.Name:
+                            if(deck.Where(cardInstance => cardInstance.Name == _nameToSendGraveDeck).ToList().Count < amountToSendPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveDeck, name: _nameToSendGraveDeck));
+                            break;
+
+                        case Card.SearchableProperties.Type:
+                            if(deck.Where(cardInstance => cardInstance.CardRef.Type == _typeToSendGraveDeck).ToList().Count < amountToSendPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveDeck, type: _typeToSendGraveDeck));
+                            break;
+
+                        case Card.SearchableProperties.Rarity:
+                            if(deck.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityToSendGraveDeck).ToList().Count < amountToSendPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveDeck, rarity: _rarityToSendGraveDeck));
+                            break;
+                    }
                 }
+                cardsBeingRemovedFromDeck += amountToSendPostMult;
+                cardsBeingRemovedFromGrave -= amountToSendPostMult;
             }
 
             if(_returnCardsFromHand)
@@ -204,11 +252,30 @@ namespace _Game.Scripts.Abilities
 
                 if(!_returnCardsByPropertyHand)
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult);
+                    if(hand.Count < amountToReturnPostMult + cardsBeingRemovedFromHand) return null;
+                    ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult));
                 }
                 else
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult, true, _propertyReturnCardsHand, _nameReturnCardsHand, _typeReturnCardsHand, _rarityReturnCardsHand);
+                    switch(_propertyReturnCardsHand)
+                    {
+                        case Card.SearchableProperties.Name:
+                            if(hand.Where(cardInstance => cardInstance.Name == _nameReturnCardsHand).ToList().Count < amountToReturnPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult, true, _propertyReturnCardsHand, name: _nameReturnCardsHand));
+                            break;
+
+                        case Card.SearchableProperties.Type:
+                            if(hand.Where(cardInstance => cardInstance.CardRef.Type == _typeReturnCardsHand).ToList().Count < amountToReturnPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult, true, _propertyReturnCardsHand, type: _typeReturnCardsHand));
+                            break;
+
+                        case Card.SearchableProperties.Rarity:
+                            if(hand.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityReturnCardsHand).ToList().Count < amountToReturnPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult, true, _propertyReturnCardsHand, rarity: _rarityReturnCardsHand));
+                            break;
+                    }
+                    cardsBeingRemovedFromHand += amountToReturnPostMult;
+                    cardsBeingRemovedFromDeck -= amountToReturnPostMult;
                 }
             }
 
@@ -216,13 +283,36 @@ namespace _Game.Scripts.Abilities
             {
                 int amountToDestroyPostMult = (_maxLevel < 2 || _deckSearchAmountIgnoresLevel) ? _amountOfCardsToDestroy : CalculateEffectForLevel(_amountOfCardsToDestroy, level);
 
+                List<CardInstance> inventory = gameManager.GetOwnedCards();
+                foreach(CardInstance card in deck) inventory.Remove(card);
+                foreach(CardInstance card in hand) inventory.Remove(card);
+                foreach(CardInstance card in grave) inventory.Remove(card);
+
+                if(inventory.Count < amountToDestroyPostMult) return null;
+
                 if(!_destroyCardsByProperty)
                 {
-                    gameManager.DestroyCards(amountToDestroyPostMult);
+                    ability.Enqueue(()=>gameManager.DestroyCards(amountToDestroyPostMult));
                 }
                 else
                 {
-                    gameManager.DestroyCards(amountToDestroyPostMult, true, _propertyDestroyCards, _nameDestroyCards, _typeDestroyCards, _rarityDestroyCards);
+                    switch(_propertyDestroyCards)
+                    {
+                        case Card.SearchableProperties.Name:
+                            if(inventory.Where(cardInstance => cardInstance.Name == _nameDestroyCards).ToList().Count < amountToDestroyPostMult) return null;
+                            ability.Enqueue(()=>gameManager.DestroyCards(amountToDestroyPostMult, true, _propertyDestroyCards, name: _nameDestroyCards));
+                            break;
+
+                        case Card.SearchableProperties.Type:
+                            if(inventory.Where(cardInstance => cardInstance.CardRef.Type == _typeDestroyCards).ToList().Count < amountToDestroyPostMult) return null;
+                            ability.Enqueue(()=>gameManager.DestroyCards(amountToDestroyPostMult, true, _propertyDestroyCards, type: _typeDestroyCards));
+                            break;
+
+                        case Card.SearchableProperties.Rarity:
+                            if(inventory.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityDestroyCards).ToList().Count < amountToDestroyPostMult) return null;
+                            ability.Enqueue(()=>gameManager.DestroyCards(amountToDestroyPostMult, true, _propertyDestroyCards, rarity: _rarityDestroyCards));
+                            break;
+                    }
                 }
             }
 
@@ -231,19 +321,19 @@ namespace _Game.Scripts.Abilities
                 if(_coinGain > 0)
                 {
                     int coinGainPostMult = (_maxLevel < 2 || _coinEffectIgnoresLevel) ? _coinGain : CalculateEffectForLevel(_coinGain, level);
-                    gameManager.AddCoins(coinGainPostMult);
+                    ability.Enqueue(()=>gameManager.AddCoins(coinGainPostMult));
                 }
 
                 if(_coinPerClickIncrease > 0)
                 {
                     int coinPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2 || _coinEffectIgnoresLevel) ? _coinPerClickIncrease : CalculateEffectForLevel(_coinPerClickIncrease, level));
-                    gameManager.IncreaseCoinsPerClick(coinPerClickPostMult, _coinPerClickDuration);
+                    ability.Enqueue(()=>gameManager.IncreaseCoinsPerClick(coinPerClickPostMult, _coinPerClickDuration));
                 }
 
                 if(_coinPerClickIncreaseManual > 0)
                 {
                     int coinPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2 || _coinEffectIgnoresLevel) ? _coinPerClickIncreaseManual : CalculateEffectForLevel(_coinPerClickIncreaseManual, level));
-                    gameManager.IncreaseCoinsPerClick(coinPerClickPostMult, _coinPerClickDuration, true);
+                    ability.Enqueue(()=>gameManager.IncreaseCoinsPerClick(coinPerClickPostMult, _coinPerClickDuration, true));
                 }
             }
 
@@ -252,26 +342,32 @@ namespace _Game.Scripts.Abilities
                 if(_soulGain > 0)
                 {
                     int soulGainPostMult = (_maxLevel < 2 || _soulEffectIgnoresLevel) ? _soulGain : CalculateEffectForLevel(_soulGain, level);
-                    gameManager.AddSouls(soulGainPostMult);
+                    ability.Enqueue(()=>gameManager.AddSouls(soulGainPostMult));
                 }
 
                 if(_soulPerClickGain > 0)
                 {
                     int soulPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2 || _soulEffectIgnoresLevel) ? _soulPerClickGain : CalculateEffectForLevel(_soulPerClickGain, level));
-                    gameManager.IncreaseSoulsPerClick(soulPerClickPostMult, _soulPerClickDuration);
+                    ability.Enqueue(()=>gameManager.IncreaseSoulsPerClick(soulPerClickPostMult, _soulPerClickDuration));
                 }
 
                 if(_soulPerClickGainManual > 0)
                 {
                     int soulPerClickPostMult = Mathf.FloorToInt((_maxLevel < 2 || _soulEffectIgnoresLevel) ? _soulPerClickGainManual : CalculateEffectForLevel(_soulPerClickGainManual, level));
-                    gameManager.IncreaseSoulsPerClick(soulPerClickPostMult, _soulPerClickDuration, true);
+                    ability.Enqueue(()=>gameManager.IncreaseSoulsPerClick(soulPerClickPostMult, _soulPerClickDuration, true));
                 }
             }
 
             if(_drawCards)
             {
                 int amountPostMult = Mathf.FloorToInt((_maxLevel < 2 || _drawEffectIgnoresLevel) ? _drawCardsAmount : CalculateEffectForLevel(_drawCardsAmount, level));
-                gameManager.DrawCard(amountPostMult);
+
+                if(deck.Count < amountPostMult + cardsBeingRemovedFromDeck) return null;
+
+                ability.Enqueue(()=>gameManager.DrawCard(amountPostMult));
+
+                cardsBeingRemovedFromDeck += amountPostMult;
+                cardsBeingRemovedFromHand -= amountPostMult;
             }
 
             if(_deckSearch)
@@ -280,12 +376,31 @@ namespace _Game.Scripts.Abilities
 
                if(!_deckSearchByProperty)
                {
-                    gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Hand, amountPostMult);
+                    if(deck.Count < amountPostMult + cardsBeingRemovedFromDeck) return null;
+                    ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Hand, amountPostMult));
                }
                else
                {
-                    gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchDeck, _nameToSearchDeck, _typeToSearchDeck, _rarityToSearchDeck);
+                    switch(_propertyToSearchDeck)
+                    {
+                        case Card.SearchableProperties.Name:
+                            if(deck.Where(cardInstance => cardInstance.Name == _nameToSearchDeck).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchDeck, name: _nameToSearchDeck));
+                            break;
+
+                        case Card.SearchableProperties.Type:
+                            if(deck.Where(cardInstance => cardInstance.CardRef.Type == _typeToSearchDeck).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchDeck, type: _typeToSearchDeck));
+                            break;
+
+                        case Card.SearchableProperties.Rarity:
+                            if(deck.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityToSearchDeck).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Deck, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchDeck, rarity: _rarityToSearchDeck));
+                            break;
+                    }
                }
+               cardsBeingRemovedFromDeck += amountPostMult;
+               cardsBeingRemovedFromHand -= amountPostMult;
             }
 
             if(_graveSearch)
@@ -294,12 +409,31 @@ namespace _Game.Scripts.Abilities
 
                 if(!_graveSearchByProperty)
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Hand, amountPostMult);
+                    if(grave.Count < amountPostMult + cardsBeingRemovedFromGrave) return null;
+                    ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Hand, amountPostMult));
                 }
                 else
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchGrave, _nameToSearchGrave, _typeToSearchGrave, _rarityToSearchGrave);
+                    switch(_propertyToSearchGrave)
+                    {
+                        case Card.SearchableProperties.Name:
+                            if(grave.Where(cardInstance => cardInstance.Name == _nameToSearchGrave).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchGrave, name: _nameToSearchGrave));
+                            break;
+
+                        case Card.SearchableProperties.Type:
+                            if(grave.Where(cardInstance => cardInstance.CardRef.Type == _typeToSearchDeck).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchGrave, type: _typeToSearchGrave));
+                            break;
+
+                        case Card.SearchableProperties.Rarity:
+                            if(grave.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityToSearchGrave).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Hand, amountPostMult, true, _propertyToSearchGrave, rarity: _rarityToSearchGrave));
+                            break;
+                    }
                 }
+                cardsBeingRemovedFromGrave += amountPostMult;
+                cardsBeingRemovedFromHand -= amountPostMult;
             }
 
             if(_returnCardsFromGrave)
@@ -308,12 +442,31 @@ namespace _Game.Scripts.Abilities
 
                 if(!_returnCardsByPropertyGrave)
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Deck, amountPostMult);
+                    if(grave.Count < amountPostMult + cardsBeingRemovedFromGrave) return null;
+                    ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Deck, amountPostMult));
                 }
                 else
                 {
-                    gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Deck, amountPostMult, true, _propertyReturnCardsGrave, _nameReturnCardsGrave, _typeReturnCardsGrave, _rarityReturnCardsGrave);
+                    switch(_propertyReturnCardsGrave)
+                    {
+                        case Card.SearchableProperties.Name:
+                            if(grave.Where(cardInstance => cardInstance.Name == _nameReturnCardsGrave).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Deck, amountPostMult, true, _propertyReturnCardsGrave, name: _nameReturnCardsGrave));
+                            break;
+
+                        case Card.SearchableProperties.Type:
+                            if(grave.Where(cardInstance => cardInstance.CardRef.Type == _typeReturnCardsGrave).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Deck, amountPostMult, true, _propertyReturnCardsGrave, type: _typeReturnCardsGrave));
+                            break;
+
+                        case Card.SearchableProperties.Rarity:
+                            if(grave.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityReturnCardsGrave).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Grave, GameManager.CardGameStates.Deck, amountPostMult, true, _propertyReturnCardsGrave, rarity: _rarityReturnCardsGrave));
+                            break;
+                    }
                 }
+                cardsBeingRemovedFromGrave += amountPostMult;
+                cardsBeingRemovedFromDeck -= amountPostMult;
             }
 
             if(_cooldownReduction)
@@ -323,11 +476,28 @@ namespace _Game.Scripts.Abilities
 
                 if(!_cooldownReductionByProperty)
                 {
+                    if(grave.Count < amountPostMult) return null;
                     gameManager.ReduceCooldownOfCards(reductionPostMult, _flatCooldownReduction, amountPostMult);
                 }
                 else
                 {
-                    gameManager.ReduceCooldownOfCards(reductionPostMult, _flatCooldownReduction, amountPostMult, true, _propertyCooldownReduction, _nameCooldownReduction, _typeCooldownReduction, _rarityCooldownReduction);
+                    switch(_propertyCooldownReduction)
+                    {
+                        case Card.SearchableProperties.Name:
+                            if(grave.Where(cardInstance => cardInstance.Name == _nameCooldownReduction).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.ReduceCooldownOfCards(reductionPostMult, _flatCooldownReduction, amountPostMult, true, _propertyCooldownReduction, name: _nameCooldownReduction));
+                            break;
+
+                        case Card.SearchableProperties.Type:
+                            if(grave.Where(cardInstance => cardInstance.CardRef.Type == _typeCooldownReduction).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.ReduceCooldownOfCards(reductionPostMult, _flatCooldownReduction, amountPostMult, true, _propertyCooldownReduction, type: _typeCooldownReduction));
+                            break;
+
+                        case Card.SearchableProperties.Rarity:
+                            if(grave.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityCooldownReduction).ToList().Count < amountPostMult) return null;
+                            ability.Enqueue(()=>gameManager.ReduceCooldownOfCards(reductionPostMult, _flatCooldownReduction, amountPostMult, true, _propertyCooldownReduction, rarity: _rarityCooldownReduction));
+                            break;
+                    }
                 }
             }
 
@@ -335,22 +505,24 @@ namespace _Game.Scripts.Abilities
             {
                 float amountPostMult = (_maxLevel < 2 || _gachaPullCostChangeAmountIgnoresLevel) ? _gachaPullCostChange : CalculateEffectForLevel(_gachaPullCostChange, level);
 
-                gameManager.ModifyGachaCost(amountPostMult, _gachaPullCostChangeIsFlat, _blockOtherGachaCostChanges);
+                ability.Enqueue(()=>gameManager.ModifyGachaCost(amountPostMult, _gachaPullCostChangeIsFlat, _blockOtherGachaCostChanges));
             }
 
             if(_gainStars)
             {
                 int amountPostMult = (_maxLevel < 2 || _starAmountIgnoresLevel) ? _gainStarsAmount : CalculateEffectForLevel(_gainStarsAmount, level);
 
-                gameManager.AddStar(amountPostMult);
+                ability.Enqueue(()=>gameManager.AddStar(amountPostMult));
             }
 
             if(_gainAutoclicker)
             {
                 int durationPostMult = (_maxLevel < 2 || _autoclickerDurationIgnoresLevel) ? _autoclickerDuration : CalculateEffectForLevel(_autoclickerDuration, level);
 
-                gameManager.GainAutoclicker(durationPostMult);
+                ability.Enqueue(()=>gameManager.GainAutoclicker(durationPostMult));
             }
+
+            return ability;
         }
 
         ///<summary>

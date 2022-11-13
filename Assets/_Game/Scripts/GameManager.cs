@@ -550,23 +550,35 @@ public class GameManager : MonoBehaviour
         if(amount < 1) return;
         CardInstance[] cardsToDestroy = null;
 
+        ICardList inventory = _cardInventory;
+
+        foreach(CardInstance card in _deck.GetCardList())
+            inventory.RemoveCard(card);
+
+        foreach(CardInstance card in _hand.GetCardList())
+            inventory.RemoveCard(card);
+
+        foreach(CardInstance card in _grave.GetCardList())
+            inventory.RemoveCard(card);
+
+        if(inventory.GetCardList().Count < amount) return;
         Time.timeScale = 0;
         if(!destroyByProperty)
         {
-            cardsToDestroy = await SelectionWindowManager.Instance.SelectCards(_cardInventory, amount);
+            cardsToDestroy = await SelectionWindowManager.Instance.SelectCards(inventory, amount);
         }
         else
         {
             switch(property)
             {
                 case Card.SearchableProperties.Name:
-                    cardsToDestroy = await SelectionWindowManager.Instance.SelectCardsByName(_cardInventory, name, amount);
+                    cardsToDestroy = await SelectionWindowManager.Instance.SelectCardsByName(inventory, name, amount);
                     break;
                 case Card.SearchableProperties.Type:
-                    cardsToDestroy = await SelectionWindowManager.Instance.SelectCardsByType(_cardInventory, type, amount);
+                    cardsToDestroy = await SelectionWindowManager.Instance.SelectCardsByType(inventory, type, amount);
                     break;
                 case Card.SearchableProperties.Rarity:
-                    cardsToDestroy = await SelectionWindowManager.Instance.SelectCardsByRarity(_cardInventory, rarity, amount);
+                    cardsToDestroy = await SelectionWindowManager.Instance.SelectCardsByRarity(inventory, rarity, amount);
                     break;
             }
         }
@@ -666,6 +678,12 @@ public class GameManager : MonoBehaviour
     ///</summary>
     ///<returns>List of CardInstance Objects.</returns>
     public List<CardInstance> GetHandList() => _hand.GetCardList();
+
+    ///<summary>
+    ///Returns the cards the player has presently in their grave.
+    ///</summary>
+    ///<returns>List of CardInstance Objects.</returns>
+    public List<CardInstance> GetGraveList() => _grave.GetCardList();
 
     ///<summary>
     ///Removes a single <paramref name="card"> from the deck.
