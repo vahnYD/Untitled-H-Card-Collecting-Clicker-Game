@@ -59,7 +59,7 @@ namespace _Game.Scripts.Cards
         ///Triggers the abilities this card posesses, start cooldown, and moves it from the hand to the grave yard after.
         ///Will not trigger if on cooldown or there is no ability.
         ///</summary>
-        public async Task<bool> ActivateAbility()
+        public bool ActivateAbility()
         {
             if(!_hasAbility) return false;
             if(_onCooldown) return false;

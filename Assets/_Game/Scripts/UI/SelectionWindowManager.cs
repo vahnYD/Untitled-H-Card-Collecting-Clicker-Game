@@ -3,6 +3,7 @@
  * Email: simon.gemmel@gmail.com
  * Discord: TheSimlier#6781
  */
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,6 +34,9 @@ namespace _Game.Scripts.UI
         private int _cardYOffset = -295;
         private List<CardInstance> _selectedCards = new List<CardInstance>();
         private int _selectionAmount = 0;
+        private bool _selectionQueued = false;
+        private bool _selectionQueueManagementRunning = false;
+        private Queue<Action> _queuedSelections = new Queue<Action>();
         private bool _isSelecting = false;
         private bool _wasCancelled = false;
         private bool _isCooldownRelated = false;
@@ -87,6 +91,13 @@ namespace _Game.Scripts.UI
             if(amount is 0) return null;
             if(cardPool.isEmpty()) return null;
 
+            if(_selectionQueued)
+            {
+                if(!_selectionQueueManagementRunning) StartCoroutine(SelectionQueueManagementCoroutine());
+                await QueueSelectionEnumerator();
+            }
+            _selectionQueued = true;
+
             _selectedCards.Clear();
 
             _selectionAmount = amount;
@@ -115,6 +126,13 @@ namespace _Game.Scripts.UI
         public async UniTask<CardInstance[]> SelectCardsByName(ICardList cardPool, string name, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
+
+            if(_selectionQueued)
+            {
+                if(!_selectionQueueManagementRunning) StartCoroutine(SelectionQueueManagementCoroutine());
+                await QueueSelectionEnumerator();
+            }
+            _selectionQueued = true;
 
             _selectedCards.Clear();
 
@@ -148,6 +166,13 @@ namespace _Game.Scripts.UI
         {
             if(amount is 0) return null;
 
+            if(_selectionQueued)
+            {
+                if(!_selectionQueueManagementRunning) StartCoroutine(SelectionQueueManagementCoroutine());
+                await QueueSelectionEnumerator();
+            }
+            _selectionQueued = true;
+
             _selectedCards.Clear();
 
             _selectionAmount = amount;
@@ -179,6 +204,13 @@ namespace _Game.Scripts.UI
         public async UniTask<CardInstance[]> SelectCardsByRarity(ICardList cardPool, Card.CardRarity rarity, int amount = 1, bool cdReduction = false, bool cdReductionIsFlat = true, float cooldownReductionAmount = 0f)
         {
             if(amount is 0) return null;
+
+            if(_selectionQueued)
+            {
+                if(!_selectionQueueManagementRunning) StartCoroutine(SelectionQueueManagementCoroutine());
+                await QueueSelectionEnumerator();
+            }
+            _selectionQueued = true;
 
             _selectedCards.Clear();
 
@@ -344,6 +376,27 @@ namespace _Game.Scripts.UI
                 _displayedCards.Remove(cardObject);
                 Destroy(cardObject.gameObject);
             }
+        }
+
+        //! Needs testing to see if the captured variable in the Action actually triggers the specific waitUntil for cases with multiple enumerators running at the same time
+        private IEnumerator QueueSelectionEnumerator()
+        {
+            bool waiting = true;
+            _queuedSelections.Enqueue(()=>waiting = false);
+            yield return new WaitUntil(()=> waiting == false);
+        }
+
+        private IEnumerator SelectionQueueManagementCoroutine()
+        {
+            _selectionQueueManagementRunning = true;
+            do
+            {
+                yield return new WaitForSecondsRealtime(0.5f);
+                yield return new WaitUntil(()=>_isSelecting == false);
+                _queuedSelections.Dequeue().Invoke();
+            } while(_queuedSelections.Count > 0);
+            _selectionQueueManagementRunning = false;
+            _selectionQueued = false;
         }
     }
 }
