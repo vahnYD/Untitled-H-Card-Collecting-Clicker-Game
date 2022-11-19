@@ -1,5 +1,31 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8867498541548335898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Hiding in the Open
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 19
+  _name: Hiding in the Open
+  _rarity: 1
+  _soulValue: 40
+  _type: 2
+  _strength: 6
+  _flavourText: "It's part of the game to not get caught! Even though it's always
+    better when someone notices~\u2665"
+  _hasAbility: 1
+  _abilities:
+  - {fileID: -3831180872251618590, guid: bf5b20ea76f0c9e43825b90d7aea2fa7, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: fb5f2f0e06276d54e8526398678fecab, type: 3}
 --- !u!114 &-7426466879798146904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +277,32 @@ MonoBehaviour:
   - {fileID: -2547480010942536960, guid: bf5b20ea76f0c9e43825b90d7aea2fa7, type: 2}
   _cardArt:
   - {fileID: 21300000, guid: 74d5c95d13d675d43ba5d2c7d8d070b0, type: 3}
+--- !u!114 &-1729417494702569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: The Best Way to Pass Time
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 20
+  _name: The Best Way to Pass Time
+  _rarity: 1
+  _soulValue: 35
+  _type: 8
+  _strength: 9
+  _flavourText: Nothing beats just staring at porn and dicks all day when you got
+    the time~!
+  _hasAbility: 1
+  _abilities:
+  - {fileID: -583436960716772801, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: ac8caedc90a9a4f439b9e5aef9d5a6c3, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281,7 +333,37 @@ MonoBehaviour:
   - {fileID: -2434828201128031798}
   - {fileID: -4508065770648686317}
   - {fileID: -7426466879798146904}
-  _nextCardId: 17
+  - {fileID: 2672940387337006536}
+  - {fileID: 4710586066954710568}
+  - {fileID: -8867498541548335898}
+  - {fileID: -1729417494702569}
+  _nextCardId: 21
+--- !u!114 &2672940387337006536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Flashing Fun
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 17
+  _name: Flashing Fun
+  _rarity: 1
+  _soulValue: 24
+  _type: 2
+  _strength: 9
+  _flavourText: "Ehehe~! Did you guys think I was wearing a Bikini? \u2665\u2665
+    Sorry, but I'm quite a bit of a pervert!"
+  _hasAbility: 1
+  _abilities:
+  - {fileID: -2326079435710305418, guid: bf5b20ea76f0c9e43825b90d7aea2fa7, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: b96ceb2662927fb4f9254832603426b6, type: 3}
 --- !u!114 &4530136483354128289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -308,6 +390,32 @@ MonoBehaviour:
   - {fileID: -3156666908429262385, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
   _cardArt:
   - {fileID: 21300000, guid: 44de2aaea5a2cf04c980dd1ac3762399, type: 3}
+--- !u!114 &4710586066954710568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Entranced Masturbation
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 18
+  _name: Entranced Masturbation
+  _rarity: 1
+  _soulValue: 40
+  _type: 0
+  _strength: 8
+  _flavourText: "One of those days where all girls do is just to stare at nothing
+    and masturbate with blank minds~\u2665"
+  _hasAbility: 1
+  _abilities:
+  - {fileID: 3306894628660691661, guid: bf5b20ea76f0c9e43825b90d7aea2fa7, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: 94114e01327446443874a57d8a9e8fe2, type: 3}
 --- !u!114 &4887181662140611054
 MonoBehaviour:
   m_ObjectHideFlags: 0

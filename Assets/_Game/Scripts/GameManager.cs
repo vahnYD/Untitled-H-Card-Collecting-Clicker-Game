@@ -289,21 +289,18 @@ public class GameManager : MonoBehaviour
 
     ///<summary>
     ///Increases the amount of souls gained whenever Click() or ManualClick() is called.
-    ///<paramref name="isManual"> determines if both get affected by the increase or only ManualClick().
+    ///<paramref name="isManual"> determines if only Click() gets affected by the increase or only ManualClick().
     ///</summary>
     ///<param name="increase">Amount by which to increase as int.</param>
     ///<param name="duration">Duration for which the increase should last in seconds as int.</param>
-    ///<param name="isManual">Optional. Determines if both or only ManualClick() will be affected. Defaults to false.</param>
+    ///<param name="isManual">Optional. Determines if only Click() or only ManualClick() will be affected. Defaults to false.</param>
     public void IncreaseSoulsPerClick(int increase, int duration, bool isManual = false)
     {
         if(!isManual)
         {
             _currentClickSoulAmount += increase;
-            _currentClickSoulAmountManual += increase;
             _soulPerClickIncreases.Enqueue(increase);
-            _soulPerClickIncreasesManual.Enqueue(increase);
             StartCoroutine(CoroutineExtensions.InvokeActionAfterSeconds(ReduceSoulsPerClickAction, duration));
-            StartCoroutine(CoroutineExtensions.InvokeActionAfterSeconds(ReduceSoulsPerClickManualAction, duration));
             return;
         }
 

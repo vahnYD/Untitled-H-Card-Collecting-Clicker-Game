@@ -129,7 +129,7 @@ namespace _Game.Scripts.Cards
         ///</summary>
         public void OnHoverEnter()
         {
-            _inspectButton.gameObject.SetActive(true);
+            if(_clickIsInspection) _inspectButton.gameObject.SetActive(true);
         }
 
         ///<summary>
@@ -137,7 +137,7 @@ namespace _Game.Scripts.Cards
         ///</summary>
         public void OnHoverExit()
         {
-            _inspectButton.gameObject.SetActive(false);
+            if(_clickIsInspection) _inspectButton.gameObject.SetActive(false);
         }
 
         private void InspectButtonClick()
