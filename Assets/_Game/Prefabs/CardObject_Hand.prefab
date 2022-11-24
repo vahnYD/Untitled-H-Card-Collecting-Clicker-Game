@@ -879,7 +879,7 @@ MonoBehaviour:
     _level: 0
     _nextUpgradeCost: 0
     _abilityText: 
-  _rarityIconList: {fileID: 11400000, guid: 188eae0112becc94e86832c2bb766e79, type: 2}
+  _cardSpriteObject: {fileID: 11400000, guid: 62f729c9afdfcc94ab97c49c28d70958, type: 2}
   _cardArtImageObj: {fileID: 8578644529960797837}
   _nameText: {fileID: 305431113356450217}
   _rarityIconImageObj: {fileID: 7499057123901460788}

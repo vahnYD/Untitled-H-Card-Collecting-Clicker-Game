@@ -5,13 +5,10 @@
  */
 using System;
 using System.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
-using _Game.Scripts.Extensions;
 using _Game.Scripts.UI;
 
 namespace _Game.Scripts.Cards
@@ -21,7 +18,7 @@ namespace _Game.Scripts.Cards
         #region Properties
         [SerializeField] private CardInstance _cardInstance = null;
         public CardInstance CardInstanceRef => _cardInstance;
-        [SerializeField] private SpriteList _rarityIconList = null;
+        [SerializeField] private SpriteListCard _cardSpriteObject = null;
         [SerializeField] private Image _cardArtImageObj = null;
         [SerializeField] private TMP_Text _nameText = null;
         [SerializeField] private Image _rarityIconImageObj = null;
@@ -32,13 +29,14 @@ namespace _Game.Scripts.Cards
         private RectTransform _localRectTransform = null;
         private CanvasGroup _localCanvasGroup = null;
         private float _canvasScaleFactor = 1;
+        private bool _skillActivationSuccesfull = false;
         #endregion
 
         #region Unity Event Functions
         private void Awake()
         {
             #if UNITY_EDITOR
-            if(_rarityIconList is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null)
+            if(_cardSpriteObject is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null)
                 Debug.LogWarning("CardObject_Hand.cs " + this.name + " is missing Object References.");
             #endif
 
@@ -59,16 +57,16 @@ namespace _Game.Scripts.Cards
             switch(card.CardRef.Rarity)
             {
                 case Card.CardRarity.Common:
-                    _rarityIconImageObj.sprite = _rarityIconList[0];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Common;
                     break;
                 case Card.CardRarity.Rare:
-                    _rarityIconImageObj.sprite = _rarityIconList[1];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Rare;
                     break;
                 case Card.CardRarity.VeryRare:
-                    _rarityIconImageObj.sprite = _rarityIconList[2];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.VeryRare;
                     break;
                 case Card.CardRarity.Special:
-                    _rarityIconImageObj.sprite = _rarityIconList[3];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Special;
                     break;
             }
             _handler = handler;
@@ -82,9 +80,15 @@ namespace _Game.Scripts.Cards
             //TODO
         }
 
-        public async Task Despawn()
+        public async Task Despawn(bool isActivation = false, int cooldown = 0)
         {
-            //TODO            
+            //TODO 
+
+            if(isActivation)
+            {
+                CardCooldownManager.Instance.StartCooldownForCard(_cardInstance, cooldown);
+                GameManager.Instance.MoveSpecificCard(_cardInstance, GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave); 
+            }
         }
 
         public void SetPositionOffSetX(float x) => this._originalPosX = x;
@@ -117,6 +121,26 @@ namespace _Game.Scripts.Cards
         public void OnEndDrag(PointerEventData eventData)
         {
             _localCanvasGroup.blocksRaycasts = true;
+        }
+
+        private void DelayedReturn()
+        {
+            if(_skillActivationSuccesfull) return;
+
+            //TODO
+        }
+
+        public void AttemptSkillActivation()
+        {
+            int cooldown = 0;
+            _skillActivationSuccesfull = _cardInstance.ActivateAbility(ref cooldown);
+            if(_skillActivationSuccesfull) Despawn(true, cooldown).RunSynchronously(); //should check if this does what I think it does
+            else PlayShakeAnimation();
+        }
+
+        private void PlayShakeAnimation()
+        {
+            //TODO
         }
         #endregion
     }

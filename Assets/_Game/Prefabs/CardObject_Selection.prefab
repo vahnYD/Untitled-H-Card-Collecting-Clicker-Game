@@ -878,7 +878,7 @@ MonoBehaviour:
     _level: 0
     _nextUpgradeCost: 0
     _abilityText: 
-  _rarityIconList: {fileID: 11400000, guid: 188eae0112becc94e86832c2bb766e79, type: 2}
+  _cardSpriteObject: {fileID: 11400000, guid: 62f729c9afdfcc94ab97c49c28d70958, type: 2}
   _cardArtImageObj: {fileID: 3552523064903487533}
   _nameText: {fileID: 4791113821679488777}
   _rarityIconImageObj: {fileID: 3337853284548298644}
@@ -888,6 +888,7 @@ MonoBehaviour:
   _abilityContainerObj: {fileID: 5044190473063490682}
   _abilityText: {fileID: 651921382426587930}
   _selectionIndicatorTransform: {fileID: 6669975152114936332}
+  _cooldownContainer: {fileID: 0}
   _cooldownText: {fileID: 878832202859154876}
 --- !u!1 &2501694073213094752
 GameObject:

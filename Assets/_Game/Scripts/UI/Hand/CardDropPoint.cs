@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using _Game.Scripts.Cards;
 
 namespace _Game.Scripts.UI
 {
@@ -25,7 +26,8 @@ namespace _Game.Scripts.UI
         #region Methods
         public void OnDrop(PointerEventData eventData)
         {
-            
+            CardObject_Hand obj = eventData.pointerDrag.GetComponent<CardObject_Hand>();
+            obj?.AttemptSkillActivation();
         }
         #endregion
     }

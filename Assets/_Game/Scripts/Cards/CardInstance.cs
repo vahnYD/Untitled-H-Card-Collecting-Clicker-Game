@@ -59,7 +59,7 @@ namespace _Game.Scripts.Cards
         ///Triggers the abilities this card posesses, start cooldown, and moves it from the hand to the grave yard after.
         ///Will not trigger if on cooldown or there is no ability.
         ///</summary>
-        public bool ActivateAbility()
+        public bool ActivateAbility(ref int cooldownInSec)
         {
             if(!_hasAbility) return false;
             if(_onCooldown) return false;
@@ -81,11 +81,9 @@ namespace _Game.Scripts.Cards
                 abilities.Dequeue().Invoke();
 
             _onCooldown = true;
-            int cooldown = 0;
-                foreach(Abilities.Ability ability in _card.Abilities)
-                cooldown += ability.CooldownInSec;
-            CardCooldownManager.Instance.StartCooldownForCard(this, cooldown);
-            GameManager.Instance.MoveSpecificCard(this, GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave);
+            foreach(Abilities.Ability ability in _card.Abilities)
+                cooldownInSec += ability.CooldownInSec;
+            
             return true;
         }
 

@@ -5,11 +5,9 @@
  */
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using _Game.Scripts.Extensions;
 using _Game.Scripts.UI;
 
 namespace _Game.Scripts.Cards
@@ -19,7 +17,7 @@ namespace _Game.Scripts.Cards
         #region Properties
         [SerializeField] private CardInstance _card;
         public CardInstance CardInstanceRef => _card;
-        [SerializeField] private SpriteList _rarityIconList = null;
+        [SerializeField] private SpriteListCard _cardSpriteObject = null;
         [SerializeField] private Image _cardArtImageObj = null;
         [SerializeField] private TMP_Text _nameText = null;
         [SerializeField] private Image _rarityIconImageObj = null;
@@ -44,7 +42,7 @@ namespace _Game.Scripts.Cards
         private void Awake()
         {
             #if UNITY_EDITOR
-            if(_rarityIconList is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null || _soulValueText is null || _typeText is null || _flavourText is null || _abilityContainerObj is null || _abilityText is null || _selectionIndicatorTransform is null || _cooldownContainer is null || _cooldownText is null)
+            if(_cardSpriteObject is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null || _soulValueText is null || _typeText is null || _flavourText is null || _abilityContainerObj is null || _abilityText is null || _selectionIndicatorTransform is null || _cooldownContainer is null || _cooldownText is null)
                 Debug.LogWarning("CardObject_Selection.cs of " + this.name + " is missing Object References.");
             #endif
         }
@@ -73,16 +71,16 @@ namespace _Game.Scripts.Cards
             switch(card.CardRef.Rarity)
             {
                 case Card.CardRarity.Common:
-                    _rarityIconImageObj.sprite = _rarityIconList[0];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Common;
                     break;
                 case Card.CardRarity.Rare:
-                    _rarityIconImageObj.sprite = _rarityIconList[1];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Rare;
                     break;
                 case Card.CardRarity.VeryRare:
-                    _rarityIconImageObj.sprite = _rarityIconList[2];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.VeryRare;
                     break;
                 case Card.CardRarity.Special:
-                    _rarityIconImageObj.sprite = _rarityIconList[3];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Special;
                     break;
             }
             _soulValueText.text = card.CardRef.SoulValue.ToString();

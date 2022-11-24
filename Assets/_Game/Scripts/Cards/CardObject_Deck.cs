@@ -7,7 +7,6 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using _Game.Scripts.Extensions;
 using _Game.Scripts.UI;
 
 namespace _Game.Scripts.Cards
@@ -17,7 +16,7 @@ namespace _Game.Scripts.Cards
         #region Properties
         [SerializeField] private CardInstance _cardInstance = null;
         public CardInstance CardInstanceRef => _cardInstance;
-        [SerializeField] private SpriteList _rarityIcons = null;
+        [SerializeField] private SpriteListCard _cardSpriteObject = null;
         [SerializeField] private Image _cardArtImageObj = null;
         [SerializeField] private TMP_Text _nameText = null;
         [SerializeField] private Image _rarityIconImageObj = null;
@@ -33,7 +32,7 @@ namespace _Game.Scripts.Cards
         #if UNITY_EDITOR
         private void Awake()
         {
-            if(_rarityIcons is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null || _typeText is null || _strengthText is null)
+            if(_cardSpriteObject is null || _cardArtImageObj is null || _nameText is null || _rarityIconImageObj is null || _typeText is null || _strengthText is null)
                 Debug.LogWarning("CardObject_Deck.cs of " + this.name + " is missing Object References.");   
         }
         #endif
@@ -57,16 +56,16 @@ namespace _Game.Scripts.Cards
             switch(card.CardRef.Rarity)
             {
                 case Card.CardRarity.Common:
-                    _rarityIconImageObj.sprite = _rarityIcons[0];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Common;
                     break;
                 case Card.CardRarity.Rare:
-                    _rarityIconImageObj.sprite = _rarityIcons[1];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Rare;
                     break;
                 case Card.CardRarity.VeryRare:
-                    _rarityIconImageObj.sprite = _rarityIcons[2];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.VeryRare;
                     break;
                 case Card.CardRarity.Special:
-                    _rarityIconImageObj.sprite = _rarityIcons[3];
+                    _rarityIconImageObj.sprite = _cardSpriteObject.RaritySprites.Special;
                     break;
             }
             _typeText.text = Enum.GetName(typeof(Card.CardType), card.CardRef.Type);
