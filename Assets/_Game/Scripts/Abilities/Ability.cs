@@ -843,9 +843,24 @@ namespace _Game.Scripts.Abilities
             SerializedProperty _spGainAutoclicker;
             SerializedProperty _spAutoclickerDuration;
             SerializedProperty _spAutoclickerDurationIgnoresLevel;
+
+            //Restrictions
+            //Minimum Card Amount
+            SerializedProperty _spMinimumCardAmount;
+            SerializedProperty _spMinimumCardAmountValue;
+            SerializedProperty _spMinimumCardAmountPlace;
+            SerializedProperty _spMinimumCardAmountLessOrEqual;
+
+            //Coin Lockout
+            SerializedProperty _spCoinLockout;
+            SerializedProperty _spCoinLockoutDuration;
+
+            //Soul Lockout
+            SerializedProperty _spSoulLockout;
+            SerializedProperty _spSoulLockoutDuration;
             #endregion
 
-            private bool _showUpgrades, _showAbilities, _showDeleteButton = false;
+            private bool _showUpgrades, _showAbilities, _showRestrictions, _showDeleteButton = false;
 
             private void OnEnable()
             {
@@ -981,6 +996,21 @@ namespace _Game.Scripts.Abilities
                 _spGainAutoclicker = serializedObject.FindProperty("_gainAutoclicker");
                 _spAutoclickerDuration = serializedObject.FindProperty("_autoclickerDuration");
                 _spAutoclickerDurationIgnoresLevel = serializedObject.FindProperty("_autoclickerDurationIgnoresLevel");
+
+                //Restrictions
+                //Minimum Card Amount
+                _spMinimumCardAmount = serializedObject.FindProperty("_minimumCardAmount");
+                _spMinimumCardAmountValue = serializedObject.FindProperty("_minimumCardAmountValue");
+                _spMinimumCardAmountPlace = serializedObject.FindProperty("_minimumCardAmountPlace");
+                _spMinimumCardAmountLessOrEqual = serializedObject.FindProperty("_minimumCardAmountLessOrEqual");
+
+                //Coin Lockout
+                _spCoinLockout = serializedObject.FindProperty("_coinLockout");
+                _spCoinLockoutDuration = serializedObject.FindProperty("_coinLockoutDuration");
+
+                //Soul Lockout
+                _spSoulLockout = serializedObject.FindProperty("_soulLockout");
+                _spSoulLockoutDuration = serializedObject.FindProperty("_soulLockoutDuration");
             }
 
             public override void OnInspectorGUI()
@@ -1619,6 +1649,67 @@ namespace _Game.Scripts.Abilities
                         GUILayout.Label("Value is Static");
                         GUILayout.FlexibleSpace();
                         EditorGUILayout.PropertyField(_spAutoclickerDurationIgnoresLevel, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+                    }
+                }
+                GUILayout.Space(5f);
+
+                _showRestrictions = EditorGUILayout.Foldout(_showRestrictions, "Ability Restrictions");
+                if(_showRestrictions)
+                {
+                    EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                    EditorGUILayout.LabelField("Minimum amount of cards required");
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.PropertyField(_spMinimumCardAmount, GUIContent.none, GUILayout.MaxWidth(50f));
+                    EditorGUILayout.EndHorizontal();
+                    if(_spMinimumCardAmount.boolValue)
+                    {
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        EditorGUILayout.LabelField("Amount");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spMinimumCardAmountValue, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        EditorGUILayout.LabelField("Location");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spMinimumCardAmountPlace, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        EditorGUILayout.LabelField("Amount is upper limit");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spMinimumCardAmountLessOrEqual, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+                    }
+                    GUILayout.Space(10f);
+
+                    EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                    EditorGUILayout.LabelField("Coin Lockout");
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.PropertyField(_spCoinLockout, GUIContent.none, GUILayout.MaxWidth(50f));
+                    EditorGUILayout.EndHorizontal();
+                    if(_spCoinLockout.boolValue)
+                    {
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        EditorGUILayout.LabelField("Duration");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spCoinLockoutDuration, GUIContent.none, GUILayout.MaxWidth(50f));
+                        EditorGUILayout.EndHorizontal();
+                    }
+                    GUILayout.Space(10f);
+
+                    EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                    EditorGUILayout.LabelField("Soul Lockout");
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.PropertyField(_spSoulLockout, GUIContent.none, GUILayout.MaxWidth(50f));
+                    EditorGUILayout.EndHorizontal();
+                    if(_spSoulLockout.boolValue)
+                    {
+                        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(300f), GUILayout.ExpandWidth(false));
+                        EditorGUILayout.LabelField("Duration");
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.PropertyField(_spSoulLockoutDuration, GUIContent.none, GUILayout.MaxWidth(50f));
                         EditorGUILayout.EndHorizontal();
                     }
                 }

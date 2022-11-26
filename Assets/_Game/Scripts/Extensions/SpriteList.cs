@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace _Game.Scripts.Extensions
 {
-    [CreateAssetMenu(fileName ="Sprite List", menuName = "ScriptableObjects/Lists/Sprite List", order =2)]
+    [CreateAssetMenu(fileName ="Sprite List", menuName = "ScriptableObjects/Lists/Sprite List/Generic", order =2)]
     public class SpriteList : ScriptableObject
     {
         [SerializeField] private List<Sprite> _spriteList = new List<Sprite>();

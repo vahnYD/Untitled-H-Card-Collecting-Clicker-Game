@@ -118,6 +118,14 @@ MonoBehaviour:
   _gainAutoclicker: 0
   _autoclickerDuration: 0
   _autoclickerDurationIgnoresLevel: 0
+  _minimumCardAmount: 0
+  _minimumCardAmountValue: 0
+  _minimumCardAmountPlace: 0
+  _minimumCardAmountLessOrEqual: 0
+  _coinLockout: 0
+  _coinLockoutDuration: 0
+  _soulLockout: 0
+  _soulLockoutDuration: 0
 --- !u!114 &-2547480010942536960
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,6 +245,14 @@ MonoBehaviour:
   _gainAutoclicker: 0
   _autoclickerDuration: 0
   _autoclickerDurationIgnoresLevel: 0
+  _minimumCardAmount: 0
+  _minimumCardAmountValue: 0
+  _minimumCardAmountPlace: 0
+  _minimumCardAmountLessOrEqual: 0
+  _coinLockout: 0
+  _coinLockoutDuration: 0
+  _soulLockout: 0
+  _soulLockoutDuration: 0
 --- !u!114 &-2326079435710305418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,6 +372,14 @@ MonoBehaviour:
   _gainAutoclicker: 0
   _autoclickerDuration: 0
   _autoclickerDurationIgnoresLevel: 0
+  _minimumCardAmount: 0
+  _minimumCardAmountValue: 0
+  _minimumCardAmountPlace: 0
+  _minimumCardAmountLessOrEqual: 0
+  _coinLockout: 0
+  _coinLockoutDuration: 0
+  _soulLockout: 0
+  _soulLockoutDuration: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,6 +520,14 @@ MonoBehaviour:
   _gainAutoclicker: 0
   _autoclickerDuration: 0
   _autoclickerDurationIgnoresLevel: 0
+  _minimumCardAmount: 0
+  _minimumCardAmountValue: 0
+  _minimumCardAmountPlace: 0
+  _minimumCardAmountLessOrEqual: 0
+  _coinLockout: 0
+  _coinLockoutDuration: 0
+  _soulLockout: 0
+  _soulLockoutDuration: 0
 --- !u!114 &3434915313765408753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -616,6 +648,14 @@ MonoBehaviour:
   _gainAutoclicker: 0
   _autoclickerDuration: 0
   _autoclickerDurationIgnoresLevel: 0
+  _minimumCardAmount: 0
+  _minimumCardAmountValue: 0
+  _minimumCardAmountPlace: 0
+  _minimumCardAmountLessOrEqual: 0
+  _coinLockout: 0
+  _coinLockoutDuration: 0
+  _soulLockout: 0
+  _soulLockoutDuration: 0
 --- !u!114 &4310290368209529015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -736,3 +776,11 @@ MonoBehaviour:
   _gainAutoclicker: 0
   _autoclickerDuration: 0
   _autoclickerDurationIgnoresLevel: 0
+  _minimumCardAmount: 0
+  _minimumCardAmountValue: 0
+  _minimumCardAmountPlace: 0
+  _minimumCardAmountLessOrEqual: 0
+  _coinLockout: 0
+  _coinLockoutDuration: 0
+  _soulLockout: 0
+  _soulLockoutDuration: 0
