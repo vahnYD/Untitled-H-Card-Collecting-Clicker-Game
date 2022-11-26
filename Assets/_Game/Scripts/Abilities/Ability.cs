@@ -157,6 +157,21 @@ namespace _Game.Scripts.Abilities
         [SerializeField] private bool _gainAutoclicker;
         [SerializeField, Min(0)] private int _autoclickerDuration;
         [SerializeField] private bool _autoclickerDurationIgnoresLevel;
+
+        //Restrictions
+        //Minimum Card Amount required for activation
+        [SerializeField] private bool _minimumCardAmount;
+        [SerializeField, Min(0)] private int _minimumCardAmountValue;
+        [SerializeField] private GameManager.CardGameStates _minimumCardAmountPlace;
+        [SerializeField] private bool _minimumCardAmountLessOrEqual;
+
+        //Gold Lockout
+        [SerializeField] private bool _coinLockout;
+        [SerializeField] private int _coinLockoutDuration;
+
+        //Soul Lockout
+        [SerializeField] private bool _soulLockout;
+        [SerializeField] private int _soulLockoutDuration;
         #endregion
 
         #region Methods
@@ -179,6 +194,40 @@ namespace _Game.Scripts.Abilities
             int cardsBeingRemovedFromDeck = 0;
 
             Queue<Action> ability = new Queue<Action>();
+
+            if(_minimumCardAmount)
+            {
+                int cardsInLocation = 0;
+                switch(_minimumCardAmountPlace)
+                {
+                    case GameManager.CardGameStates.Deck:
+                        cardsInLocation = deck.Count - cardsBeingRemovedFromDeck;
+                        break;
+
+                    case GameManager.CardGameStates.Grave:
+                        cardsInLocation = grave.Count - cardsBeingRemovedFromGrave;
+                        break;
+
+                    case GameManager.CardGameStates.Hand:
+                        cardsInLocation = hand.Count - cardsBeingRemovedFromHand;
+                        break;
+                }
+
+                if( !((_minimumCardAmountLessOrEqual) ? cardsInLocation <= _minimumCardAmountValue : cardsInLocation == _minimumCardAmountValue))
+                {
+                    return null;
+                }
+            }
+
+            if(_coinLockout)
+            {
+                ability.Enqueue(()=>gameManager.BlockCoinGain(_coinLockoutDuration));
+            }
+
+            if(_soulLockout)
+            {
+                ability.Enqueue(()=>gameManager.BlockSoulGain(_soulLockoutDuration));
+            }
 
             if(_sendGraveHand)
             {

@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
     private Queue<int> _coinPerClickIncreasesManual = new Queue<int>();
     private Action ReduceCoinsPerClickAction;
     private Action ReduceCoinsPerClickManualAction;
+    [SerializeField] private BoolValue _coinGainBlocked;
+    private Action CoinGainUnblockAction;
     [SerializeField] private LongValue _coinAmount;
     public long CoinTotal => _coinAmount.Value;
     [SerializeField] private long _totalCoinsEarned;
@@ -43,6 +45,8 @@ public class GameManager : MonoBehaviour
     private Queue<int> _soulPerClickIncreasesManual = new Queue<int>();
     private Action ReduceSoulsPerClickAction;
     private Action ReduceSoulsPerClickManualAction;
+    [SerializeField] private BoolValue _soulGainBlocked;
+    private Action SoulGainUnblockAction;
     [SerializeField] private LongValue _soulAmount;
     public long SoulTotal => _soulAmount.Value;
 
@@ -124,8 +128,10 @@ public class GameManager : MonoBehaviour
 
         ReduceCoinsPerClickAction = () => ReduceCoinsPerClick(ref _currentClickCoinAmount);
         ReduceCoinsPerClickManualAction = () => ReduceCoinsPerClick(ref _currentClickCoinAmountManual, true);
+        CoinGainUnblockAction = () => UnblockCoinGain();
         ReduceSoulsPerClickAction = () => ReduceSoulsPerClick(ref _currentClickSoulAmount);
         ReduceSoulsPerClickManualAction = () => ReduceCoinsPerClick(ref _currentClickSoulAmountManual, true);
+        SoulGainUnblockAction = () => UnblockSoulGain();
 
         #if UNITY_EDITOR
         if(_drawIsBlocked != null)
@@ -175,8 +181,8 @@ public class GameManager : MonoBehaviour
     ///</summary>
     public void ManualClick()
     {
-        AddCoins(_currentClickCoinAmountManual);
-        AddSouls(_currentClickSoulAmountManual);
+        if(!_coinGainBlocked.Value)AddCoins(_currentClickCoinAmountManual);
+        if(!_soulGainBlocked.Value)AddSouls(_currentClickSoulAmountManual);
     }
 
     ///<summary>
@@ -184,8 +190,8 @@ public class GameManager : MonoBehaviour
     ///</summary>
     public void Click()
     {
-        AddCoins(_currentClickCoinAmount);
-        AddSouls(_currentClickSoulAmount);
+        if(!_coinGainBlocked.Value)AddCoins(_currentClickCoinAmount);
+        if(!_soulGainBlocked.Value)AddSouls(_currentClickSoulAmount);
     }
 
     ///<summary>
@@ -200,9 +206,11 @@ public class GameManager : MonoBehaviour
     // Currency Interactions
     ///<summary>
     ///Adds the specified amount of coins to the possessed coin amount and total coins earned.
+    ///Fails if coin gain is presently blocked.
     ///</summary>
     public void AddCoins(int coins)
     {
+        if(_coinGainBlocked.Value) return;
         _coinAmount.Value += coins;
         _totalCoinsEarned += coins;
     }
@@ -264,10 +272,26 @@ public class GameManager : MonoBehaviour
     }
 
     ///<summary>
+    ///Blocks all coin aquisition for the given duration.
+    ///</summary>
+    public void BlockCoinGain(int durationInSeconds)
+    {
+        _coinGainBlocked.Value = true;
+        CoroutineExtensions.InvokeActionAfterSeconds(CoinGainUnblockAction, durationInSeconds);
+    }
+
+    ///<summary>
+    ///Unblocks coin aquisition.
+    ///</summary>    
+    private void UnblockCoinGain() => _coinGainBlocked.Value = false;
+
+    ///<summary>
     ///Adds the specified amount of souls to the possessed soul amount.
+    ///Fails if soul gain is presently blocked.
     ///</summary>
     public void AddSouls(int souls)
     {
+        if(_soulGainBlocked.Value) return;
         if(_soulAmount.Value > _gameSettings.MaxSoulsAtBase) return;
         _soulAmount.Value += souls;
         if(_soulAmount.Value > _gameSettings.MaxSoulsAtBase) _soulAmount.Value = _gameSettings.MaxSoulsAtBase;
@@ -325,6 +349,17 @@ public class GameManager : MonoBehaviour
         else val = 0;
         return;
     }
+
+    public void BlockSoulGain(int durationInSeconds)
+    {
+        _soulGainBlocked.Value = true;
+        CoroutineExtensions.InvokeActionAfterSeconds(SoulGainUnblockAction, durationInSeconds);
+    }
+
+    ///<summary>
+    ///Unblocks soul aquisition.
+    ///</summary>
+    private void UnblockSoulGain() => _soulGainBlocked.Value = false;
 
     //Updates the amount of lewd points
     //updates whenever the amount of cards in the player inventory changes
