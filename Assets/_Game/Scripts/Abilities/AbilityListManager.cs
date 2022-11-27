@@ -25,7 +25,13 @@ namespace _Game.Scripts.Abilities
         
         #region Methods
         public int GetNextAbilityId() => _nextAbilityId;
-        public void IncreaseNextAbilityId() => _nextAbilityId++;
+        public void IncreaseNextAbilityId()
+        {
+            _nextAbilityId++;
+            #if UNITY_EDITOR
+            AssetDatabase.SaveAssets();
+            #endif
+        }
 
         ///<summary>
         ///Searches for the Ability with the corresponding ID.
@@ -45,7 +51,7 @@ namespace _Game.Scripts.Abilities
 
         #if UNITY_EDITOR
         [ContextMenu("Increase Next Ability ID")]
-        private void DebugIncreaseNextAbilityId() => _nextAbilityId++;
+        private void DebugIncreaseNextAbilityId() => IncreaseNextAbilityId();
 
         [CustomEditor(typeof(AbilityListManager))]
         public class AbilityListManagerEditor : Editor

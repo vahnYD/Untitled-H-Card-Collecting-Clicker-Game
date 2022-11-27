@@ -126,6 +126,134 @@ MonoBehaviour:
   _coinLockoutDuration: 0
   _soulLockout: 0
   _soulLockoutDuration: 0
+--- !u!114 &-2754771076664763094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b16baa35ccf4a784f836df4e0ef7e8dc, type: 3}
+  m_Name: Flat Soul Gain #1
+  m_EditorClassIdentifier: 
+  _abilityLevelList: {fileID: 11400000}
+  _id: 15
+  _name: Flat Soul Gain #1
+  _abilityText: 'Gain {4} Souls.
+
+    Cooldown: 4 hours'
+  _maxLevel: 0
+  _cooldownInSec: 14400
+  CooldownInSec: 0
+  _baseUpgradeCost: 0
+  _upgradeCostMultAdditivePart: 0
+  _upgradeCostMultMultiplicativePart: 0
+  _effectMultPerLevel: 0
+  _overwriteEffectMultipliers: 0
+  _effectMultPerLevelOverwrites: []
+  _coinGainEffect: 0
+  _coinGain: 0
+  _coinPerClickIncrease: 0
+  _coinPerClickIncreaseManual: 0
+  _coinPerClickDuration: 0
+  _coinEffectIgnoresLevel: 0
+  _soulGainEffect: 1
+  _soulGain: 2000
+  _soulPerClickGain: 0
+  _soulPerClickGainManual: 0
+  _soulPerClickDuration: 0
+  _soulEffectIgnoresLevel: 0
+  _drawCards: 0
+  _drawCardsAmount: 0
+  _drawEffectIgnoresLevel: 0
+  _deckSearch: 0
+  _deckSearchAmount: 0
+  _deckSearchAmountIgnoresLevel: 0
+  _deckSearchByProperty: 0
+  _propertyToSearchDeck: 0
+  _nameToSearchDeck: 
+  _typeToSearchDeck: 0
+  _rarityToSearchDeck: 0
+  _graveSearch: 0
+  _graveSearchAmount: 0
+  _graveSearchAmountIgnoresLevel: 0
+  _graveSearchByProperty: 0
+  _propertyToSearchGrave: 0
+  _nameToSearchGrave: 
+  _typeToSearchGrave: 0
+  _rarityToSearchGrave: 0
+  _returnCardsFromHand: 0
+  _amountOfCardsToReturnHand: 0
+  _returnFromHandAmountIgnoresLevel: 0
+  _returnCardsByPropertyHand: 0
+  _propertyReturnCardsHand: 0
+  _nameReturnCardsHand: 
+  _typeReturnCardsHand: 0
+  _rarityReturnCardsHand: 0
+  _returnCardsFromGrave: 0
+  _amountOfCardsToReturnGrave: 0
+  _returnFromGraveAmountIgnoresLevel: 0
+  _returnCardsByPropertyGrave: 0
+  _propertyReturnCardsGrave: 0
+  _nameReturnCardsGrave: 
+  _typeReturnCardsGrave: 0
+  _rarityReturnCardsGrave: 0
+  _sendGraveHand: 0
+  _amountToSendGraveHand: 0
+  _sendFromHandAmountIgnoresLevel: 0
+  _sendGraveByPropertyHand: 0
+  _propertyToSendGraveHand: 0
+  _nameToSendGraveHand: 
+  _typeToSendGraveHand: 0
+  _rarityToSendGraveHand: 0
+  _sendGraveDeck: 0
+  _amountToSendGraveDeck: 0
+  _sendFromDeckAmountIgnoresLevel: 0
+  _sendGraveByPropertyDeck: 0
+  _propertyToSendGraveDeck: 0
+  _nameToSendGraveDeck: 
+  _typeToSendGraveDeck: 0
+  _rarityToSendGraveDeck: 0
+  _cooldownReduction: 0
+  _amountCardsCooldownReduction: 0
+  _cdReductionCardAmountIgnoresLevel: 0
+  _amountReductionCooldownReduction: 0
+  _flatCooldownReduction: 0
+  _cdReductionReductionAmountIgnoresLevel: 0
+  _cooldownReductionByProperty: 0
+  _propertyCooldownReduction: 0
+  _nameCooldownReduction: 
+  _typeCooldownReduction: 0
+  _rarityCooldownReduction: 0
+  _manipulateGachaPullCost: 0
+  _gachaPullCostChange: 0
+  _gachaPullCostChangeIsFlat: 0
+  _blockOtherGachaCostChanges: 0
+  _gachaPullCostChangeAmountIgnoresLevel: 0
+  _destroyCards: 0
+  _amountOfCardsToDestroy: 0
+  _destroyAmountIgnoresLevel: 0
+  _destroyCardsByProperty: 0
+  _propertyDestroyCards: 0
+  _nameDestroyCards: 
+  _typeDestroyCards: 0
+  _rarityDestroyCards: 0
+  _gainStars: 0
+  _gainStarsAmount: 0
+  _starAmountIgnoresLevel: 0
+  _gainAutoclicker: 0
+  _autoclickerDuration: 0
+  _autoclickerDurationIgnoresLevel: 0
+  _minimumCardAmount: 0
+  _minimumCardAmountValue: 0
+  _minimumCardAmountPlace: 0
+  _minimumCardAmountLessOrEqual: 0
+  _coinLockout: 0
+  _coinLockoutDuration: 0
+  _soulLockout: 0
+  _soulLockoutDuration: 0
 --- !u!114 &-2547480010942536960
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,6 +528,7 @@ MonoBehaviour:
   - {fileID: -2326079435710305418}
   - {fileID: 3306894628660691661}
   - {fileID: -3831180872251618590}
+  - {fileID: -2754771076664763094}
   _level: 0
 --- !u!114 &3306894628660691661
 MonoBehaviour:
@@ -684,7 +813,7 @@ MonoBehaviour:
   _overwriteEffectMultipliers: 0
   _effectMultPerLevelOverwrites: []
   _coinGainEffect: 1
-  _coinGain: 200
+  _coinGain: 999
   _coinPerClickIncrease: 0
   _coinPerClickIncreaseManual: 0
   _coinPerClickDuration: 0

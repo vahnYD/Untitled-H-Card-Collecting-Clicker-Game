@@ -102,6 +102,82 @@ MonoBehaviour:
   - {fileID: -4312921976915214306, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
   _cardArt:
   - {fileID: 21300000, guid: e742840b769cde54cb01603a2af46251, type: 3}
+--- !u!114 &-5956992743511267020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Masturbation Habits
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 28
+  _name: Masturbation Habits
+  _rarity: 0
+  _soulValue: 1
+  _type: 7
+  _strength: 1
+  _flavourText: It's the beginning ~! Every girls have this before going further
+    !
+  _hasAbility: 0
+  _abilities: []
+  _cardArt:
+  - {fileID: 21300000, guid: 97e0a5fa13c405144bc1d2216aed4fff, type: 3}
+--- !u!114 &-5235942518440873250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: All Dolled Up!
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 27
+  _name: All Dolled Up!
+  _rarity: 2
+  _soulValue: 775
+  _type: 7
+  _strength: 123
+  _flavourText: "In a Daze~\u2665 Doing everything her Master wants, a Doll to be
+    played with~\u2665"
+  _hasAbility: 1
+  _abilities:
+  - {fileID: 8176826924068476654, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: 949dc74b13a09404d9391281ad1d1840, type: 3}
+--- !u!114 &-5192461388709971841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Invitation
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 29
+  _name: Invitation
+  _rarity: 0
+  _soulValue: 1
+  _type: 4
+  _strength: 1
+  _flavourText: When a girl is wearing her sluttiest clothes, it's easy to get a
+    fuck buddy for that night~!
+  _hasAbility: 0
+  _abilities: []
+  _cardArt:
+  - {fileID: 21300000, guid: bf8f0eaff7fb0b8409abcf4c6e754fe7, type: 3}
 --- !u!114 &-4974392921973857802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -153,6 +229,32 @@ MonoBehaviour:
   _cardArt:
   - {fileID: 21300000, guid: 9ce8cfcc0fc90764e9c7ed21e3b29f0d, type: 3}
   - {fileID: 21300000, guid: 9aa3ae74643a9f94db4cd27d12852eb7, type: 3}
+--- !u!114 &-4673793825601844249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Convenient Inconvenience~!
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 24
+  _name: Convenient Inconvenience~!
+  _rarity: 1
+  _soulValue: 23
+  _type: 1
+  _strength: 9
+  _flavourText: Magic sure is Convenient! Well, do it wrong and you'll gain an Inconvenient
+    body Mod, though! But well, after some time passes, it will feel so right~!
+  _hasAbility: 1
+  _abilities:
+  - {fileID: 4824392237579830697, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: 9e0c86cf48d8a9c4284882754d50f222, type: 3}
 --- !u!114 &-4508065770648686317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,7 +439,42 @@ MonoBehaviour:
   - {fileID: 4710586066954710568}
   - {fileID: -8867498541548335898}
   - {fileID: -1729417494702569}
-  _nextCardId: 21
+  - {fileID: 202921256907493467}
+  - {fileID: 6960972160577825018}
+  - {fileID: 4519793511493223015}
+  - {fileID: -4673793825601844249}
+  - {fileID: 3264877731164281564}
+  - {fileID: 4596298373642014360}
+  - {fileID: -5235942518440873250}
+  - {fileID: -5956992743511267020}
+  - {fileID: -5192461388709971841}
+  _nextCardId: 30
+--- !u!114 &202921256907493467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Typical Turning Method
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 21
+  _name: Typical Turning Method
+  _rarity: 1
+  _soulValue: 25
+  _type: 5
+  _strength: 7
+  _flavourText: "Going Evil? Well define evil~\u2665 I think becoming a girl that
+    will be servicing all the boys she knows is angelic if anything!"
+  _hasAbility: 1
+  _abilities:
+  - {fileID: -2754771076664763094, guid: bf5b20ea76f0c9e43825b90d7aea2fa7, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: d0fe647cdbfdaf543ae6c6e5aa0677ec, type: 3}
 --- !u!114 &2672940387337006536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,6 +501,58 @@ MonoBehaviour:
   - {fileID: -2326079435710305418, guid: bf5b20ea76f0c9e43825b90d7aea2fa7, type: 2}
   _cardArt:
   - {fileID: 21300000, guid: b96ceb2662927fb4f9254832603426b6, type: 3}
+--- !u!114 &3264877731164281564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: "What to learn in Class\u2665"
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 25
+  _name: "What to learn in Class\u2665"
+  _rarity: 1
+  _soulValue: 23
+  _type: 8
+  _strength: 9
+  _flavourText: There is a lot of stuff to learn in School. One of them is about
+    the greatness and worship of Dicks, and Pussies, Tits. All sorts of lewd things!
+  _hasAbility: 1
+  _abilities:
+  - {fileID: -6509763678397353457, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: 5a9a9e5b2c7f0104598e8c24e994a2eb, type: 3}
+--- !u!114 &4519793511493223015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: "Before the Main Dish~\u2665"
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 23
+  _name: "Before the Main Dish~\u2665"
+  _rarity: 1
+  _soulValue: 40
+  _type: 7
+  _strength: 5
+  _flavourText: Foreplay means doing eeeeeverything your man asks you to! Being the
+    perfect slut is the answer to get rough sex!
+  _hasAbility: 1
+  _abilities:
+  - {fileID: -5693688238051127472, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: a32e71082791b1b49b87eb44b5223a97, type: 3}
 --- !u!114 &4530136483354128289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -390,6 +579,32 @@ MonoBehaviour:
   - {fileID: -3156666908429262385, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
   _cardArt:
   - {fileID: 21300000, guid: 44de2aaea5a2cf04c980dd1ac3762399, type: 3}
+--- !u!114 &4596298373642014360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Lick pet
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 26
+  _name: Lick pet
+  _rarity: 2
+  _soulValue: 800
+  _type: 6
+  _strength: 169
+  _flavourText: Some Apps are magical at turning Straight gals into pussy worshipping
+    pets! Dunno how these apps are being made, though?
+  _hasAbility: 1
+  _abilities:
+  - {fileID: 6124840364932940303, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: 56e6e9ca9d1ae4743bdc96fb628a2f99, type: 3}
 --- !u!114 &4710586066954710568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,6 +707,32 @@ MonoBehaviour:
   - {fileID: -8287521344627039553, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
   _cardArt:
   - {fileID: 21300000, guid: f4f975da2ef26cb4b99eff4dd8c9a33a, type: 3}
+--- !u!114 &6960972160577825018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c9a7ef5c30fc7141998762c4cb1ad30, type: 3}
+  m_Name: Slimy Fun!
+  m_EditorClassIdentifier: 
+  _cardList: {fileID: 11400000}
+  _id: 22
+  _name: Slimy Fun!
+  _rarity: 1
+  _soulValue: 22
+  _type: 5
+  _strength: 6
+  _flavourText: Having slimes entering your brain feels waaaay better than drugged
+    up sex! Really!
+  _hasAbility: 1
+  _abilities:
+  - {fileID: -907825529456648217, guid: f51393552ccda7a4f9f057e7e2c0a361, type: 2}
+  _cardArt:
+  - {fileID: 21300000, guid: cedb5d00566fd6a42936abc92d4318d4, type: 3}
 --- !u!114 &7819064613863038480
 MonoBehaviour:
   m_ObjectHideFlags: 0

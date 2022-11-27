@@ -44,7 +44,7 @@ namespace _Game.Scripts.Abilities
         //Possible Ability Effects
         //Coin Gain
         [SerializeField] private bool _coinGainEffect;
-        [SerializeField, Min(0)] private int _coinGain;
+        [SerializeField] private int _coinGain;
         [SerializeField, Min(0), Tooltip("Increases both Manual and Normal")] private float _coinPerClickIncrease;
         [SerializeField, Min(0), Tooltip("Increases only Manual")] private float _coinPerClickIncreaseManual;
         [SerializeField, Min(0), Tooltip("0 => Infinite Duration")] private int _coinPerClickDuration;
@@ -370,7 +370,14 @@ namespace _Game.Scripts.Abilities
                 if(_coinGain > 0)
                 {
                     int coinGainPostMult = (_maxLevel < 2 || _coinEffectIgnoresLevel) ? _coinGain : CalculateEffectForLevel(_coinGain, level);
-                    ability.Enqueue(()=>gameManager.AddCoins(coinGainPostMult));
+                    if(coinGainPostMult > 0)
+                    {
+                        ability.Enqueue(()=>gameManager.AddCoins(coinGainPostMult));
+                    }
+                    else
+                    {
+                        ability.Enqueue(()=>gameManager.RemoveCoins(coinGainPostMult));
+                    }
                 }
 
                 if(_coinPerClickIncrease > 0)
