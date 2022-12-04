@@ -11,6 +11,7 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using BreakInfinity;
 using _Game.Scripts.Cards;
 using _Game.Scripts.Extensions;
 using _Game.Scripts.UI;
@@ -35,8 +36,8 @@ public class GameManager : MonoBehaviour
     private Action ReduceCoinsPerClickManualAction;
     [SerializeField] private BoolValue _coinGainBlocked;
     private Action CoinGainUnblockAction;
-    [SerializeField] private LongValue _coinAmount;
-    public long CoinTotal => _coinAmount.Value;
+    [SerializeField] private BigDoubleValue _coinAmount;
+    public BigDouble CoinTotal => _coinAmount.Value;
     [SerializeField] private long _totalCoinsEarned;
 
     private int _currentClickSoulAmount = 0;
@@ -80,15 +81,13 @@ public class GameManager : MonoBehaviour
     public bool FirstRoundGachaCapReached => _reachedFirstRoundCap.Value;
     [SerializeField] private BoolValue _tenPullDisabled;
     public bool isTenPullDisabled => _tenPullDisabled.Value;
-    [SerializeField] private int _totalGachaPullAmount;
-    public int TotalGachaPullAmount => _totalGachaPullAmount;
-    [SerializeField] private IntValue _gachaPullCost;
-    [SerializeField] private IntValue _gachaPullCost10;
-    [SerializeField] private BoolValue _gachaCostIsModified;
-    [SerializeField] private BoolValue _gachaCostChangesAreBlocked;
+    [SerializeField] private BigDoubleValue _totalGachaPullAmount;
+    public BigDouble TotalGachaPullAmount => _totalGachaPullAmount.Value;
+    [SerializeField] private ModifiableBigDoubleValue _gachaPullCost;
+    [SerializeField] private ModifiableBigDoubleValue _gachaPullCost10;
     [SerializeField] private BoolValue _starWasUsed;
     private bool StarWasUsed => _starWasUsed.Value;
-    public bool GachaCostChangesAreBlocked => _gachaCostChangesAreBlocked.Value;
+    public bool GachaCostChangesAreBlocked => !_gachaPullCost.isModifiable;
 	#endregion
 
     #region Events
@@ -111,7 +110,7 @@ public class GameManager : MonoBehaviour
         }
 
         #if UNITY_EDITOR
-        if(_cardList is null || _gameSettings is null || _coinAmount is null || _soulAmount is null || _lewdPointAmount is null || _crystalAmount is null || _starAmount is null || _devilTearAmount is null || _drawIsBlocked is null || _deckModifyIsBlocked is null || _firstRound is null || _reachedFirstRoundCap is null || _tenPullDisabled is null || _gachaPullCost is null || _gachaPullCost10 is null || _gachaCostIsModified is null || _gachaCostChangesAreBlocked is null || _starWasUsed is null)
+        if(_cardList is null || _gameSettings is null || _coinAmount is null || _soulAmount is null || _lewdPointAmount is null || _crystalAmount is null || _starAmount is null || _devilTearAmount is null || _drawIsBlocked is null || _deckModifyIsBlocked is null || _firstRound is null || _reachedFirstRoundCap is null || _tenPullDisabled is null || _gachaPullCost is null || _gachaPullCost10 is null || _starWasUsed is null)
             Debug.LogWarning("Game Manager is missing Object References");
         #endif
 
@@ -219,7 +218,7 @@ public class GameManager : MonoBehaviour
     ///Removes the specified amount of coins.
     ///Possessed coin amount can't fall below 0.
     ///</summary>
-    public void RemoveCoins(int coins)
+    public void RemoveCoins(BigDouble coins)
     {
         if(_coinAmount.Value - coins <= 0)
         {
@@ -757,7 +756,18 @@ public class GameManager : MonoBehaviour
         int amount = (isTenPull) ? 10 : 1;
 
         //removes pull cost from coin total for the given amount
-        RemoveCoins((isTenPull) ? _gachaPullCost10.Value : _gachaPullCost.Value);
+        if(!isTenPull)
+        {
+            RemoveCoins(_gachaPullCost.ModifiedValue);
+            if(!_gachaPullCost.isModifiable) _gachaPullCost.UnblockModification();
+            _gachaPullCost.ClearModification();
+        }
+        else
+        {
+            RemoveCoins(_gachaPullCost10.ModifiedValue);
+            if(!_gachaPullCost10.isModifiable) _gachaPullCost10.UnblockModification();
+            _gachaPullCost10.ClearModification();
+        }
 
         //rolls cards and saves them in a dictionary
         Dictionary<CardInstance, bool> pulledCards = new Dictionary<CardInstance, bool>();
@@ -774,12 +784,12 @@ public class GameManager : MonoBehaviour
         }
 
         //increases gacha pull count
-        _totalGachaPullAmount += amount;
+        _totalGachaPullAmount.Value += amount;
 
         //triggers potential bool flags
-        if(_totalGachaPullAmount > 10) _tenPullDisabled.Value = false;
-        if(_firstRound && _totalGachaPullAmount > _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1] -10) _tenPullDisabled.Value = true;
-        if(_firstRound && _totalGachaPullAmount >= _gameSettings.GachaPullCostIncreaseReductionUpperBounds[_gameSettings.GachaPullCostIncreaseReductionUpperBounds.Count-1]) _reachedFirstRoundCap.Value = true;
+        if(_totalGachaPullAmount.Value > 10) _tenPullDisabled.Value = false;
+        if(_firstRound && _totalGachaPullAmount.Value > 500 -10) _tenPullDisabled.Value = true;
+        if(_firstRound && _totalGachaPullAmount.Value >= 500) _reachedFirstRoundCap.Value = true;
 
         //recalcs gacha pull cost and lewd point amount
         UpdateGachaPullCost(isTenPull);
@@ -795,74 +805,34 @@ public class GameManager : MonoBehaviour
     ///<param name="isTenPull">Optional. Bool flag to set if single pull cost updating needs to account for a single or for ten recently pulled cards. Defaults to false.</param>
     private void UpdateGachaPullCost(bool isTenPull = false)
     {
-        List<int> bounds = _gameSettings.GachaPullCostIncreaseReductionUpperBounds;
-        List<float> mults = _gameSettings.GachaPullCostIncreaseReductions;
         int counter = (isTenPull) ? 10 : 1;
-        int singleCost = _gachaPullCost.Value;
+        BigDouble singleCost = _gachaPullCost.OriginalValue;
 
         //updates single cost
         for(int i = 0; i < counter; i++)
         {
-            singleCost = _gachaPullCost.Value;
-            _gachaPullCost.Value = CalcGachaCost(singleCost, bounds, mults);
+            singleCost = _gachaPullCost.OriginalValue;
+            _gachaPullCost.OverwriteOriginalValue( CalcGachaCost() );
         }
 
 
         //updates 10-pull cost
-        int cost = _gachaPullCost.Value;
+        BigDouble cost = _gachaPullCost.OriginalValue;
         for(int i = 1; i < 10; i++)
         {
-            singleCost = CalcGachaCost(singleCost, bounds, mults, i);
+            singleCost = CalcGachaCost(i);
             cost += singleCost;
         }
-        _gachaPullCost10.Value = cost;
+        _gachaPullCost10.OverwriteOriginalValue(cost);
     }
 
-
-    //TODO redo gacha cost calc with new number class to make the correct scaling possible
-
-    private int CalcGachaCost(int singlePullCost, List<int> bounds, List<float> mults, int pullIncrease = 0)
+    private BigDouble CalcGachaCost(int pullIncrease = 0)
     {
-        if(singlePullCost is 0) singlePullCost = _gameSettings.BaseGachaPullCost;
-        float incrementMult = 1f;
-        bool multSet = false;
-        for(int i = 0; i < mults.Count - 1; i++)
-        {
-            if(i >= bounds.Count) break;
-            if(_totalGachaPullAmount+pullIncrease < bounds[i])
-            {
-                incrementMult = mults[i];
-                multSet = true;
-                break;
-            }
-        }
-        if(!multSet && _firstRound) incrementMult = mults[mults.Count - 1];
-        singlePullCost =  Mathf.FloorToInt(singlePullCost + (_totalGachaPullAmount+pullIncrease) * (_gameSettings.BaseGachaPullIncrement * incrementMult));
-        return singlePullCost;
-    }
-
-    //! Deprecated 
-    private int CalcGachaCostRecursive(int counter, List<int> bounds, List<float> mults)
-    {
-        if(counter <= 0)
-            return _gameSettings.BaseGachaPullCost;
-
-        float incrementMult = 1f;
-        bool multSet = false;
-        for(int i = 0; i < mults.Count - 1; i++)
-        {
-            if(i >= bounds.Count) break;
-            if(counter < bounds[i])
-            {
-                incrementMult = mults[i];
-                multSet = true;
-                break;
-            }
-        }
-        if(!multSet && _firstRound) incrementMult = mults[mults.Count - 1];
-
-        int output = Mathf.FloorToInt(CalcGachaCostRecursive(counter - 1, bounds, mults) + (counter * (_gameSettings.BaseGachaPullIncrement * incrementMult)));
-        return output;
+        BigDouble pullCount = _totalGachaPullAmount.Value +1 +pullIncrease;
+        return BigDouble.Add(
+            pullCount * 3,
+            pullCount * (BigDouble.Pow(pullCount, 1+(pullCount * 0.00069))/14)
+        ).Floor() + 7;
     }
 
     ///<summary>
@@ -876,17 +846,18 @@ public class GameManager : MonoBehaviour
     public void ModifyGachaCost(float amount = 0.5f, bool isFlat = false, bool isBlocking = false, bool starWasUsed = false)
     {
         if(starWasUsed is true && _starWasUsed.Value is true) return;
-        if(_gachaCostChangesAreBlocked) return;
+        if(!_gachaPullCost.isModifiable || (starWasUsed && !_gachaPullCost10.isModifiable)) return;
 
-        if(!isFlat && !starWasUsed) _gachaPullCost.Value = Mathf.RoundToInt(_gachaPullCost.Value + (_gachaPullCost.Value * amount));
-        else if(!starWasUsed) _gachaPullCost.Value += Mathf.RoundToInt(amount);
+        if(starWasUsed is false)
+        {
+            _gachaPullCost.ModifyValue(amount, isFlat);
 
-        if(isBlocking) _gachaCostChangesAreBlocked.Value = true;
-
-        if(starWasUsed is true)
+            if(isBlocking) _gachaPullCost.BlockModification();
+        }
+        else
         {
             _starWasUsed.Value = true;
-            _gachaPullCost10.Value = Mathf.RoundToInt(_gachaPullCost10.Value * 0.5f);
+            _gachaPullCost10.ModifyValue(0.5f);
         }
     }
 

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using BreakInfinity;
 using _Game.Scripts.Extensions;
 using _Game.Scripts.Cards;
 
@@ -25,9 +26,9 @@ namespace _Game.Scripts.UI
         [SerializeField] private Button _closeGachaPullsButton = null;
         [SerializeField] private BoolValue _reachedFirstRoundCapFlag = null;
         [SerializeField] private BoolValue _tenPullDisabledFlag = null;
-        [SerializeField] private LongValue _coinAmount = null;
-        [SerializeField] private IntValue _singlePullCost = null;
-        [SerializeField] private IntValue _tenPullCost = null;
+        [SerializeField] private BigDoubleValue _coinAmount = null;
+        [SerializeField] private ModifiableBigDoubleValue _singlePullCost = null;
+        [SerializeField] private ModifiableBigDoubleValue _tenPullCost = null;
         [SerializeField] private GachaPullDuplicateAnimationHandler[] _displayTenGachaPullsCoordinates;
         [SerializeField] private GachaPullDuplicateAnimationHandler _displaySingleGachaPullCoordinate;
         [SerializeField] private float _singlePullScaleMult = 2f;
@@ -106,26 +107,26 @@ namespace _Game.Scripts.UI
         #endregion
         
         #region Methods
-        private void CatchCoinAmountChange(long newVal)
+        private void CatchCoinAmountChange(BigDouble newVal)
         {
-            if(newVal >= _singlePullCost.Value && !_reachedFirstRoundCapFlag.Value && !_buttonGachaLock) _singlePullButton.interactable = true;
+            if(newVal >= _singlePullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value && !_buttonGachaLock) _singlePullButton.interactable = true;
             else _singlePullButton.interactable = false;
 
-            if(newVal >= _tenPullCost.Value && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag && !_buttonGachaLock) _tenPullButton.interactable = true;
+            if(newVal >= _tenPullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag && !_buttonGachaLock) _tenPullButton.interactable = true;
             else _tenPullButton.interactable = false;
         }
 
         private void CatchFirstRoundCapFlag(bool newVal)
         {
-            if(_coinAmount.Value > _singlePullCost.Value && !newVal && !_buttonGachaLock) _singlePullButton.interactable = true;
+            if(_coinAmount.Value > _singlePullCost.ModifiedValue && !newVal && !_buttonGachaLock) _singlePullButton.interactable = true;
             else _singlePullButton.interactable = false;
-            if(_coinAmount.Value > _tenPullCost.Value && !_tenPullDisabledFlag.Value && !newVal && !_buttonGachaLock) _tenPullButton.interactable = true;
+            if(_coinAmount.Value > _tenPullCost.ModifiedValue && !_tenPullDisabledFlag.Value && !newVal && !_buttonGachaLock) _tenPullButton.interactable = true;
             else _tenPullButton.interactable = false; 
         }
 
         private void CatchTenPullDisabledFlag(bool newVal)
         {
-            if(_coinAmount.Value > _tenPullCost.Value && !_reachedFirstRoundCapFlag.Value && !newVal && !_buttonGachaLock) _tenPullButton.interactable = true;
+            if(_coinAmount.Value > _tenPullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value && !newVal && !_buttonGachaLock) _tenPullButton.interactable = true;
             else _tenPullButton.interactable = false;
         }
 
@@ -215,8 +216,8 @@ namespace _Game.Scripts.UI
             }
 
             _buttonGachaLock = false;
-            if(_coinAmount.Value > _singlePullCost.Value && !_reachedFirstRoundCapFlag.Value) _singlePullButton.interactable = true;
-            if(_coinAmount.Value > _tenPullCost.Value && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag.Value) _tenPullButton.interactable = true;
+            if(_coinAmount.Value > _singlePullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value) _singlePullButton.interactable = true;
+            if(_coinAmount.Value > _tenPullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag.Value) _tenPullButton.interactable = true;
         }
 
         ///<summary>

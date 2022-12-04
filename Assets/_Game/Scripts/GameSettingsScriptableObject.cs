@@ -44,14 +44,6 @@ public class GameSettingsScriptableObject : ScriptableObject
     //Gacha Settings
     [SerializeField] private List<float> _gachaPullWeights;
     public List<float> GachaPullWeights => _gachaPullWeights;
-    [SerializeField, Min(0)] private int _baseGachaPullCost;
-    public int BaseGachaPullCost => _baseGachaPullCost;
-    [SerializeField, Min(0)] private float _baseGachaPullIncrement;
-    public float BaseGachaPullIncrement => _baseGachaPullIncrement;
-    [SerializeField] private List<int> _gachaPullCostIncreaseReductionUpperBounds = new List<int>();
-    public List<int> GachaPullCostIncreaseReductionUpperBounds => _gachaPullCostIncreaseReductionUpperBounds;
-    [SerializeField] private List<float> _gachaPullCostIncreaseReductions = new List<float>();
-    public List<float> GachaPullCostIncreaseReductions => _gachaPullCostIncreaseReductions;
     [SerializeField, Tooltip("In order from top to bottom: Common, Rare, Very Rare, Special.")] private List<int> _cardDismantleCrystalValues = new List<int>(4);
     public List<int> CardDismantleCrystalValues => _cardDismantleCrystalValues;
     [SerializeField, Min(0)] private int _crystalsPerStar;
@@ -96,10 +88,6 @@ public class GameSettingsScriptableObject : ScriptableObject
 
         //Gacha
         SerializedProperty _spGachaPullWeights;
-        SerializedProperty _spBaseGachaPullCost;
-        SerializedProperty _spBaseGachaPullIncrement;
-        SerializedProperty _spGachaPullCostIncreaseReductions;
-        SerializedProperty _spGachaPullCostIncreaseReductionUpperBounds;
         SerializedProperty _spCardDismantleCrystalValues;
         SerializedProperty _spCrystalsPerStar;
 
@@ -135,10 +123,6 @@ public class GameSettingsScriptableObject : ScriptableObject
 
             //Gacha
             _spGachaPullWeights = serializedObject.FindProperty("_gachaPullWeights");
-            _spBaseGachaPullCost = serializedObject.FindProperty("_baseGachaPullCost");
-            _spBaseGachaPullIncrement = serializedObject.FindProperty("_baseGachaPullIncrement");
-            _spGachaPullCostIncreaseReductions = serializedObject.FindProperty("_gachaPullCostIncreaseReductions");
-            _spGachaPullCostIncreaseReductionUpperBounds = serializedObject.FindProperty("_gachaPullCostIncreaseReductionUpperBounds");
             _spCardDismantleCrystalValues = serializedObject.FindProperty("_cardDismantleCrystalValues");
             _spCrystalsPerStar = serializedObject.FindProperty("_crystalsPerStar");
 
@@ -202,16 +186,6 @@ public class GameSettingsScriptableObject : ScriptableObject
             if(_showGachaSettings)
             {
                 EditorGUILayout.PropertyField(_spGachaPullWeights);
-
-                GUILayout.Space(3f);
-                
-                EditorGUILayout.PropertyField(_spBaseGachaPullCost);
-
-                GUILayout.Space(3f);
-
-                EditorGUILayout.PropertyField(_spBaseGachaPullIncrement);
-                EditorGUILayout.PropertyField(_spGachaPullCostIncreaseReductions);
-                EditorGUILayout.PropertyField(_spGachaPullCostIncreaseReductionUpperBounds);
 
                 GUILayout.Space(3f);
 

@@ -5,6 +5,7 @@
  */
 using UnityEngine;
 using TMPro;
+using BreakInfinity;
 using _Game.Scripts.Extensions;
 
 namespace _Game.Scripts.UI
@@ -12,7 +13,7 @@ namespace _Game.Scripts.UI
     public class CurrencyUpdater : MonoBehaviour
     {
         #region Properties
-        [SerializeField] private LongValue _coinAmount = null;
+        [SerializeField] private BigDoubleValue _coinAmount = null;
         [SerializeField] private LongValue _soulAmount = null;
         [SerializeField] private TMP_Text _coinDisplay = null;
         [SerializeField] private TMP_Text _soulDisplay = null;
@@ -35,7 +36,7 @@ namespace _Game.Scripts.UI
             #if UNITY_EDITOR
             if(_coinDisplay != null && _coinAmount != null)
             #endif
-                _coinDisplay.text = _coinAmount.Value.ToString();
+                _coinDisplay.text = (_coinAmount.Value > 999999999) ? _coinAmount.Value.ToString("E4") : _coinAmount.Value.ToString("F0");
 
             #if UNITY_EDITOR
             if(_soulAmount != null && _soulDisplay != null && _soulPercent != null)
@@ -74,7 +75,7 @@ namespace _Game.Scripts.UI
                 _soulAmount.ValueChangedEvent -= UpdateSoulText;
         }
 
-        private void UpdateCoinText(long newVal) => _coinDisplay.text = newVal.ToString();
+        private void UpdateCoinText(BigDouble newVal) => _coinDisplay.text = (newVal > 999999999) ? newVal.ToString("E4") : newVal.ToString("F0");
 
         private void UpdateSoulText(long newVal)
         {

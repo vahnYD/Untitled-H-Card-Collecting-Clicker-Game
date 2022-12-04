@@ -11,11 +11,11 @@ using BreakInfinity;
 
 namespace _Game.Scripts.Extensions
 {
-    [CreateAssetMenu(fileName ="ModifiableBigDoubleValue", menuName ="ScriptableObjects/Values/BigDouble/Modifiable")]
+    [CreateAssetMenu(fileName ="Modifiable BigDouble Value", menuName ="ScriptableObjects/Values/BigDouble/Modifiable", order = 2)]
     public class ModifiableBigDoubleValue : ScriptableObject, ISavable
     {
         #region Properties
-        [SerializeField] private BigDouble _originalValue;
+        [SerializeField] private BigDouble _originalValue = new BigDouble();
         public BigDouble OriginalValue
         {
             get => _originalValue;
@@ -160,5 +160,10 @@ namespace _Game.Scripts.Extensions
         {
             //TODO
         }
+
+        #if UNITY_EDITOR
+        [ContextMenu("Refresh Modified Value")]
+        private void DebugRefreshModifiedValue() => OriginalValue = OriginalValue;
+        #endif
     }
 }

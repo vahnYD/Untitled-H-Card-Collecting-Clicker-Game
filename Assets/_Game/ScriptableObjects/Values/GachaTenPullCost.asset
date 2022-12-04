@@ -9,7 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e51c15a2c4f2db498131c9b252ad061, type: 3}
-  m_Name: GachaCostChangesAreBlockedFlag
+  m_Script: {fileID: 11500000, guid: fa07fbb2b7417794fa2a2827b34e2051, type: 3}
+  m_Name: GachaTenPullCost
   m_EditorClassIdentifier: 
-  _value: 0
+  _originalValue:
+    mantissa: 0
+    exponent: 0
+  _oVStatic: 0
+  _strictlyPositive: 0
+  _modifiedValue:
+    mantissa: 0
+    exponent: 0
+  _isModifiable: 0

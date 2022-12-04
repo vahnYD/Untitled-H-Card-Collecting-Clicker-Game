@@ -18,7 +18,7 @@ namespace _Game.Scripts.UI
         public static CardViewManager Instance {get; private set;}
 
         #region Properties
-        [SerializeField] private SpriteList _rarityIcons = null;
+        [SerializeField] private SpriteListCard _rarityIcons = null;
         [Space(3f)]
         [SerializeField] private Transform _cardViewWindowTransform = null;
         [SerializeField] private Transform _cardGuiTransform = null;
@@ -80,19 +80,19 @@ namespace _Game.Scripts.UI
             switch(card.CardRef.Rarity)
             {
                 case Card.CardRarity.Common:
-                    _cardRarityImageComponent.sprite = _rarityIcons[0];
+                    _cardRarityImageComponent.sprite = _rarityIcons.RaritySprites.Common;
                     break;
                 
                 case Card.CardRarity.Rare:
-                    _cardRarityImageComponent.sprite = _rarityIcons[1];
+                    _cardRarityImageComponent.sprite = _rarityIcons.RaritySprites.Rare;
                     break;
 
                 case Card.CardRarity.VeryRare:
-                    _cardRarityImageComponent.sprite = _rarityIcons[2];
+                    _cardRarityImageComponent.sprite = _rarityIcons.RaritySprites.VeryRare;
                     break;
 
                 case Card.CardRarity.Special:
-                    _cardRarityImageComponent.sprite = _rarityIcons[3];
+                    _cardRarityImageComponent.sprite = _rarityIcons.RaritySprites.Special;
                     break;
             }
             _cardSoulValueTextComponent.text = card.CardRef.SoulValue.ToString();

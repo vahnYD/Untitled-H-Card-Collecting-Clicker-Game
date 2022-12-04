@@ -3505,7 +3505,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 585008617}
   m_HandleRect: {fileID: 585008616}
   m_Direction: 2
-  m_Value: 1.0000004
+  m_Value: 0.9999994
   m_Size: 0.6666667
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3700,7 +3700,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000027598226}
+  m_AnchoredPosition: {x: 0, y: 0.000008676302}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &241217844
@@ -5469,8 +5469,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1641541210}
   m_HandleRect: {fileID: 1641541209}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.9999981
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6714,9 +6714,9 @@ MonoBehaviour:
   _closeGachaPullsButton: {fileID: 588760375}
   _reachedFirstRoundCapFlag: {fileID: 11400000, guid: 70aec117482665c4db3aedd292bde0eb, type: 2}
   _tenPullDisabledFlag: {fileID: 11400000, guid: 2511da5a05a359a4b99f5af3d45ecaa9, type: 2}
-  _coinAmount: {fileID: 11400000, guid: 23720d898ecef0546955c6ed793220d5, type: 2}
+  _coinAmount: {fileID: 11400000, guid: 5e270d148207cdb4586967cc156f86a9, type: 2}
   _singlePullCost: {fileID: 11400000, guid: ca225886563b5e04889f885df6514052, type: 2}
-  _tenPullCost: {fileID: 11400000, guid: ec6ae99ab4d562d42a4f6b7e5dc16db6, type: 2}
+  _tenPullCost: {fileID: 11400000, guid: dabe4c326c2858c4e97f70a7acfb7c40, type: 2}
   _displayTenGachaPullsCoordinates:
   - {fileID: 1986035359}
   - {fileID: 1465651542}
@@ -7422,7 +7422,7 @@ MonoBehaviour:
   _cardList: {fileID: 11400000, guid: 68c4b89f33bc7894b9d2cd4a969c9d75, type: 2}
   _gameSettings: {fileID: 11400000, guid: 732d82a13141b4c4995897cb8d35c7b4, type: 2}
   _coinGainBlocked: {fileID: 11400000, guid: 92347b3742cf0bf4b8d7bdbae8471dd3, type: 2}
-  _coinAmount: {fileID: 11400000, guid: 23720d898ecef0546955c6ed793220d5, type: 2}
+  _coinAmount: {fileID: 11400000, guid: 5e270d148207cdb4586967cc156f86a9, type: 2}
   _totalCoinsEarned: 0
   _soulGainBlocked: {fileID: 11400000, guid: 93d0de33f2b99f04b89958341e326288, type: 2}
   _soulAmount: {fileID: 11400000, guid: 711ac300f4d58674396f1e619bf82d8d, type: 2}
@@ -7443,11 +7443,9 @@ MonoBehaviour:
   _firstRound: {fileID: 11400000, guid: 0aa0e3cd0be0ad845a73d57ab33f5f0d, type: 2}
   _reachedFirstRoundCap: {fileID: 11400000, guid: 70aec117482665c4db3aedd292bde0eb, type: 2}
   _tenPullDisabled: {fileID: 11400000, guid: 2511da5a05a359a4b99f5af3d45ecaa9, type: 2}
-  _totalGachaPullAmount: 0
+  _totalGachaPullAmount: {fileID: 11400000, guid: 9d0d1ac0eeaeeb64eb678ad5b11d936a, type: 2}
   _gachaPullCost: {fileID: 11400000, guid: ca225886563b5e04889f885df6514052, type: 2}
-  _gachaPullCost10: {fileID: 11400000, guid: ec6ae99ab4d562d42a4f6b7e5dc16db6, type: 2}
-  _gachaCostIsModified: {fileID: 11400000, guid: 5e0aefc5126f0a6448da73562084de43, type: 2}
-  _gachaCostChangesAreBlocked: {fileID: 11400000, guid: 71a8847705adef44a819f3e375ac8246, type: 2}
+  _gachaPullCost10: {fileID: 11400000, guid: dabe4c326c2858c4e97f70a7acfb7c40, type: 2}
   _starWasUsed: {fileID: 11400000, guid: 6ca866e31480e164a9f367ffb2e722f2, type: 2}
 --- !u!114 &457908767
 MonoBehaviour:
@@ -7461,7 +7459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0db36cd74ec38dd4d893c2f7d2abc4b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rarityIcons: {fileID: 11400000, guid: 188eae0112becc94e86832c2bb766e79, type: 2}
+  _rarityIcons: {fileID: 11400000, guid: 62f729c9afdfcc94ab97c49c28d70958, type: 2}
   _cardViewWindowTransform: {fileID: 1208625467}
   _cardGuiTransform: {fileID: 1376460312}
   _cardArtImageComponent: {fileID: 1753735569}
@@ -8821,7 +8819,7 @@ MonoBehaviour:
   _crystalAmount: {fileID: 11400000, guid: b7daf589816b0704ea02af15576daf3e, type: 2}
   _starAmount: {fileID: 11400000, guid: 213e47fa61376b24c9fb547b80c04999, type: 2}
   _singleRollCost: {fileID: 11400000, guid: ca225886563b5e04889f885df6514052, type: 2}
-  _tenRollCost: {fileID: 11400000, guid: ec6ae99ab4d562d42a4f6b7e5dc16db6, type: 2}
+  _tenRollCost: {fileID: 11400000, guid: dabe4c326c2858c4e97f70a7acfb7c40, type: 2}
   _crystalText: {fileID: 384455640}
   _starText: {fileID: 702634142}
   _singleRollCostText: {fileID: 853152117}
@@ -11459,7 +11457,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1515093575}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16264,7 +16262,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 163077878}
   m_HandleRect: {fileID: 163077877}
   m_Direction: 2
-  m_Value: 1.0000004
+  m_Value: 1.0000001
   m_Size: 0.5195195
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -17307,8 +17305,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 433335228}
   m_HandleRect: {fileID: 433335227}
   m_Direction: 0
-  m_Value: -0.000061035156
-  m_Size: 0.99822694
+  m_Value: 0
+  m_Size: 0.9982268
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -18249,8 +18247,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2126425962}
   m_HandleRect: {fileID: 2126425961}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.9999934
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -19210,7 +19208,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 558334638}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20621,7 +20619,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0000072983794}
+  m_AnchoredPosition: {x: 0, y: 0.000020834108}
   m_SizeDelta: {x: 0, y: 750}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1283438361
@@ -21727,7 +21725,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 951553929}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -23578,7 +23576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e205b427b9b903f4ebac9d53a0b0c3ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _coinAmount: {fileID: 11400000, guid: 23720d898ecef0546955c6ed793220d5, type: 2}
+  _coinAmount: {fileID: 11400000, guid: 5e270d148207cdb4586967cc156f86a9, type: 2}
   _soulAmount: {fileID: 11400000, guid: 711ac300f4d58674396f1e619bf82d8d, type: 2}
   _coinDisplay: {fileID: 710149182}
   _soulDisplay: {fileID: 681958418}
@@ -23760,7 +23758,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1283438362}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999951
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -24976,7 +24974,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 63172600}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -25238,7 +25236,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 73390618}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -28017,7 +28015,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 986149616}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -28516,7 +28514,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0000029193518}
+  m_AnchoredPosition: {x: 0, y: 0.000045923214}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1889055026
@@ -29536,7 +29534,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1318393321}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -30314,7 +30312,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1403453417}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
