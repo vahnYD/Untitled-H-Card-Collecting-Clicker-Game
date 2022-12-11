@@ -11,12 +11,17 @@ using _Game.Scripts.Cards;
 
 namespace _Game.Scripts.UI
 {
-    public class CardDropPoint : MonoBehaviour, IDropHandler
+    public class CardDropPoint : MonoBehaviour, IDropHandler, IInitializePotentialDragHandler
     {
         public void OnDrop(PointerEventData eventData)
         {
             CardObject_Hand obj = eventData.pointerDrag.GetComponent<CardObject_Hand>();
             obj?.AttemptSkillActivation();
+        }
+
+        public void OnInitializePotentialDrag(PointerEventData eventData)
+        {
+            eventData.useDragThreshold = false;
         }
     }
 }

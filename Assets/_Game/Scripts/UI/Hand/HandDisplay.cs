@@ -53,6 +53,7 @@ namespace _Game.Scripts.UI
         private void OnEnable()
         {
             _drawIsBlockedFlag.ValueChangedEvent += CatchDrawBlock;
+            GameManager.HandsizeChangedEvent += Populate;
             _drawButton?.onClick.AddListener(delegate {DrawCard();});
             _inspectGraveButton?.onClick.AddListener(delegate {InspectGrave();});
         }
@@ -60,6 +61,7 @@ namespace _Game.Scripts.UI
         private void OnDisable()
         {
             _drawIsBlockedFlag.ValueChangedEvent -= CatchDrawBlock;
+            GameManager.HandsizeChangedEvent -= Populate;
             _drawButton?.onClick.RemoveListener(delegate {DrawCard();});
             _inspectGraveButton?.onClick.RemoveListener(delegate {InspectGrave();});
 
@@ -78,7 +80,7 @@ namespace _Game.Scripts.UI
             Populate();
         }
 
-        private async void Populate()
+        private async void Populate(int newVal = 0)
         {
             List<CardInstance> cardsInHand = _gameManager.GetHandList();
             if(cardsInHand.Count is 0 && _displayedCards.Count is 0) return;
@@ -107,7 +109,7 @@ namespace _Game.Scripts.UI
                 CardObject_Hand cardObjComp = cardObject.GetComponent<CardObject_Hand>();
                 RectTransform cardTransform = cardObject.GetComponent<RectTransform>();
                 cardObjComp.Initialise( card, this, _rootCanvas.scaleFactor, () => OnHoverStart(cardTransform), () => OnHoverEnd(cardTransform) );
-                _displayedCards.Add(cardTransform, _displayedCards.Values.Max<int>()+1);
+                _displayedCards.Add(cardTransform, (_displayedCards.Count is 0) ? 1 : _displayedCards.Values.Max<int>()+1);
                 await cardObjComp.Spawn();
                 AdjustCardSpacing();
             }
@@ -158,6 +160,12 @@ namespace _Game.Scripts.UI
 
         private void OnHoverStart(RectTransform hoveredCard)
         {
+            if(_displayedCards.Count is < 6)
+            {
+                hoveredCard.anchoredPosition += new Vector2(0, 5);
+                return;
+            }
+
             int indexHovered = _displayedCards[hoveredCard];
 
             //adjust spacing left and right of hovered index by varying amounts based on distance to hovered card
@@ -198,9 +206,13 @@ namespace _Game.Scripts.UI
             _displayedCards.OrderBy(pair => pair.Value);
             foreach(KeyValuePair<RectTransform, int> pair in _displayedCards)
             {
-                pair.Key.DOLocalMoveX((pair.Value - center) * cardDistance, 0.1f);
-                pair.Key.GetComponent<CardObject_Hand>().SetPositionOffSetX((pair.Value - center) * cardDistance);
-                pair.Key.SetSiblingIndex(pair.Value);
+                CardObject_Hand cardObj = pair.Key.GetComponent<CardObject_Hand>();
+                if(cardObj.isBeingDragged != true)
+                {
+                    pair.Key.DOLocalMove(new Vector2((pair.Value - center) * cardDistance, 0), 0.1f);
+                    cardObj.SetPositionOffSetX((pair.Value - center) * cardDistance, cardDistance/2);
+                    pair.Key.SetSiblingIndex(pair.Value);
+                }
             }
         }
 
@@ -211,7 +223,7 @@ namespace _Game.Scripts.UI
 
         private void DrawCard()
         {
-            _gameManager.DrawCard();
+            _gameManager.DrawCard(3);
         }
 
         private void CatchDrawBlock(bool newVal)

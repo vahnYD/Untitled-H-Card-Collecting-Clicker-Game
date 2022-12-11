@@ -15,7 +15,7 @@ namespace _Game.Scripts.UI
     public class HandDisplayCardPopUp : MonoBehaviour
     {
         #region Properties
-        [SerializeField] private SpriteList _rarityIconList = null;
+        [SerializeField] private SpriteListCard _rarityIconList = null;
         [SerializeField] private TMP_Text _nameText = null;
         [SerializeField] private Image _cardArtImgObj = null;
         [SerializeField] private Image _cardRarityImgObj = null;
@@ -49,7 +49,7 @@ namespace _Game.Scripts.UI
         #region Methods
         public void DisplayCard(CardInstance card)
         {
-            if(_displayedCard.CardArt == card.CardArt) return;
+            if(_displayedCard != null && _displayedCard.CardArt == card.CardArt) return;
             _displayedCard = card;
             _nameText.text = card.Name;
             _typeText.text = Enum.GetName(typeof(Card.CardType),card.CardRef.Type);
@@ -58,16 +58,16 @@ namespace _Game.Scripts.UI
             switch(card.CardRef.Rarity)
             {
                 case Card.CardRarity.Common:
-                    _cardRarityImgObj.sprite = _rarityIconList[0];
+                    _cardRarityImgObj.sprite = _rarityIconList.RaritySprites.Common;
                     break;
                 case Card.CardRarity.Rare:
-                    _cardRarityImgObj.sprite = _rarityIconList[1];
+                    _cardRarityImgObj.sprite = _rarityIconList.RaritySprites.Rare;
                     break;
                 case Card.CardRarity.VeryRare:
-                    _cardRarityImgObj.sprite = _rarityIconList[2];
+                    _cardRarityImgObj.sprite = _rarityIconList.RaritySprites.VeryRare;
                     break;
                 case Card.CardRarity.Special:
-                    _cardRarityImgObj.sprite = _rarityIconList[3];
+                    _cardRarityImgObj.sprite = _rarityIconList.RaritySprites.Special;
                     break;
             }
 
