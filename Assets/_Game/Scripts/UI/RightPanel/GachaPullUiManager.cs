@@ -109,11 +109,23 @@ namespace _Game.Scripts.UI
         #region Methods
         private void CatchCoinAmountChange(BigDouble newVal)
         {
-            if(newVal >= _singlePullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value && !_buttonGachaLock) _singlePullButton.interactable = true;
-            else _singlePullButton.interactable = false;
+            if(newVal >= _singlePullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value && !_buttonGachaLock)
+            {
+                _singlePullButton.interactable = true;
+            }
+            else
+            {
+                _singlePullButton.interactable = false;
+            }
 
-            if(newVal >= _tenPullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag && !_buttonGachaLock) _tenPullButton.interactable = true;
-            else _tenPullButton.interactable = false;
+            if(newVal >= _tenPullCost.ModifiedValue && !_reachedFirstRoundCapFlag.Value && !_tenPullDisabledFlag.Value && !_buttonGachaLock)
+            {
+                _tenPullButton.interactable = true;
+            }
+            else 
+            {
+                _tenPullButton.interactable = false;
+            }
         }
 
         private void CatchFirstRoundCapFlag(bool newVal)

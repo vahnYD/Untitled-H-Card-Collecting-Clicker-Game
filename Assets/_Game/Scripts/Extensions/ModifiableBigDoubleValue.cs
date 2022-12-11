@@ -15,7 +15,7 @@ namespace _Game.Scripts.Extensions
     public class ModifiableBigDoubleValue : ScriptableObject, ISavable
     {
         #region Properties
-        [SerializeField] private BigDouble _originalValue = new BigDouble();
+        [SerializeField] private BigDouble _originalValue = new BigDouble(1f);
         public BigDouble OriginalValue
         {
             get => _originalValue;
@@ -35,7 +35,7 @@ namespace _Game.Scripts.Extensions
         public bool CanBeNegative => !_strictlyPositive;
 
         [Space]
-        [SerializeField] private BigDouble _modifiedValue;
+        [SerializeField] private BigDouble _modifiedValue = new BigDouble(1f);
         public BigDouble ModifiedValue
         {
             get => _modifiedValue;
@@ -68,7 +68,7 @@ namespace _Game.Scripts.Extensions
 
         public bool isModified {get; private set;}
         public float ModificationAmount {get; private set;}
-        public bool ModificationIsAdditive {get; private set;}
+        public bool ModificationIsAdditive {get; private set;} = true;
 
         public event Action<BigDouble> OriginalValueChangedEvent;
         public event Action<BigDouble> ModifiedValueChangedEvent;
@@ -164,6 +164,9 @@ namespace _Game.Scripts.Extensions
         #if UNITY_EDITOR
         [ContextMenu("Refresh Modified Value")]
         private void DebugRefreshModifiedValue() => OriginalValue = OriginalValue;
+
+        [ContextMenu("Set Modification to Additive")]
+        private void DebugSetModificationAdditive() => ModificationIsAdditive = true;
         #endif
     }
 }

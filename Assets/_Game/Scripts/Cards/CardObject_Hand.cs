@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+using DG.Tweening;
 using _Game.Scripts.UI;
 
 namespace _Game.Scripts.Cards
@@ -22,6 +23,7 @@ namespace _Game.Scripts.Cards
         [SerializeField] private Image _cardArtImageObj = null;
         [SerializeField] private TMP_Text _nameText = null;
         [SerializeField] private Image _rarityIconImageObj = null;
+        [SerializeField, Range(0.5f, 1.5f)] private float _tweenDuration = 0.3f;
         private bool _isInitialised = false;
         private Action _clickExecute = null;
         private float _originalPosX = 0;
@@ -30,6 +32,9 @@ namespace _Game.Scripts.Cards
         private CanvasGroup _localCanvasGroup = null;
         private float _canvasScaleFactor = 1;
         private bool _skillActivationSuccesfull = false;
+        private bool _isBeingDragged = false;
+        private Action _hoverStartAction = null;
+        private Action _hoverEndAction = null;
         #endregion
 
         #region Unity Event Functions
@@ -46,7 +51,7 @@ namespace _Game.Scripts.Cards
         #endregion
         
         #region Methods
-        public void Initialise(CardInstance card, HandDisplay handler, float canvasScaleFactor)
+        public void Initialise(CardInstance card, HandDisplay handler, float canvasScaleFactor, Action hoverStartAction, Action hoverEndAction)
         {
             if(_isInitialised) return;
 
@@ -72,6 +77,8 @@ namespace _Game.Scripts.Cards
             _handler = handler;
             this._canvasScaleFactor = canvasScaleFactor;
             _clickExecute = () => handler.CardClicked(this._cardInstance);
+            _hoverStartAction = hoverStartAction;
+            _hoverEndAction = hoverEndAction;
             _isInitialised = true;
         }
 
@@ -100,12 +107,12 @@ namespace _Game.Scripts.Cards
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            //TODO
+            _hoverStartAction?.Invoke();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            //TODO
+            _hoverEndAction?.Invoke();
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -116,18 +123,21 @@ namespace _Game.Scripts.Cards
         public void OnBeginDrag(PointerEventData eventData)
         {
             _localCanvasGroup.blocksRaycasts = false;
+            _isBeingDragged = true;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            _localCanvasGroup.blocksRaycasts = true;
+            _isBeingDragged = false;
+            if(_localRectTransform.localPosition != new Vector3(_originalPosX, 0, 0)) Invoke(nameof(DelayedReturn), 2);
         }
 
         private void DelayedReturn()
         {
-            if(_skillActivationSuccesfull) return;
+            if(_skillActivationSuccesfull || _isBeingDragged) return;
 
-            //TODO
+            _localRectTransform.DOLocalMove(new Vector2(_originalPosX, 0), _tweenDuration)
+                .OnComplete(()=> _localCanvasGroup.blocksRaycasts = true);
         }
 
         public void AttemptSkillActivation()

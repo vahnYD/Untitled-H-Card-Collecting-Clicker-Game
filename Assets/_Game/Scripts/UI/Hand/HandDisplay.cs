@@ -28,7 +28,7 @@ namespace _Game.Scripts.UI
         [SerializeField] private TMPro.TMP_Text _cooldownText = null;
         [SerializeField] private Button _inspectGraveButton = null;
         [SerializeField] private Canvas _rootCanvas = null;
-        private Dictionary<Transform, int> _displayedCards = new Dictionary<Transform, int>();
+        private Dictionary<RectTransform, int> _displayedCards = new Dictionary<RectTransform, int>();
         private GameManager _gameManager;
         private int _drawCooldown;
         private bool _cooldownCoroutineRunning = false;
@@ -105,7 +105,9 @@ namespace _Game.Scripts.UI
             {
                 GameObject cardObject = Instantiate(_cardObjectPrefab, _centerCardSpotTransform);
                 CardObject_Hand cardObjComp = cardObject.GetComponent<CardObject_Hand>();
-                cardObjComp.Initialise(card, this, _rootCanvas.scaleFactor);
+                RectTransform cardTransform = cardObject.GetComponent<RectTransform>();
+                cardObjComp.Initialise( card, this, _rootCanvas.scaleFactor, () => OnHoverStart(cardTransform), () => OnHoverEnd(cardTransform) );
+                _displayedCards.Add(cardTransform, _displayedCards.Values.Max<int>()+1);
                 await cardObjComp.Spawn();
                 AdjustCardSpacing();
             }
@@ -127,7 +129,7 @@ namespace _Game.Scripts.UI
             {
                 if(!cardsInHand.Contains(card))
                 {
-                    KeyValuePair<Transform, int> cardObject = _displayedCards.Where(cardObject => cardObject.Key.GetComponent<CardObject_Hand>().CardInstanceRef.CardArt == card.CardArt).FirstOrDefault();
+                    KeyValuePair<RectTransform, int> cardObject = _displayedCards.Where(cardObject => cardObject.Key.GetComponent<CardObject_Hand>().CardInstanceRef.CardArt == card.CardArt).FirstOrDefault();
                     _displayedCards.Remove(cardObject.Key);
                     removedIndeces.Add(cardObject.Value);
                     await cardObject.Key.GetComponent<CardObject_Hand>().Despawn();
@@ -144,8 +146,8 @@ namespace _Game.Scripts.UI
 
             for(int i = 0; i < emptyIndeces.Count; i++)
             {
-                List<KeyValuePair<Transform, int>> higherIndexCards = _displayedCards.Where(pair => pair.Value > emptyIndeces[i]-i).ToList();
-                foreach(KeyValuePair<Transform, int> pair in higherIndexCards)
+                List<KeyValuePair<RectTransform, int>> higherIndexCards = _displayedCards.Where(pair => pair.Value > emptyIndeces[i]-i).ToList();
+                foreach(KeyValuePair<RectTransform, int> pair in higherIndexCards)
                 {
                     _displayedCards[pair.Key] = pair.Value-1;
                 }
@@ -154,9 +156,26 @@ namespace _Game.Scripts.UI
             AdjustCardSpacing();
         }
 
+        private void OnHoverStart(RectTransform hoveredCard)
+        {
+            int indexHovered = _displayedCards[hoveredCard];
+
+            //adjust spacing left and right of hovered index by varying amounts based on distance to hovered card
+            foreach(KeyValuePair<RectTransform, int> cardObject in _displayedCards)
+            {
+                int indexDelta = cardObject.Value - indexHovered;
+
+                //TODO find good curve for spacing
+            }
+        }
+
+        private void OnHoverEnd(RectTransform hoveredCard) => AdjustCardSpacing();
+
         private void AdjustCardOrder()
         {
             //TODO
+            
+
         }
 
         private void AdjustCardSpacing()
@@ -177,9 +196,9 @@ namespace _Game.Scripts.UI
             //TODO needs to be adjusted to account for card drag n drop
 
             _displayedCards.OrderBy(pair => pair.Value);
-            foreach(KeyValuePair<Transform, int> pair in _displayedCards)
+            foreach(KeyValuePair<RectTransform, int> pair in _displayedCards)
             {
-                pair.Key.GetComponent<RectTransform>().DOLocalMoveX((pair.Value - center) * cardDistance, 0.1f);
+                pair.Key.DOLocalMoveX((pair.Value - center) * cardDistance, 0.1f);
                 pair.Key.GetComponent<CardObject_Hand>().SetPositionOffSetX((pair.Value - center) * cardDistance);
                 pair.Key.SetSiblingIndex(pair.Value);
             }

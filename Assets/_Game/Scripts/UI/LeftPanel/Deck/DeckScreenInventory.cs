@@ -106,7 +106,6 @@ namespace _Game.Scripts.UI
                     int index = _displayedCards.Count;
                     columnIndex = index % _columnTransforms.Length;
                     rowIndex = (index - (index % _columnTransforms.Length))/_columnTransforms.Length;
-                    if(columnIndex is 0 && _displayedCards.Count > 3) rowIndex++;
                 }
 
                 GameObject cardObject = Instantiate(_cardObjectPrefab, _columnTransforms[columnIndex]);

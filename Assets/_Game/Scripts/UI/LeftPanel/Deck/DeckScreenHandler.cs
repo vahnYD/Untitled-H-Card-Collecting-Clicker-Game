@@ -248,7 +248,7 @@ namespace _Game.Scripts.UI
             Populate(_selectedCards.Count);
 
             //Check if apply is allowed
-            if(_selectedCards.Count == _currentDeckSize && _amountOfVRareCardsInSelection !> _gameSettings.MaximumVRareCardsAllowedInDeckAtBase && _amountOfSpecialCardsInSelection !> _gameSettings.MaximumSpecialCardsAllowedInDeckAtBase && _modifyIsBlocked.Value == false)
+            if(_selectedCards.Count == _currentDeckSize && _amountOfVRareCardsInSelection <= _gameSettings.MaximumVRareCardsAllowedInDeckAtBase && _amountOfSpecialCardsInSelection <= _gameSettings.MaximumSpecialCardsAllowedInDeckAtBase && _modifyIsBlocked.Value == false)
             {
                 _applyAllowed = true;
                 _applyBtn.interactable = true;

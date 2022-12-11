@@ -13,22 +13,10 @@ namespace _Game.Scripts.UI
 {
     public class CardDropPoint : MonoBehaviour, IDropHandler
     {
-        #region Properties
-        #endregion
-
-        #region Unity Event Functions
-        private void Awake()
-        {
-            
-        }
-        #endregion
-        
-        #region Methods
         public void OnDrop(PointerEventData eventData)
         {
             CardObject_Hand obj = eventData.pointerDrag.GetComponent<CardObject_Hand>();
             obj?.AttemptSkillActivation();
         }
-        #endregion
     }
 }

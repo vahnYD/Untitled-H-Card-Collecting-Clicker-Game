@@ -787,7 +787,8 @@ public class GameManager : MonoBehaviour
         _totalGachaPullAmount.Value += amount;
 
         //triggers potential bool flags
-        if(_totalGachaPullAmount.Value > 10) _tenPullDisabled.Value = false;
+        _tenPullDisabled.Value = (_totalGachaPullAmount.Value < 10);
+
         if(_firstRound && _totalGachaPullAmount.Value > 500 -10) _tenPullDisabled.Value = true;
         if(_firstRound && _totalGachaPullAmount.Value >= 500) _reachedFirstRoundCap.Value = true;
 
@@ -806,12 +807,10 @@ public class GameManager : MonoBehaviour
     private void UpdateGachaPullCost(bool isTenPull = false)
     {
         int counter = (isTenPull) ? 10 : 1;
-        BigDouble singleCost = _gachaPullCost.OriginalValue;
 
         //updates single cost
         for(int i = 0; i < counter; i++)
         {
-            singleCost = _gachaPullCost.OriginalValue;
             _gachaPullCost.OverwriteOriginalValue( CalcGachaCost() );
         }
 
@@ -820,8 +819,7 @@ public class GameManager : MonoBehaviour
         BigDouble cost = _gachaPullCost.OriginalValue;
         for(int i = 1; i < 10; i++)
         {
-            singleCost = CalcGachaCost(i);
-            cost += singleCost;
+            cost += CalcGachaCost(i);
         }
         _gachaPullCost10.OverwriteOriginalValue(cost);
     }
@@ -829,10 +827,11 @@ public class GameManager : MonoBehaviour
     private BigDouble CalcGachaCost(int pullIncrease = 0)
     {
         BigDouble pullCount = _totalGachaPullAmount.Value +1 +pullIncrease;
-        return BigDouble.Add(
+        BigDouble output = BigDouble.Add(
             pullCount * 3,
             pullCount * (BigDouble.Pow(pullCount, 1+(pullCount * 0.00069))/14)
         ).Floor() + 7;
+        return output;
     }
 
     ///<summary>
