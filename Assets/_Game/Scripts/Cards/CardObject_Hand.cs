@@ -27,11 +27,12 @@ namespace _Game.Scripts.Cards
         private bool _isInitialised = false;
         private Action _clickExecute = null;
         private float _originalPosX = 0;
+        public float OriginalXAxisPosition => _originalPosX;
         private float _cardPosDelta = 0;
         private HandDisplay _handler = null;
         private RectTransform _localRectTransform = null;
         private CanvasGroup _localCanvasGroup = null;
-        private float _canvasScaleFactor = 1;
+        private Canvas _rootCanvas;
         private bool _skillActivationSuccesfull = false;
         private bool _isBeingDragged = false;
         public bool isBeingDragged => _isBeingDragged;
@@ -53,7 +54,7 @@ namespace _Game.Scripts.Cards
         #endregion
         
         #region Methods
-        public void Initialise(CardInstance card, HandDisplay handler, float canvasScaleFactor, Action hoverStartAction, Action hoverEndAction)
+        public void Initialise(CardInstance card, HandDisplay handler, Canvas canvasForScaleFactor, Action hoverStartAction, Action hoverEndAction)
         {
             if(_isInitialised) return;
 
@@ -77,7 +78,7 @@ namespace _Game.Scripts.Cards
                     break;
             }
             _handler = handler;
-            this._canvasScaleFactor = canvasScaleFactor;
+            this._rootCanvas = canvasForScaleFactor;
             _clickExecute = () => handler.CardClicked(this._cardInstance);
             _hoverStartAction = hoverStartAction;
             _hoverEndAction = hoverEndAction;
@@ -130,8 +131,6 @@ namespace _Game.Scripts.Cards
         public void OnDrag(PointerEventData eventData)
         {
             _localRectTransform.anchoredPosition += eventData.delta / transform.lossyScale;
-
-            //TODO check if card moved outside of delta while in hand area and adjust hand order if true
         }
 
         public void OnBeginDrag(PointerEventData eventData)

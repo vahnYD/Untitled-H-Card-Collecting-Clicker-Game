@@ -10,13 +10,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using DG.Tweening;
 using _Game.Scripts.Cards;
 using _Game.Scripts.Extensions;
 
 namespace _Game.Scripts.UI
 {
-    public class HandDisplay : MonoBehaviour
+    public class HandDisplay : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
     {
         #region Properties
         [SerializeField] private GameObject _cardObjectPrefab = null;
@@ -28,10 +29,15 @@ namespace _Game.Scripts.UI
         [SerializeField] private TMPro.TMP_Text _cooldownText = null;
         [SerializeField] private Button _inspectGraveButton = null;
         [SerializeField] private Canvas _rootCanvas = null;
+        [SerializeField, Range(0, 2)] private float _hoverSpacingDelta = 0.25f;
         private Dictionary<RectTransform, int> _displayedCards = new Dictionary<RectTransform, int>();
         private GameManager _gameManager;
         private int _drawCooldown;
         private bool _cooldownCoroutineRunning = false;
+        private Vector2 _draggingBoundingBoxSize;
+
+        private bool _isDraggingCard = false;
+        private RectTransform _draggedCard = null;
         #endregion
 
         #region Unity Event Functions
@@ -47,6 +53,7 @@ namespace _Game.Scripts.UI
         {
             _gameManager = GameManager.Instance;
             _drawCooldown = _gameManager.GameSettingsRef.DrawCooldownInSec;
+            _draggingBoundingBoxSize = new Vector2(_handTransform.sizeDelta.x, _handTransform.sizeDelta.y); 
             CatchHandSizeChange(0);
         }
 
@@ -108,7 +115,7 @@ namespace _Game.Scripts.UI
                 GameObject cardObject = Instantiate(_cardObjectPrefab, _centerCardSpotTransform);
                 CardObject_Hand cardObjComp = cardObject.GetComponent<CardObject_Hand>();
                 RectTransform cardTransform = cardObject.GetComponent<RectTransform>();
-                cardObjComp.Initialise( card, this, _rootCanvas.scaleFactor, () => OnHoverStart(cardTransform), () => OnHoverEnd(cardTransform) );
+                cardObjComp.Initialise( card, this, _rootCanvas, () => OnHoverStart(cardTransform), () => OnHoverEnd(cardTransform));
                 _displayedCards.Add(cardTransform, (_displayedCards.Count is 0) ? 1 : _displayedCards.Values.Max<int>()+1);
                 await cardObjComp.Spawn();
                 AdjustCardSpacing();
@@ -158,6 +165,16 @@ namespace _Game.Scripts.UI
             AdjustCardSpacing();
         }
 
+        private RectTransform GetCardTransformByIndex(int index)
+        {
+            foreach(KeyValuePair<RectTransform, int> pair in _displayedCards)
+            {
+                if(pair.Value == index) return pair.Key;
+            }
+
+            return null;
+        }
+
         private void OnHoverStart(RectTransform hoveredCard)
         {
             if(_displayedCards.Count is < 6)
@@ -171,17 +188,75 @@ namespace _Game.Scripts.UI
             //adjust spacing left and right of hovered index by varying amounts based on distance to hovered card
             foreach(KeyValuePair<RectTransform, int> cardObject in _displayedCards)
             {
-                int indexDelta = cardObject.Value - indexHovered;
+                int indexDelta = 0;
+                float mult = 0;
 
-                //TODO find good curve for spacing
+                if(cardObject.Value < indexHovered)
+                {
+                    indexDelta = _displayedCards.Values.Min() - cardObject.Value;
+                    mult = -Mathf.Pow(2, indexDelta * _hoverSpacingDelta) + 1;
+                }
+                else if(cardObject.Value > indexHovered)
+                {
+                    indexDelta = _displayedCards.Values.Max() - cardObject.Value;
+                    mult = Mathf.Pow(2, indexDelta * _hoverSpacingDelta) - 1;
+                }
+
+                if(indexDelta != 0 && mult != 0)
+                {
+                    DOTween.Complete(cardObject.Key);
+                    cardObject.Key.DOAnchorPosX(cardObject.Key.anchoredPosition.x + ((cardObject.Key.anchoredPosition.x / 4) * mult), 0.1f); //? might need tweaking of the value the mult gets multiplier by
+                }
             }
         }
 
         private void OnHoverEnd(RectTransform hoveredCard) => AdjustCardSpacing();
 
-        private void AdjustCardOrder()
+        public void OnBeginDrag(PointerEventData eventData)
         {
-            //TODO
+            CardObject_Hand obj = eventData.pointerDrag.GetComponent<CardObject_Hand>();
+            if(obj == null)
+            {
+                _isDraggingCard = false;
+                return;
+            }
+
+            _draggedCard = obj.gameObject.GetComponent<RectTransform>();
+            _isDraggingCard = true;
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            _isDraggingCard = false;
+            _draggedCard = null;
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            if(_isDraggingCard is false) return;
+
+            if(_draggedCard.anchoredPosition.x + _draggingBoundingBoxSize.x/2 > _draggingBoundingBoxSize.x || _draggedCard.anchoredPosition.x + _draggingBoundingBoxSize.x/2 < 0) return;
+            if(_draggedCard.anchoredPosition.y + _draggingBoundingBoxSize.y/2 > _draggingBoundingBoxSize.y || _draggedCard.anchoredPosition.y + _draggingBoundingBoxSize.y/2 < 0) return;
+
+            RectTransform cardLeft = GetCardTransformByIndex(_displayedCards[_draggedCard] - 1);
+            RectTransform cardRight = GetCardTransformByIndex(_displayedCards[_draggedCard] + 1);
+
+            if(cardLeft == null && cardRight == null) return;
+
+            if(cardLeft != null && _draggedCard.anchoredPosition.x < cardLeft.anchoredPosition.x) AdjustCardOrder(_draggedCard, cardLeft);
+            if(cardRight != null && _draggedCard.anchoredPosition.x > cardRight.anchoredPosition.x) AdjustCardOrder(_draggedCard, cardRight);
+        }
+
+        private void AdjustCardOrder(RectTransform selectedCard, RectTransform cardToSwapWith)
+        {
+            int selectedIndex = _displayedCards[selectedCard];
+            float selectedPosX = selectedCard.GetComponent<CardObject_Hand>().OriginalXAxisPosition;
+
+            int swapIndex = _displayedCards[cardToSwapWith];
+            float swapPosX = cardToSwapWith.GetComponent<CardObject_Hand>().OriginalXAxisPosition;
+            
+            _displayedCards[selectedCard] = swapIndex;
+            _displayedCards[cardToSwapWith] = selectedIndex;
             
 
         }
@@ -209,6 +284,7 @@ namespace _Game.Scripts.UI
                 CardObject_Hand cardObj = pair.Key.GetComponent<CardObject_Hand>();
                 if(cardObj.isBeingDragged != true)
                 {
+                    DOTween.Complete(pair.Key);
                     pair.Key.DOLocalMove(new Vector2((pair.Value - center) * cardDistance, 0), 0.1f);
                     cardObj.SetPositionOffSetX((pair.Value - center) * cardDistance, cardDistance/2);
                     pair.Key.SetSiblingIndex(pair.Value);
