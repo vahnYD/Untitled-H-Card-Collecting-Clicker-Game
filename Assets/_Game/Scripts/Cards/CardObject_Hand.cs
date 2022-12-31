@@ -28,7 +28,6 @@ namespace _Game.Scripts.Cards
         private Action _clickExecute = null;
         private float _originalPosX = 0;
         public float OriginalXAxisPosition => _originalPosX;
-        private float _cardPosDelta = 0;
         private HandDisplay _handler = null;
         private RectTransform _localRectTransform = null;
         private CanvasGroup _localCanvasGroup = null;
@@ -93,7 +92,6 @@ namespace _Game.Scripts.Cards
         public async Task Despawn(bool isActivation = false, int cooldown = 0)
         {
             //TODO 
-
             if(isActivation)
             {
                 CardCooldownManager.Instance.StartCooldownForCard(_cardInstance, cooldown);
@@ -101,10 +99,9 @@ namespace _Game.Scripts.Cards
             }
         }
 
-        public void SetPositionOffSetX(float x, float delta)
+        public void SetPositionOffSetX(float x)
         {
             this._originalPosX = x;
-            this._cardPosDelta = delta;
         }
 
         public void OnPointerDown(PointerEventData eventData)
@@ -157,7 +154,7 @@ namespace _Game.Scripts.Cards
         {
             int cooldown = 0;
             _skillActivationSuccesfull = _cardInstance.ActivateAbility(ref cooldown);
-            if(_skillActivationSuccesfull) Despawn(true, cooldown).RunSynchronously(); //should check if this does what I think it does
+            if(_skillActivationSuccesfull) Despawn(true, cooldown); //should check if this does what I think it does
             else PlayShakeAnimation();
         }
 

@@ -30,7 +30,7 @@ namespace _Game.Scripts.Abilities
         [SerializeField, Min(1), Tooltip("Max Level < 2 => Un-upgradable")] private int _maxLevel;
         public int MaxLevel => _maxLevel;
         [SerializeField, Min(0)] private int _cooldownInSec;
-        public int CooldownInSec;
+        public int CooldownInSec => _cooldownInSec;
         
         //Upgrade
         [SerializeField, Min(0)] private int _baseUpgradeCost;
@@ -182,7 +182,7 @@ namespace _Game.Scripts.Abilities
         ///</summary>
         ///<param name="level">Level at which the ability activates.</param>
         ///<returns>Queue of System.Action delegates, or null if any minimum requirements for activation arent met.
-        public Queue<Action> GetAbilityActions(int level = 1)
+        public Queue<Action> GetAbilityActions(int level = 1, bool isCardAbility = false, CardInstance cardInstance = null)
         {
             GameManager gameManager = GameManager.Instance;
             List<CardInstance> deck = gameManager.GetDeckList();
@@ -243,17 +243,35 @@ namespace _Game.Scripts.Abilities
                     switch(_propertyToSendGraveHand)
                     {
                         case Card.SearchableProperties.Name:
-                            if(hand.Where(cardInstance => cardInstance.Name == _nameToSendGraveHand).ToList().Count < amountToSendPostMult) return null;
+                            if
+                            (
+                                hand.Where(cardInstance => cardInstance.CardRef.Name == _nameToSendGraveHand).ToList().Count 
+                                - ((isCardAbility && cardInstance != null && _nameToSendGraveHand == cardInstance.Name) ? 1 : 0)
+                                < amountToSendPostMult
+                            ) return null;
+
                             ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, name: _nameToSendGraveHand));
                             break;
 
                         case Card.SearchableProperties.Type:
-                            if(hand.Where(cardInstance => cardInstance.CardRef.Type == _typeToSendGraveHand).ToList().Count < amountToSendPostMult) return null;
+                            if
+                            (
+                                hand.Where(cardInstance => cardInstance.CardRef.Type == _typeToSendGraveHand).ToList().Count
+                                - ((isCardAbility && cardInstance != null && _typeToSendGraveHand == cardInstance.CardRef.Type) ? 1 : 0)
+                                < amountToSendPostMult
+                            ) return null;
+
                             ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, type: _typeToSendGraveHand));
                             break;
 
                         case Card.SearchableProperties.Rarity:
-                            if(hand.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityToSendGraveHand).ToList().Count < amountToSendPostMult) return null;
+                            if
+                            (
+                                hand.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityToSendGraveHand).ToList().Count
+                                - ((isCardAbility && cardInstance != null && _rarityToSendGraveHand == cardInstance.CardRef.Rarity) ? 1 : 0)
+                                < amountToSendPostMult
+                            ) return null;
+
                             ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Grave, amountToSendPostMult, true, _propertyToSendGraveHand, rarity: _rarityToSendGraveHand));
                             break;
                     }
@@ -309,17 +327,35 @@ namespace _Game.Scripts.Abilities
                     switch(_propertyReturnCardsHand)
                     {
                         case Card.SearchableProperties.Name:
-                            if(hand.Where(cardInstance => cardInstance.Name == _nameReturnCardsHand).ToList().Count < amountToReturnPostMult) return null;
+                            if
+                            (
+                                hand.Where(cardInstance => cardInstance.Name == _nameReturnCardsHand).ToList().Count
+                                - ((isCardAbility && cardInstance != null && _nameReturnCardsHand == cardInstance.CardRef.Name) ? 1 : 0)
+                                < amountToReturnPostMult
+                            ) return null;
+
                             ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult, true, _propertyReturnCardsHand, name: _nameReturnCardsHand));
                             break;
 
                         case Card.SearchableProperties.Type:
-                            if(hand.Where(cardInstance => cardInstance.CardRef.Type == _typeReturnCardsHand).ToList().Count < amountToReturnPostMult) return null;
+                            if
+                            (
+                                hand.Where(cardInstance => cardInstance.CardRef.Type == _typeReturnCardsHand).ToList().Count
+                                - ((isCardAbility && cardInstance != null && _typeReturnCardsHand == cardInstance.CardRef.Type) ? 1 : 0)
+                                < amountToReturnPostMult
+                            ) return null;
+
                             ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult, true, _propertyReturnCardsHand, type: _typeReturnCardsHand));
                             break;
 
                         case Card.SearchableProperties.Rarity:
-                            if(hand.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityReturnCardsHand).ToList().Count < amountToReturnPostMult) return null;
+                            if
+                            (
+                                hand.Where(cardInstance => cardInstance.CardRef.Rarity == _rarityReturnCardsHand).ToList().Count
+                                - ((isCardAbility && cardInstance != null && _rarityReturnCardsHand == cardInstance.CardRef.Rarity) ? 1 : 0)
+                                < amountToReturnPostMult
+                            ) return null;
+
                             ability.Enqueue(()=>gameManager.MoveCards(GameManager.CardGameStates.Hand, GameManager.CardGameStates.Deck, amountToReturnPostMult, true, _propertyReturnCardsHand, rarity: _rarityReturnCardsHand));
                             break;
                     }

@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     private Action CoinGainUnblockAction;
     [SerializeField] private BigDoubleValue _coinAmount;
     public BigDouble CoinTotal => _coinAmount.Value;
-    [SerializeField] private long _totalCoinsEarned;
+    [SerializeField] private BigDouble _totalCoinsEarned;
 
     private int _currentClickSoulAmount = 0;
     private int _currentClickSoulAmountManual = 0;
@@ -936,13 +936,19 @@ public class GameManager : MonoBehaviour
 
     #if UNITY_EDITOR
     [ContextMenu("Debug/Add Coins/1k")]
-    private void DebugAddCoins1000() => _coinAmount.Value += 1000;
+    private void DebugAddCoins1k() => _coinAmount.Value += 1000;
 
     [ContextMenu("Debug/Add Coins/10k")]
-    private void DebugAddCoins10000() => _coinAmount.Value += 10000;
+    private void DebugAddCoins10k() => _coinAmount.Value += 10000;
 
     [ContextMenu("Debug/Add Coins/100k")]
-    private void DebugAddCoins100000() => _coinAmount.Value += 100000;
+    private void DebugAddCoins100k() => _coinAmount.Value += 100000;
+
+    [ContextMenu("Debug/Add Coins/1M")]
+    private void DebugAddCoins1M() => _coinAmount.Value += 1000000;
+
+    [ContextMenu("Debug/Add Coins/10M")]
+    private void DebugAddCoins10M() => _coinAmount.Value += 10000000;
 
     [ContextMenu("Debug/Add Souls/1k")]
     private void DebugAddSouls1000() => _soulAmount.Value += 1000;

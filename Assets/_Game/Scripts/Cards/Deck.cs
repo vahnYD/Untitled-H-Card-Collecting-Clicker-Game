@@ -12,9 +12,19 @@ namespace _Game.Scripts.Cards
     [Serializable]
     public class Deck : ICardList
     {
+        //! Cards randomly get removed from hand despite remove/removeMultiple/draw not getting triggered and the list being private
         #region Properties
-        [SerializeField] private List<CardInstance> _decklist = new List<CardInstance>();
-        public List<CardInstance> DeckList => _decklist;
+        [SerializeField] private List<CardInstance> _decklist;
+        public List<CardInstance> DeckList
+        {
+            get{return _decklist;}
+            private set{}
+        }
+
+        public Deck()
+        {
+            _decklist = new List<CardInstance>();
+        }
 
         ///<summary>
         ///Gets Invoked whenever the amount of cards in the list goes up or down.

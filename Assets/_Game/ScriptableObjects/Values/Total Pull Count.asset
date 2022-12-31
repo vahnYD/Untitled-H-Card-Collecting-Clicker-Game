@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Total Pull Count
   m_EditorClassIdentifier: 
   _value:
-    mantissa: 0
-    exponent: 0
+    mantissa: 1.8
+    exponent: 2

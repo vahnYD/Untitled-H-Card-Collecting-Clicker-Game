@@ -258,7 +258,10 @@ namespace _Game.Scripts.UI
             _displayedCards[selectedCard] = swapIndex;
             _displayedCards[cardToSwapWith] = selectedIndex;
             
+            selectedCard.GetComponent<CardObject_Hand>().SetPositionOffSetX(swapPosX);
+            cardToSwapWith.GetComponent<CardObject_Hand>().SetPositionOffSetX(selectedPosX);
 
+            OnHoverStart(selectedCard);
         }
 
         private void AdjustCardSpacing()
@@ -286,7 +289,7 @@ namespace _Game.Scripts.UI
                 {
                     DOTween.Complete(pair.Key);
                     pair.Key.DOLocalMove(new Vector2((pair.Value - center) * cardDistance, 0), 0.1f);
-                    cardObj.SetPositionOffSetX((pair.Value - center) * cardDistance, cardDistance/2);
+                    cardObj.SetPositionOffSetX((pair.Value - center) * cardDistance);
                     pair.Key.SetSiblingIndex(pair.Value);
                 }
             }

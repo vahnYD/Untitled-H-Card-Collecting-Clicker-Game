@@ -2746,7 +2746,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 23, y: -30}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 200, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &185369873
 MonoBehaviour:
@@ -2795,11 +2795,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 31.3
+  m_fontSizeBase: 24.3
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 20
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -2811,7 +2811,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -3700,7 +3700,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.00020328311}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &241217844
@@ -7078,6 +7078,7 @@ MonoBehaviour:
   _cooldownText: {fileID: 859553542}
   _inspectGraveButton: {fileID: 253993380}
   _rootCanvas: {fileID: 457908764}
+  _hoverSpacingDelta: 0.25
 --- !u!1 &441399951
 GameObject:
   m_ObjectHideFlags: 0
@@ -7318,6 +7319,7 @@ GameObject:
   - component: {fileID: 457908766}
   - component: {fileID: 457908767}
   - component: {fileID: 457908768}
+  - component: {fileID: 457908769}
   m_Layer: 5
   m_Name: Game
   m_TagString: Untagged
@@ -7423,7 +7425,9 @@ MonoBehaviour:
   _gameSettings: {fileID: 11400000, guid: 732d82a13141b4c4995897cb8d35c7b4, type: 2}
   _coinGainBlocked: {fileID: 11400000, guid: 92347b3742cf0bf4b8d7bdbae8471dd3, type: 2}
   _coinAmount: {fileID: 11400000, guid: 5e270d148207cdb4586967cc156f86a9, type: 2}
-  _totalCoinsEarned: 0
+  _totalCoinsEarned:
+    mantissa: 0
+    exponent: 0
   _soulGainBlocked: {fileID: 11400000, guid: 93d0de33f2b99f04b89958341e326288, type: 2}
   _soulAmount: {fileID: 11400000, guid: 711ac300f4d58674396f1e619bf82d8d, type: 2}
   _lewdPointAmount: {fileID: 11400000, guid: 4d2765599b3370643943b91e2bd10822, type: 2}
@@ -7490,6 +7494,18 @@ MonoBehaviour:
   _selectionConfirmButton: {fileID: 108026868}
   _selectionCancelButton: {fileID: 1785145842}
   _firstCardSpot: {fileID: 1203071639}
+--- !u!114 &457908769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457908761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12c77d8158c26d24ea252be41959cd89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &459066216
 GameObject:
   m_ObjectHideFlags: 0
@@ -16007,11 +16023,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
-  m_fontSizeBase: 32
+  m_fontSize: 72
+  m_fontSizeBase: 24.2
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 24
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -16025,7 +16041,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 4
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
@@ -18261,7 +18277,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2126425961}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99875987
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20632,7 +20648,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000038146973}
+  m_AnchoredPosition: {x: 0, y: 0.00051863433}
   m_SizeDelta: {x: 0, y: 750}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1283438361
@@ -23771,7 +23787,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1283438362}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9990699
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

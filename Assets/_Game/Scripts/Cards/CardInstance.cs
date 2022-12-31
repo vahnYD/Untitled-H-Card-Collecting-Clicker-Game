@@ -69,7 +69,7 @@ namespace _Game.Scripts.Cards
 
             foreach(Abilities.Ability ability in _card.Abilities)
             {
-                carry = ability.GetAbilityActions(_level);
+                carry = ability.GetAbilityActions(_level, isCardAbility: true, cardInstance: this);
                 if(carry is null) return false;
                 for(int i = 0; i < carry.Count; i++)
                     abilities.Enqueue(carry.Dequeue());
@@ -77,13 +77,16 @@ namespace _Game.Scripts.Cards
 
             //! Presently causes issues if multiple abilities that use the selection window get activated quickly.
 
+            _onCooldown = true;
+            foreach(Abilities.Ability ability in _card.Abilities)
+            {
+                cooldownInSec += ability.CooldownInSec;
+            }
+
             for(int i = 0; i < abilities.Count; i++)
                 abilities.Dequeue().Invoke();
 
-            _onCooldown = true;
-            foreach(Abilities.Ability ability in _card.Abilities)
-                cooldownInSec += ability.CooldownInSec;
-            
+
             return true;
         }
 

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e51c15a2c4f2db498131c9b252ad061, type: 3}
   m_Name: DrawIsBlockedFlag
   m_EditorClassIdentifier: 
-  _value: 0
+  _value: 1

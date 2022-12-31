@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: GachaSinglePullCost
   m_EditorClassIdentifier: 
   _originalValue:
-    mantissa: 0
-    exponent: 0
+    mantissa: 5.029
+    exponent: 3
   _oVStatic: 0
   _strictlyPositive: 0
   _modifiedValue:
-    mantissa: 0
-    exponent: 0
-  _isModifiable: 0
+    mantissa: 5.029
+    exponent: 3
+  _isModifiable: 1
